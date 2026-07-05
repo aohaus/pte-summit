@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>PTE SUMMIT — 79m峰トレーナー</title>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  html,body{margin:0;padding:0;background:#EEF3F4;}
+  *{-webkit-tap-highlight-color:transparent;}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useRef } = React;
+
+/* ================= PTE SUMMIT — GitHub Pages standalone build =================
+   Storage: localStorage (Claude artifact版は window.storage)
+============================================================================== */
+
+const WFD_QUESTIONS = [
+  "The lecture will be postponed until further notice.",
+  "Undergraduate students are encouraged to attend the seminar.",
+  "The library holds an extensive collection of rare manuscripts.",
+  "Climate change has become a significant global challenge.",
+  "Students must submit their assignments before the deadline.",
+  "The results of the experiment were published in a scientific journal.",
+  "Economic growth depends on innovation and technological progress.",
+  "The university provides a wide range of support services.",
+  "Renewable energy sources are essential for sustainable development.",
+  "Attendance at tutorials is compulsory for all first year students.",
+  "The research team analysed the data over several months.",
+  "A comprehensive review of the literature is required.",
+  "The committee will announce its decision at the end of the week.",
+  "Effective communication skills are highly valued by employers.",
+  "The final examination will cover all topics discussed in class.",
+  "Access to the laboratory is restricted to authorised personnel.",
+  "The professor emphasised the importance of critical thinking.",
+  "Urban populations have increased dramatically in recent decades.",
+  "Scholarship applications must include two academic references.",
+  "The findings suggest a strong correlation between the two variables.",
+];
+
+const RS_QUESTIONS = [
+  "The results will be announced next week.",
+  "Please leave your assignments in the box provided.",
+  "The seminar on economics has been cancelled.",
+  "You can borrow up to ten books from the library.",
+  "The application deadline has been extended by two weeks.",
+  "All students are required to attend the orientation session.",
+  "The cafeteria is closed on public holidays.",
+  "Our professor has published several books on modern history.",
+  "The exam results will be available on the university website.",
+  "Please turn off your mobile phones during the lecture.",
+  "The science building is located next to the main library.",
+  "Tutorials will begin in the second week of the semester.",
+  "Remember to bring your student card to the examination.",
+  "The lecture theatre has been moved to another building.",
+  "Group presentations account for thirty percent of the final grade.",
+];
+
+const DAILY_GOAL = 10;
+
+/* ---------- helpers ---------- */
+const norm = (s) =>
+  s.toLowerCase().replace(/[^a-z0-9\s']/g, "").replace(/\s+/g, " ").trim();
+
+function scoreWords(target, answer) {
+  const t = norm(target).split(" ");
+  const a = new Map();
+  norm(answer).split(" ").forEach((w) => a.set(w, (a.get(w) || 0) + 1));
+  const marks = t.map((w) => {
+    const c = a.get(w) || 0;
+    if (c > 0) { a.set(w, c - 1); return true; }
+    return false;
+  });
+  const correct = marks.filter(Boolean).length;
+  return { marks, correct, total: t.length, pct: correct / t.length };
+}
+
+const toScale = (pct) => Math.round(10 + pct * 80);
+const todayStr = () => new Date().toISOString().slice(0, 10);
+
+function loadState() {
+  try {
+    const r = localStorage.getItem("pte-summit-v1");
+    return r ? JSON.parse(r) : null;
+  } catch { return null; }
+}
+function saveState(s) {
+  try { localStorage.setItem("pte-summit-v1", JSON.stringify(s)); }
+  catch (e) { console.error("save failed", e); }
+}
+
+const EMPTY = {
+  attempts: [],
+  streak: 0,
+  lastActive: null,
+  doneToday: 0,
+  doneDate: null,
+};
+
+function estimateFor(attempts, types) {
+  const recent = attempts.filter((a) => types.includes(a.taskType)).slice(-10);
+  if (!recent.length) return null;
+  const avg = recent.reduce((s, a) => s + a.pct, 0) / recent.length;
+  return toScale(avg);
+}
+
+/* ---------- speech (TTS) ---------- */
+function speak(text, rate = 0.95) {
+  return new Promise((res) => {
+    try {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      const voices = window.speechSynthesis.getVoices();
+      u.voice =
+        voices.find((v) => v.lang === "en-AU") ||
+        voices.find((v) => v.lang && v.lang.startsWith("en")) || null;
+      u.rate = rate;
+      u.onend = res;
+      u.onerror = res;
+      window.speechSynthesis.speak(u);
+    } catch { res(); }
+  });
+}
+
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+
+/* ================= styles ================= */
+const S = {
+  bg: "#EEF3F4", ink: "#123039", sub: "#5A7278",
+  blue: "#145C9E", green: "#1F9D6C", red: "#D64545", amber: "#C98A12",
+  line: "#D8E2E4", card: "#FFFFFF",
+};
+const font = "'Space Grotesk','Avenir Next','Helvetica Neue',system-ui,sans-serif";
+const btnPrimary = {
+  padding: "13px 22px", fontSize: 15, fontWeight: 700, background: S.blue,
+  color: "#fff", border: "none", borderRadius: 10, fontFamily: font, cursor: "pointer",
+};
+const btnGhost = {
+  padding: "13px 16px", fontSize: 14, fontWeight: 600, background: "#fff",
+  color: S.blue, border: `1px solid ${S.blue}`, borderRadius: 10, fontFamily: font, cursor: "pointer",
+};
+const card = { background: S.card, border: `1px solid ${S.line}`, borderRadius: 12, padding: 16 };
+
+/* ================= shared components ================= */
+
+function Altimeter({ skills }) {
+  const vals = Object.values(skills).filter((v) => v !== null);
+  const alt = vals.length ? Math.min(...vals) : 0;
+  const H = 190, MAX = 90;
+  const y = (v) => H - (v / MAX) * H;
+  return (
+    <svg viewBox={`0 0 120 ${H + 24}`} style={{ width: 120, flexShrink: 0 }}>
+      <polygon points={`10,${H} 60,10 110,${H}`} fill="#DCE7EA" />
+      <polygon points={`38,${H} 60,10 82,${H}`} fill="#C7D8DD" />
+      <line x1="4" x2="116" y1={y(79)} y2={y(79)} stroke={S.green} strokeWidth="2" strokeDasharray="4 3" />
+      <text x="116" y={y(79) - 4} textAnchor="end" fontSize="10" fill={S.green} fontWeight="700">79 SUMMIT</text>
+      <line x1="4" x2="116" y1={y(alt)} y2={y(alt)} stroke={S.blue} strokeWidth="2" />
+      <circle cx="60" cy={y(alt)} r="5" fill={S.blue} />
+      <text x="4" y={y(alt) - 5} fontSize="11" fill={S.blue} fontWeight="700">
+        {vals.length ? `現在 ${alt}` : "未計測"}
+      </text>
+      <text x="60" y={H + 18} textAnchor="middle" fontSize="10" fill={S.sub}>
+        最低スコア = 現在標高
+      </text>
+    </svg>
+  );
+}
+
+function SkillCard({ label, jp, val }) {
+  const c = val === null ? S.sub : val >= 79 ? S.green : val >= 70 ? S.amber : S.red;
+  return (
+    <div style={{ background: S.card, border: `1px solid ${S.line}`, borderRadius: 10, padding: "10px 12px", flex: 1, minWidth: 0 }}>
+      <div style={{ fontSize: 11, color: S.sub, letterSpacing: 1 }}>{label} <span style={{ letterSpacing: 0 }}>{jp}</span></div>
+      <div style={{ fontSize: 26, fontWeight: 700, color: c, fontVariantNumeric: "tabular-nums" }}>
+        {val === null ? "–" : val}
+      </div>
+      <div style={{ fontSize: 10, color: c }}>
+        {val === null ? "未計測" : val >= 79 ? "登頂圏" : `79まで +${79 - val}`}
+      </div>
+    </div>
+  );
+}
+
+function WordDiff({ target, marks }) {
+  return (
+    <p style={{ lineHeight: 1.9, fontSize: 16, margin: "0 0 12px" }}>
+      {norm(target).split(" ").map((w, i) => (
+        <span key={i} style={{
+          color: marks[i] ? S.green : S.red,
+          fontWeight: marks[i] ? 500 : 700,
+          textDecoration: marks[i] ? "none" : "underline",
+          marginRight: 6,
+        }}>{w}</span>
+      ))}
+    </p>
+  );
+}
+
+function TaskHeader({ title, onExit }) {
+  return (
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+      <button onClick={onExit} style={{ background: "none", border: "none", color: S.blue, fontSize: 14, fontFamily: font, cursor: "pointer", padding: 0 }}>← ダッシュボード</button>
+      <div style={{ fontSize: 11, letterSpacing: 2, color: S.sub, fontWeight: 700 }}>{title}</div>
+    </div>
+  );
+}
+
+/* ================= App ================= */
+
+function App() {
+  const [state, setState] = useState(() => loadState() || EMPTY);
+  const [view, setView] = useState("dash");
+
+  useEffect(() => { window.speechSynthesis && window.speechSynthesis.getVoices(); }, []);
+
+  const record = (pct, taskType) => {
+    setState((prev) => {
+      const today = todayStr();
+      const yesterday = new Date(Date.now() - 864e5).toISOString().slice(0, 10);
+      const newStreak =
+        prev.lastActive === today ? prev.streak :
+        prev.lastActive === yesterday ? prev.streak + 1 : 1;
+      const next = {
+        ...prev,
+        attempts: [...prev.attempts, { date: today, taskType, pct }],
+        streak: newStreak,
+        lastActive: today,
+        doneDate: today,
+        doneToday: (prev.doneDate === today ? prev.doneToday : 0) + 1,
+      };
+      saveState(next);
+      return next;
+    });
+  };
+
+  const skills = {
+    L: estimateFor(state.attempts, ["WFD", "RS"]),
+    W: estimateFor(state.attempts, ["WFD"]),
+    S: estimateFor(state.attempts, ["RS"]),
+    R: null,
+  };
+  const doneToday = state.doneDate === todayStr() ? state.doneToday : 0;
+
+  return (
+    <div style={{ fontFamily: font, background: S.bg, minHeight: "100vh", color: S.ink }}>
+      <div style={{ maxWidth: 480, margin: "0 auto", padding: "16px 14px 40px" }}>
+        {view === "dash" && (
+          <Dashboard skills={skills} state={state} doneToday={doneToday} onNav={setView} />
+        )}
+        {view === "wfd" && (
+          <WFD onExit={() => setView("dash")} onResult={(p) => record(p, "WFD")} />
+        )}
+        {view === "rs" && (
+          <RS onExit={() => setView("dash")} onResult={(p) => record(p, "RS")} />
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ================= Dashboard ================= */
+
+function Dashboard({ skills, state, doneToday, onNav }) {
+  const tasks = [
+    { id: "wfd", name: "Write from Dictation", jp: "聞いて書き取る", affects: "L + W", ready: true },
+    { id: "rs", name: "Repeat Sentence", jp: "聞いて復唱する", affects: "S + L", ready: true },
+    { id: "write", name: "Essay / SWT", jp: "AI採点ライティング", affects: "W + R", ready: false },
+    { id: "ra", name: "Read Aloud", jp: "音読", affects: "S + R", ready: false },
+  ];
+  return (
+    <React.Fragment>
+      <header style={{ marginBottom: 14 }}>
+        <div style={{ fontSize: 11, letterSpacing: 3, color: S.blue, fontWeight: 700 }}>PTE SUMMIT</div>
+        <h1 style={{ margin: "2px 0 0", fontSize: 22, fontWeight: 700 }}>79m峰 登頂計画</h1>
+        <div style={{ fontSize: 12, color: S.sub }}>全セクション79 = Australia PR</div>
+      </header>
+
+      <div style={{ display: "flex", gap: 12, ...card, padding: 12, marginBottom: 12 }}>
+        <Altimeter skills={skills} />
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, flex: 1, alignContent: "center" }}>
+          <SkillCard label="L" jp="聞く" val={skills.L} />
+          <SkillCard label="W" jp="書く" val={skills.W} />
+          <SkillCard label="S" jp="話す" val={skills.S} />
+          <SkillCard label="R" jp="読む" val={skills.R} />
+        </div>
+      </div>
+
+      <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
+        <div style={{ flex: 1, background: S.card, border: `1px solid ${S.line}`, borderRadius: 10, padding: 12 }}>
+          <div style={{ fontSize: 11, color: S.sub }}>ストリーク</div>
+          <div style={{ fontSize: 22, fontWeight: 700 }}>{state.streak}<span style={{ fontSize: 12 }}> 日</span></div>
+        </div>
+        <div style={{ flex: 2, background: S.card, border: `1px solid ${S.line}`, borderRadius: 10, padding: 12 }}>
+          <div style={{ fontSize: 11, color: S.sub }}>今日のミッション(全タスク合算)</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{ flex: 1, height: 8, background: S.line, borderRadius: 4, overflow: "hidden" }}>
+              <div style={{ width: `${Math.min(doneToday / DAILY_GOAL, 1) * 100}%`, height: "100%", background: doneToday >= DAILY_GOAL ? S.green : S.blue }} />
+            </div>
+            <div style={{ fontSize: 13, fontWeight: 700 }}>{doneToday}/{DAILY_GOAL}</div>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ fontSize: 12, color: S.sub, fontWeight: 700, letterSpacing: 1, marginBottom: 8 }}>トレーニング</div>
+      <div style={{ display: "grid", gap: 8 }}>
+        {tasks.map((t) => (
+          <button
+            key={t.id}
+            onClick={() => t.ready && onNav(t.id)}
+            disabled={!t.ready}
+            style={{
+              display: "flex", justifyContent: "space-between", alignItems: "center",
+              textAlign: "left", padding: "14px 14px", borderRadius: 12,
+              background: t.ready ? S.card : "#E4EBEC",
+              border: `1px solid ${S.line}`, fontFamily: font,
+              cursor: t.ready ? "pointer" : "default", opacity: t.ready ? 1 : 0.6,
+            }}
+          >
+            <div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: S.ink }}>{t.name}</div>
+              <div style={{ fontSize: 12, color: S.sub }}>{t.jp}</div>
+            </div>
+            <div style={{ textAlign: "right" }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: t.ready ? S.blue : S.sub }}>{t.affects}</div>
+              {!t.ready && <div style={{ fontSize: 10, color: S.sub }}>準備中</div>}
+            </div>
+          </button>
+        ))}
+      </div>
+      <p style={{ fontSize: 11, color: S.sub, marginTop: 12 }}>
+        {SR ? "✓ この環境は音声認識に対応しています" : "△ この環境は音声認識非対応(Repeat Sentenceは自己採点)。iPhoneはSafari、AndroidはChromeで開いてください。"}
+      </p>
+    </React.Fragment>
+  );
+}
+
+/* ================= Write from Dictation ================= */
+
+function WFD({ onExit, onResult }) {
+  const [qIdx, setQIdx] = useState(() => Math.floor(Math.random() * WFD_QUESTIONS.length));
+  const [phase, setPhase] = useState("ready");
+  const [answer, setAnswer] = useState("");
+  const [result, setResult] = useState(null);
+  const [plays, setPlays] = useState(0);
+  const inputRef = useRef(null);
+  const q = WFD_QUESTIONS[qIdx];
+
+  const play = async () => {
+    setPhase("playing");
+    setPlays((p) => p + 1);
+    await speak(q);
+    setPhase("typing");
+    setTimeout(() => inputRef.current && inputRef.current.focus(), 100);
+  };
+
+  const submit = () => {
+    if (!answer.trim()) return;
+    const r = scoreWords(q, answer);
+    setResult(r);
+    setPhase("result");
+    onResult(r.pct);
+  };
+
+  const next = () => {
+    setQIdx((i) => (i + 1 + Math.floor(Math.random() * (WFD_QUESTIONS.length - 1))) % WFD_QUESTIONS.length);
+    setAnswer(""); setResult(null); setPlays(0); setPhase("ready");
+  };
+
+  return (
+    <React.Fragment>
+      <TaskHeader title="WRITE FROM DICTATION" onExit={onExit} />
+      <div style={card}>
+        {phase === "ready" && (
+          <div style={{ textAlign: "center", padding: "24px 0" }}>
+            <p style={{ fontSize: 13, color: S.sub, marginBottom: 16 }}>音声を聞いて、聞こえた文を正確にタイプします。<br />本番は1回のみ再生。再生回数も記録されます。</p>
+            <button onClick={play} style={btnPrimary}>▶ 再生する</button>
+          </div>
+        )}
+        {phase === "playing" && (
+          <div style={{ textAlign: "center", padding: "40px 0", color: S.blue, fontWeight: 700 }}>🔊 再生中…</div>
+        )}
+        {(phase === "typing" || phase === "result") && (
+          <React.Fragment>
+            <textarea
+              ref={inputRef}
+              value={answer}
+              onChange={(e) => setAnswer(e.target.value)}
+              disabled={phase === "result"}
+              placeholder="聞こえた文をタイプ…"
+              rows={3}
+              style={{
+                width: "100%", boxSizing: "border-box", fontSize: 16, padding: 12,
+                border: `1px solid ${S.line}`, borderRadius: 10, fontFamily: font,
+                resize: "none", background: phase === "result" ? "#F7FAFA" : "#fff", color: S.ink,
+              }}
+            />
+            {phase === "typing" && (
+              <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+                <button onClick={play} style={{ ...btnGhost, flex: 1 }}>もう一度 ({plays})</button>
+                <button onClick={submit} style={{ ...btnPrimary, flex: 2 }}>採点する</button>
+              </div>
+            )}
+          </React.Fragment>
+        )}
+        {phase === "result" && result && (
+          <div style={{ marginTop: 14 }}>
+            <div style={{ fontSize: 13, color: S.sub, marginBottom: 6 }}>正解文(単語ごとの判定)</div>
+            <WordDiff target={q} marks={result.marks} />
+            <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 14 }}>
+              <div style={{ fontSize: 30, fontWeight: 700, color: result.pct >= 0.9 ? S.green : result.pct >= 0.7 ? S.amber : S.red }}>
+                {result.correct}/{result.total}
+              </div>
+              <div style={{ fontSize: 13, color: S.sub }}>
+                推定寄与スコア {toScale(result.pct)} {plays > 1 && `・再生${plays}回(本番は1回)`}
+              </div>
+            </div>
+            <button onClick={next} style={{ ...btnPrimary, width: "100%" }}>次の問題 →</button>
+          </div>
+        )}
+      </div>
+    </React.Fragment>
+  );
+}
+
+/* ================= Repeat Sentence ================= */
+
+function RS({ onExit, onResult }) {
+  const [qIdx, setQIdx] = useState(() => Math.floor(Math.random() * RS_QUESTIONS.length));
+  const [phase, setPhase] = useState("ready");
+  const [transcript, setTranscript] = useState("");
+  const [result, setResult] = useState(null);
+  const [srFailed, setSrFailed] = useState(!SR);
+  const [errMsg, setErrMsg] = useState("");
+  const recRef = useRef(null);
+  const phaseRef = useRef(phase);
+  phaseRef.current = phase;
+  const q = RS_QUESTIONS[qIdx];
+
+  const startRecognition = () => {
+    setErrMsg("");
+    try {
+      const rec = new SR();
+      recRef.current = rec;
+      rec.lang = "en-AU";
+      rec.continuous = false;
+      rec.interimResults = false;
+      rec.maxAlternatives = 1;
+      let got = false;
+      rec.onresult = (e) => {
+        got = true;
+        const text = Array.from(e.results).map((r) => r[0].transcript).join(" ");
+        setTranscript(text);
+        const r = scoreWords(q, text);
+        setResult(r);
+        setPhase("result");
+        onResult(r.pct);
+      };
+      rec.onerror = (e) => {
+        console.error("SR error:", e.error);
+        if (e.error === "not-allowed" || e.error === "service-not-allowed") {
+          setErrMsg("マイクの使用が許可されませんでした。ブラウザの設定でマイクを許可するか、自己採点モードで練習してください。");
+          setSrFailed(true);
+          setPhase("self");
+        } else if (!got) {
+          setErrMsg(`音声を認識できませんでした(${e.error})。もう一度試すか、自己採点に切り替えてください。`);
+          setPhase("recfail");
+        }
+      };
+      rec.onend = () => {
+        if (!got && phaseRef.current === "recording") setPhase("recfail");
+      };
+      rec.start();
+      setPhase("recording");
+    } catch (err) {
+      console.error(err);
+      setSrFailed(true);
+      setPhase("self");
+    }
+  };
+
+  const play = async () => {
+    setPhase("playing");
+    setTranscript("");
+    setResult(null);
+    await speak(q);
+    if (srFailed) {
+      setPhase("self");
+    } else {
+      startRecognition();
+    }
+  };
+
+  const stopRec = () => {
+    try { recRef.current && recRef.current.stop(); } catch (e) {}
+  };
+
+  const selfScore = (pct, label) => {
+    setResult({ selfLabel: label, pct });
+    setPhase("result");
+    onResult(pct);
+  };
+
+  const next = () => {
+    setQIdx((i) => (i + 1 + Math.floor(Math.random() * (RS_QUESTIONS.length - 1))) % RS_QUESTIONS.length);
+    setTranscript(""); setResult(null); setErrMsg(""); setPhase("ready");
+  };
+
+  return (
+    <React.Fragment>
+      <TaskHeader title="REPEAT SENTENCE" onExit={onExit} />
+      <div style={card}>
+        {phase === "ready" && (
+          <div style={{ textAlign: "center", padding: "24px 0" }}>
+            <p style={{ fontSize: 13, color: S.sub, marginBottom: 6 }}>
+              音声を聞いたら、<b>すぐに同じ文を声に出して</b>復唱します。
+            </p>
+            <p style={{ fontSize: 11, color: srFailed ? S.amber : S.sub, marginBottom: 16 }}>
+              {srFailed
+                ? "この環境は音声認識に対応していないため、自己採点モードで練習します。"
+                : "再生終了後、自動でマイクが起動します(初回はマイク許可を求められます)。"}
+            </p>
+            <button onClick={play} style={btnPrimary}>▶ 再生する</button>
+          </div>
+        )}
+
+        {phase === "playing" && (
+          <div style={{ textAlign: "center", padding: "40px 0", color: S.blue, fontWeight: 700 }}>🔊 再生中… 終わったらすぐ復唱!</div>
+        )}
+
+        {phase === "recording" && (
+          <div style={{ textAlign: "center", padding: "24px 0" }}>
+            <div style={{ fontSize: 40, marginBottom: 8 }}>🎙️</div>
+            <div style={{ color: S.red, fontWeight: 700, marginBottom: 16 }}>録音中 — いま復唱してください</div>
+            <button onClick={stopRec} style={btnGhost}>話し終えた(停止)</button>
+          </div>
+        )}
+
+        {phase === "recfail" && (
+          <div style={{ textAlign: "center", padding: "20px 0" }}>
+            <p style={{ fontSize: 13, color: S.amber, marginBottom: 16 }}>{errMsg || "音声を認識できませんでした。"}</p>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button onClick={play} style={{ ...btnGhost, flex: 1 }}>もう一度</button>
+              <button onClick={() => setPhase("self")} style={{ ...btnPrimary, flex: 1 }}>自己採点に切替</button>
+            </div>
+          </div>
+        )}
+
+        {phase === "self" && (
+          <div style={{ padding: "8px 0" }}>
+            {errMsg && <p style={{ fontSize: 12, color: S.amber }}>{errMsg}</p>}
+            <div style={{ fontSize: 13, color: S.sub, marginBottom: 6 }}>正解文</div>
+            <p style={{ fontSize: 17, fontWeight: 600, lineHeight: 1.6, marginBottom: 4 }}>{q}</p>
+            <button onClick={() => speak(q)} style={{ ...btnGhost, padding: "8px 14px", fontSize: 13, marginBottom: 16 }}>🔊 もう一度聞く</button>
+            <div style={{ fontSize: 13, color: S.sub, marginBottom: 8 }}>どのくらい正確に復唱できましたか?</div>
+            <div style={{ display: "grid", gap: 8 }}>
+              {[
+                ["完璧に言えた(全単語・語順OK)", 1.0],
+                ["ほぼ言えた(1〜2語ミス)", 0.8],
+                ["半分くらい言えた", 0.5],
+                ["ほとんど言えなかった", 0.2],
+              ].map(([label, pct]) => (
+                <button key={label} onClick={() => selfScore(pct, label)} style={{ ...btnGhost, textAlign: "left" }}>{label}</button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {phase === "result" && result && (
+          <div style={{ padding: "4px 0" }}>
+            {result.marks ? (
+              <React.Fragment>
+                <div style={{ fontSize: 13, color: S.sub, marginBottom: 6 }}>正解文(あなたの発話に含まれた単語=緑)</div>
+                <WordDiff target={q} marks={result.marks} />
+                <div style={{ fontSize: 12, color: S.sub, marginBottom: 10 }}>
+                  認識された発話: <span style={{ color: S.ink }}>{transcript || "(なし)"}</span>
+                </div>
+                <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 14 }}>
+                  <div style={{ fontSize: 30, fontWeight: 700, color: result.pct >= 0.9 ? S.green : result.pct >= 0.7 ? S.amber : S.red }}>
+                    {result.correct}/{result.total}
+                  </div>
+                  <div style={{ fontSize: 13, color: S.sub }}>推定寄与スコア {toScale(result.pct)}</div>
+                </div>
+              </React.Fragment>
+            ) : (
+              <React.Fragment>
+                <div style={{ fontSize: 13, color: S.sub, marginBottom: 6 }}>自己採点</div>
+                <p style={{ fontSize: 15, fontWeight: 600, marginBottom: 4 }}>{result.selfLabel}</p>
+                <div style={{ fontSize: 13, color: S.sub, marginBottom: 14 }}>推定寄与スコア {toScale(result.pct)}</div>
+              </React.Fragment>
+            )}
+            <button onClick={next} style={{ ...btnPrimary, width: "100%" }}>次の問題 →</button>
+          </div>
+        )}
+      </div>
+      <p style={{ fontSize: 11, color: S.sub, marginTop: 10, lineHeight: 1.6 }}>
+        Repeat SentenceはSpeakingとListeningの最大配点タスク。内容(単語一致)に加え、本番では流暢さと発音も採点されます。
+      </p>
+    </React.Fragment>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
