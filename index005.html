@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>PTE SUMMIT — 79m峰トレーナー</title>
+<style>
+  :root{
+    --bg:#EEF3F4; --ink:#123039; --sub:#5A7278; --blue:#145C9E;
+    --green:#1F9D6C; --red:#D64545; --amber:#C98A12; --line:#D8E2E4; --card:#FFF;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+    font-family:'Space Grotesk','Avenir Next','Helvetica Neue',system-ui,sans-serif;}
+  #app{max-width:480px;margin:0 auto;padding:16px 14px 40px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;}
+  .btn{display:block;width:100%;padding:14px 22px;font-size:15px;font-weight:700;
+    background:var(--blue);color:#fff;border:none;border-radius:10px;font-family:inherit;cursor:pointer;}
+  .btn.ghost{background:#fff;color:var(--blue);border:1px solid var(--blue);font-weight:600;}
+  .btn:active{opacity:.85;}
+  .row{display:flex;gap:8px;}
+  .sub{color:var(--sub);}
+  h1{margin:2px 0 0;font-size:22px;}
+  textarea{width:100%;font-size:16px;padding:12px;border:1px solid var(--line);
+    border-radius:10px;font-family:inherit;resize:none;color:var(--ink);}
+  .taskbtn{display:flex;justify-content:space-between;align-items:center;text-align:left;
+    padding:14px;border-radius:12px;background:var(--card);border:1px solid var(--line);
+    font-family:inherit;cursor:pointer;width:100%;}
+  .taskbtn[disabled]{background:#E4EBEC;opacity:.6;cursor:default;}
+  #err{display:none;background:#FBEAEA;color:#8A2222;font-size:12px;padding:8px 12px;
+    border-radius:8px;margin-bottom:10px;white-space:pre-wrap;}
+</style>
+</head>
+<body>
+<div id="app"><div id="err"></div><div id="root">読み込み中…</div></div>
+<script>
+"use strict";
+/* エラーを画面に表示(モバイルでのデバッグ用) */
+window.onerror = function(msg, src, line){
+  var e = document.getElementById("err");
+  e.style.display = "block";
+  e.textContent = "エラー: " + msg + " (line " + line + ")";
+};
+
+/* ================= data ================= */
+var WFD_QUESTIONS = [
+  "The lecture will be postponed until further notice.",
+  "Undergraduate students are encouraged to attend the seminar.",
+  "The library holds an extensive collection of rare manuscripts.",
+  "Climate change has become a significant global challenge.",
+  "Students must submit their assignments before the deadline.",
+  "The results of the experiment were published in a scientific journal.",
+  "Economic growth depends on innovation and technological progress.",
+  "The university provides a wide range of support services.",
+  "Renewable energy sources are essential for sustainable development.",
+  "Attendance at tutorials is compulsory for all first year students.",
+  "The research team analysed the data over several months.",
+  "A comprehensive review of the literature is required.",
+  "The committee will announce its decision at the end of the week.",
+  "Effective communication skills are highly valued by employers.",
+  "The final examination will cover all topics discussed in class.",
+  "Access to the laboratory is restricted to authorised personnel.",
+  "The professor emphasised the importance of critical thinking.",
+  "Urban populations have increased dramatically in recent decades.",
+  "Scholarship applications must include two academic references.",
+  "The findings suggest a strong correlation between the two variables."
+];
+var RS_QUESTIONS = [
+  "The results will be announced next week.",
+  "Please leave your assignments in the box provided.",
+  "The seminar on economics has been cancelled.",
+  "You can borrow up to ten books from the library.",
+  "The application deadline has been extended by two weeks.",
+  "All students are required to attend the orientation session.",
+  "The cafeteria is closed on public holidays.",
+  "Our professor has published several books on modern history.",
+  "The exam results will be available on the university website.",
+  "Please turn off your mobile phones during the lecture.",
+  "The science building is located next to the main library.",
+  "Tutorials will begin in the second week of the semester.",
+  "Remember to bring your student card to the examination.",
+  "The lecture theatre has been moved to another building.",
+  "Group presentations account for thirty percent of the final grade."
+];
+var DAILY_GOAL = 10;
+
+/* ================= helpers ================= */
+function norm(s){
+  return s.toLowerCase().replace(/[^a-z0-9\s']/g,"").replace(/\s+/g," ").trim();
+}
+function scoreWords(target, answer){
+  var t = norm(target).split(" ");
+  var pool = {};
+  norm(answer).split(" ").forEach(function(w){ pool[w] = (pool[w]||0)+1; });
+  var marks = t.map(function(w){
+    if(pool[w] > 0){ pool[w]--; return true; }
+    return false;
+  });
+  var correct = marks.filter(Boolean).length;
+  return { marks:marks, correct:correct, total:t.length, pct:correct/t.length };
+}
+function toScale(pct){ return Math.round(10 + pct*80); }
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function esc(s){
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+/* ================= storage ================= */
+var STORE_KEY = "pte-summit-v1";
+function loadState(){
+  try{
+    var r = localStorage.getItem(STORE_KEY);
+    return r ? JSON.parse(r) : null;
+  }catch(e){ return null; }
+}
+var state = loadState() || {
+  attempts: [], streak: 0, lastActive: null, doneToday: 0, doneDate: null
+};
+function saveState(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+  catch(e){ console.error(e); }
+}
+function recordAttempt(pct, taskType){
+  var today = todayStr();
+  var yesterday = new Date(Date.now()-864e5).toISOString().slice(0,10);
+  state.streak = (state.lastActive === today) ? state.streak :
+                 (state.lastActive === yesterday) ? state.streak + 1 : 1;
+  state.attempts.push({ date: today, taskType: taskType, pct: pct });
+  state.doneToday = (state.doneDate === today ? state.doneToday : 0) + 1;
+  state.doneDate = today;
+  state.lastActive = today;
+  saveState();
+}
+function estimateFor(types){
+  var recent = state.attempts.filter(function(a){ return types.indexOf(a.taskType) >= 0; }).slice(-10);
+  if(!recent.length) return null;
+  var avg = recent.reduce(function(s,a){ return s + a.pct; }, 0) / recent.length;
+  return toScale(avg);
+}
+
+/* ================= speech ================= */
+function speak(text, done){
+  try{
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    var voices = window.speechSynthesis.getVoices();
+    var v = null, i;
+    for(i=0;i<voices.length;i++){ if(voices[i].lang === "en-AU"){ v = voices[i]; break; } }
+    if(!v){ for(i=0;i<voices.length;i++){ if(voices[i].lang && voices[i].lang.indexOf("en") === 0){ v = voices[i]; break; } } }
+    if(v) u.voice = v;
+    u.rate = 0.95;
+    u.onend = done; u.onerror = done;
+    window.speechSynthesis.speak(u);
+  }catch(e){ done(); }
+}
+var SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+
+/* ================= rendering ================= */
+var root = document.getElementById("root");
+
+function colorFor(val){
+  if(val === null) return "var(--sub)";
+  if(val >= 79) return "var(--green)";
+  if(val >= 70) return "var(--amber)";
+  return "var(--red)";
+}
+
+function altimeterSVG(skills){
+  var vals = [];
+  for(var k in skills){ if(skills[k] !== null) vals.push(skills[k]); }
+  var alt = vals.length ? Math.min.apply(null, vals) : 0;
+  var H = 190, MAX = 90;
+  function y(v){ return H - (v/MAX)*H; }
+  return '' +
+  '<svg viewBox="0 0 120 214" style="width:120px;flex-shrink:0;">' +
+    '<polygon points="10,'+H+' 60,10 110,'+H+'" fill="#DCE7EA"/>' +
+    '<polygon points="38,'+H+' 60,10 82,'+H+'" fill="#C7D8DD"/>' +
+    '<line x1="4" x2="116" y1="'+y(79)+'" y2="'+y(79)+'" stroke="#1F9D6C" stroke-width="2" stroke-dasharray="4 3"/>' +
+    '<text x="116" y="'+(y(79)-4)+'" text-anchor="end" font-size="10" fill="#1F9D6C" font-weight="700">79 SUMMIT</text>' +
+    '<line x1="4" x2="116" y1="'+y(alt)+'" y2="'+y(alt)+'" stroke="#145C9E" stroke-width="2"/>' +
+    '<circle cx="60" cy="'+y(alt)+'" r="5" fill="#145C9E"/>' +
+    '<text x="4" y="'+(y(alt)-5)+'" font-size="11" fill="#145C9E" font-weight="700">' + (vals.length ? "現在 "+alt : "未計測") + '</text>' +
+    '<text x="60" y="'+(H+18)+'" text-anchor="middle" font-size="10" fill="#5A7278">最低スコア = 現在標高</text>' +
+  '</svg>';
+}
+
+function skillCardHTML(label, jp, val){
+  var c = colorFor(val);
+  var note = val === null ? "未計測" : (val >= 79 ? "登頂圏" : "79まで +" + (79-val));
+  return '<div style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;">' +
+    '<div style="font-size:11px;color:var(--sub);letter-spacing:1px;">'+label+' <span style="letter-spacing:0;">'+jp+'</span></div>' +
+    '<div style="font-size:26px;font-weight:700;color:'+c+';font-variant-numeric:tabular-nums;">'+(val===null?"–":val)+'</div>' +
+    '<div style="font-size:10px;color:'+c+';">'+note+'</div></div>';
+}
+
+function wordDiffHTML(target, marks){
+  var words = norm(target).split(" ");
+  var out = '<p style="line-height:1.9;font-size:16px;margin:0 0 12px;">';
+  for(var i=0;i<words.length;i++){
+    var ok = marks[i];
+    out += '<span style="color:'+(ok?"var(--green)":"var(--red)")+';font-weight:'+(ok?"500":"700")+';' +
+           (ok?"":"text-decoration:underline;")+'margin-right:6px;">'+esc(words[i])+'</span>';
+  }
+  return out + '</p>';
+}
+
+function headerHTML(title){
+  return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">' +
+    '<button id="back" style="background:none;border:none;color:var(--blue);font-size:14px;font-family:inherit;cursor:pointer;padding:0;">← ダッシュボード</button>' +
+    '<div style="font-size:11px;letter-spacing:2px;color:var(--sub);font-weight:700;">'+title+'</div></div>';
+}
+
+function resultBlockHTML(r, extra){
+  var c = r.pct >= 0.9 ? "var(--green)" : r.pct >= 0.7 ? "var(--amber)" : "var(--red)";
+  return '<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;">' +
+    '<div style="font-size:30px;font-weight:700;color:'+c+';">'+r.correct+'/'+r.total+'</div>' +
+    '<div style="font-size:13px;color:var(--sub);">推定寄与スコア '+toScale(r.pct)+(extra||"")+'</div></div>';
+}
+
+/* ================= Dashboard ================= */
+function renderDash(){
+  var skills = {
+    L: estimateFor(["WFD","RS"]),
+    W: estimateFor(["WFD"]),
+    S: estimateFor(["RS"]),
+    R: null
+  };
+  var doneToday = state.doneDate === todayStr() ? state.doneToday : 0;
+  var pctBar = Math.min(doneToday/DAILY_GOAL,1)*100;
+  var tasks = [
+    { id:"wfd", name:"Write from Dictation", jp:"聞いて書き取る", affects:"L + W", ready:true },
+    { id:"rs", name:"Repeat Sentence", jp:"聞いて復唱する", affects:"S + L", ready:true },
+    { id:"write", name:"Essay / SWT", jp:"AI採点ライティング", affects:"W + R", ready:false },
+    { id:"ra", name:"Read Aloud", jp:"音読", affects:"S + R", ready:false }
+  ];
+  var taskHTML = tasks.map(function(t){
+    return '<button class="taskbtn" data-nav="'+t.id+'"'+(t.ready?"":" disabled")+'>' +
+      '<div><div style="font-size:15px;font-weight:700;">'+t.name+'</div>' +
+      '<div style="font-size:12px;color:var(--sub);">'+t.jp+'</div></div>' +
+      '<div style="text-align:right;"><div style="font-size:12px;font-weight:700;color:'+(t.ready?"var(--blue)":"var(--sub)")+';">'+t.affects+'</div>' +
+      (t.ready?"":'<div style="font-size:10px;color:var(--sub);">準備中</div>')+'</div></button>';
+  }).join("");
+
+  root.innerHTML =
+    '<header style="margin-bottom:14px;">' +
+      '<div style="font-size:11px;letter-spacing:3px;color:var(--blue);font-weight:700;">PTE SUMMIT</div>' +
+      '<h1>79m峰 登頂計画</h1>' +
+      '<div style="font-size:12px;color:var(--sub);">全セクション79 = Australia PR</div>' +
+    '</header>' +
+    '<div class="card" style="display:flex;gap:12px;padding:12px;margin-bottom:12px;">' +
+      altimeterSVG(skills) +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;flex:1;align-content:center;">' +
+        skillCardHTML("L","聞く",skills.L) + skillCardHTML("W","書く",skills.W) +
+        skillCardHTML("S","話す",skills.S) + skillCardHTML("R","読む",skills.R) +
+      '</div>' +
+    '</div>' +
+    '<div class="row" style="margin-bottom:14px;">' +
+      '<div style="flex:1;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px;">' +
+        '<div style="font-size:11px;color:var(--sub);">ストリーク</div>' +
+        '<div style="font-size:22px;font-weight:700;">'+state.streak+'<span style="font-size:12px;"> 日</span></div>' +
+      '</div>' +
+      '<div style="flex:2;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px;">' +
+        '<div style="font-size:11px;color:var(--sub);">今日のミッション(全タスク合算)</div>' +
+        '<div style="display:flex;align-items:center;gap:8px;">' +
+          '<div style="flex:1;height:8px;background:var(--line);border-radius:4px;overflow:hidden;">' +
+            '<div style="width:'+pctBar+'%;height:100%;background:'+(doneToday>=DAILY_GOAL?"var(--green)":"var(--blue)")+';"></div>' +
+          '</div><div style="font-size:13px;font-weight:700;">'+doneToday+'/'+DAILY_GOAL+'</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div style="font-size:12px;color:var(--sub);font-weight:700;letter-spacing:1px;margin-bottom:8px;">トレーニング</div>' +
+    '<div style="display:grid;gap:8px;">'+taskHTML+'</div>' +
+    '<p style="font-size:11px;color:var(--sub);margin-top:12px;">' +
+      (SR ? "✓ この環境は音声認識に対応しています"
+          : "△ この環境は音声認識非対応(Repeat Sentenceは自己採点)。iPhoneはSafari、AndroidはChromeで開いてください。") +
+    '</p>';
+
+  var btns = root.querySelectorAll("[data-nav]");
+  for(var i=0;i<btns.length;i++){
+    btns[i].addEventListener("click", function(){
+      var id = this.getAttribute("data-nav");
+      if(id === "wfd") renderWFD();
+      if(id === "rs") renderRS();
+    });
+  }
+}
+
+/* ================= Write from Dictation ================= */
+function renderWFD(){
+  var qIdx = Math.floor(Math.random()*WFD_QUESTIONS.length);
+  var plays = 0;
+
+  function screen(html){
+    root.innerHTML = headerHTML("WRITE FROM DICTATION") + '<div class="card">' + html + '</div>';
+    document.getElementById("back").addEventListener("click", renderDash);
+  }
+  function ready(){
+    screen('<div style="text-align:center;padding:24px 0;">' +
+      '<p style="font-size:13px;color:var(--sub);margin-bottom:16px;">音声を聞いて、聞こえた文を正確にタイプします。<br>本番は1回のみ再生。再生回数も記録されます。</p>' +
+      '<button class="btn" id="play" style="width:auto;display:inline-block;">▶ 再生する</button></div>');
+    document.getElementById("play").addEventListener("click", play);
+  }
+  function play(){
+    plays++;
+    screen('<div style="text-align:center;padding:40px 0;color:var(--blue);font-weight:700;">🔊 再生中…</div>');
+    speak(WFD_QUESTIONS[qIdx], typing);
+  }
+  function typing(prev){
+    screen('<textarea id="ans" rows="3" placeholder="聞こえた文をタイプ…"></textarea>' +
+      '<div class="row" style="margin-top:10px;">' +
+      '<button class="btn ghost" id="again" style="flex:1;">もう一度 ('+plays+')</button>' +
+      '<button class="btn" id="submit" style="flex:2;">採点する</button></div>');
+    var ta = document.getElementById("ans");
+    if(typeof prev === "string") ta.value = prev;
+    ta.focus();
+    document.getElementById("again").addEventListener("click", function(){
+      var kept = ta.value;
+      plays++;
+      speak(WFD_QUESTIONS[qIdx], function(){ typing(kept); });
+    });
+    document.getElementById("submit").addEventListener("click", function(){
+      var v = ta.value;
+      if(!v.trim()) return;
+      var r = scoreWords(WFD_QUESTIONS[qIdx], v);
+      recordAttempt(r.pct, "WFD");
+      result(r, v);
+    });
+  }
+  function result(r, answer){
+    screen('<textarea rows="3" disabled style="background:#F7FAFA;">'+esc(answer)+'</textarea>' +
+      '<div style="margin-top:14px;">' +
+      '<div style="font-size:13px;color:var(--sub);margin-bottom:6px;">正解文(単語ごとの判定)</div>' +
+      wordDiffHTML(WFD_QUESTIONS[qIdx], r.marks) +
+      resultBlockHTML(r, plays>1 ? "・再生"+plays+"回(本番は1回)" : "") +
+      '<button class="btn" id="next">次の問題 →</button></div>');
+    document.getElementById("next").addEventListener("click", function(){
+      qIdx = (qIdx + 1 + Math.floor(Math.random()*(WFD_QUESTIONS.length-1))) % WFD_QUESTIONS.length;
+      plays = 0;
+      ready();
+    });
+  }
+  ready();
+}
+
+/* ================= Repeat Sentence ================= */
+function renderRS(){
+  var qIdx = Math.floor(Math.random()*RS_QUESTIONS.length);
+  var srFailed = !SR;
+  var rec = null;
+
+  function q(){ return RS_QUESTIONS[qIdx]; }
+  function screen(html, foot){
+    root.innerHTML = headerHTML("REPEAT SENTENCE") + '<div class="card">' + html + '</div>' +
+      '<p style="font-size:11px;color:var(--sub);margin-top:10px;line-height:1.6;">Repeat SentenceはSpeakingとListeningの最大配点タスク。内容(単語一致)に加え、本番では流暢さと発音も採点されます。</p>';
+    document.getElementById("back").addEventListener("click", function(){
+      try{ if(rec) rec.abort(); }catch(e){}
+      renderDash();
+    });
+  }
+  function ready(){
+    screen('<div style="text-align:center;padding:24px 0;">' +
+      '<p style="font-size:13px;color:var(--sub);margin-bottom:6px;">音声を聞いたら、<b>すぐに同じ文を声に出して</b>復唱します。</p>' +
+      '<p style="font-size:11px;color:'+(srFailed?"var(--amber)":"var(--sub)")+';margin-bottom:16px;">' +
+      (srFailed ? "この環境は音声認識に対応していないため、自己採点モードで練習します。"
+                : "再生終了後、自動でマイクが起動します(初回はマイク許可を求められます)。") +
+      '</p><button class="btn" id="play" style="width:auto;display:inline-block;">▶ 再生する</button></div>');
+    document.getElementById("play").addEventListener("click", play);
+  }
+  function play(){
+    screen('<div style="text-align:center;padding:40px 0;color:var(--blue);font-weight:700;">🔊 再生中…</div>');
+    speak(q(), function(){
+      if(srFailed){ selfMode(""); return; }
+      window.speechSynthesis.cancel();
+      /* iOSはタップ操作から直接認識を開始しないと音声が渡されないため、
+         自動開始ではなくボタンを表示する */
+      screen('<div style="text-align:center;padding:24px 0;">' +
+        '<p style="font-size:13px;color:var(--sub);margin-bottom:16px;">ボタンを押して、すぐに復唱してください。</p>' +
+        '<button class="btn" id="recstart" style="width:auto;display:inline-block;font-size:17px;">🎙️ 録音開始</button>' +
+        '<div style="margin-top:12px;"><button class="btn ghost" id="toself2" style="width:auto;display:inline-block;padding:8px 14px;font-size:13px;">自己採点で答える</button></div></div>');
+      document.getElementById("recstart").addEventListener("click", startRecognition);
+      document.getElementById("toself2").addEventListener("click", function(){ selfMode(""); });
+    });
+  }
+  function startRecognition(){
+    var finalText = "";
+    var interimText = "";
+    var finished = false;
+    function currentText(){ return (finalText + " " + interimText).trim(); }
+    function finalize(){
+      if(finished) return;
+      finished = true;
+      var text = currentText();
+      if(text){
+        var r = scoreWords(q(), text);
+        recordAttempt(r.pct, "RS");
+        result(r, text);
+      }else{
+        recfail("音声を検出できませんでした。iPhoneの場合、設定 > 一般 > キーボード >「音声入力」がオンか確認してください。もう一度試すか、自己採点に切り替えることもできます。");
+      }
+    }
+    try{
+      rec = new SR();
+      rec.lang = "en-AU";
+      rec.continuous = true;        /* 手動停止まで聞き続ける */
+      rec.interimResults = true;    /* iOSは途中結果しか返さないことがある */
+      rec.maxAlternatives = 1;
+      rec.onresult = function(e){
+        interimText = "";
+        for(var i=0;i<e.results.length;i++){
+          if(e.results[i].isFinal){
+            /* finalはresultIndex以降のみ追加(重複防止のため毎回組み直す) */
+          }
+        }
+        finalText = "";
+        for(var j=0;j<e.results.length;j++){
+          if(e.results[j].isFinal) finalText += e.results[j][0].transcript + " ";
+          else interimText += e.results[j][0].transcript + " ";
+        }
+        var live = document.getElementById("live");
+        if(live) live.textContent = currentText() || "…";
+      };
+      rec.onerror = function(e){
+        if(e.error === "not-allowed" || e.error === "service-not-allowed"){
+          finished = true;
+          srFailed = true;
+          selfMode("マイクの使用が許可されませんでした。設定 > Safari > マイク で許可するか、自己採点で練習してください。");
+        }
+        /* no-speech等はonendに任せる */
+      };
+      rec.onend = finalize;
+      rec.start();
+      screen('<div style="text-align:center;padding:24px 0;">' +
+        '<div style="font-size:40px;margin-bottom:8px;">🎙️</div>' +
+        '<div style="color:var(--red);font-weight:700;margin-bottom:8px;">録音中 — いま復唱してください</div>' +
+        '<div id="live" style="min-height:24px;font-size:14px;color:var(--sub);margin-bottom:12px;">…</div>' +
+        '<button class="btn ghost" id="stop" style="width:auto;display:inline-block;">話し終えた(停止)</button></div>');
+      document.getElementById("stop").addEventListener("click", function(){
+        try{ rec.stop(); }catch(e){ finalize(); }
+        /* stopしてもonendが来ない環境向けの保険 */
+        setTimeout(finalize, 1500);
+      });
+    }catch(err){
+      srFailed = true;
+      selfMode("");
+    }
+  }
+  function recfail(msg){
+    screen('<div style="text-align:center;padding:20px 0;">' +
+      '<p style="font-size:13px;color:var(--amber);margin-bottom:16px;">'+esc(msg)+'</p>' +
+      '<div class="row">' +
+      '<button class="btn ghost" id="retry" style="flex:1;">もう一度</button>' +
+      '<button class="btn" id="toself" style="flex:1;">自己採点に切替</button></div></div>');
+    document.getElementById("retry").addEventListener("click", play);
+    document.getElementById("toself").addEventListener("click", function(){ selfMode(""); });
+  }
+  function selfMode(msg){
+    var opts = [
+      ["完璧に言えた(全単語・語順OK)", 1.0],
+      ["ほぼ言えた(1〜2語ミス)", 0.8],
+      ["半分くらい言えた", 0.5],
+      ["ほとんど言えなかった", 0.2]
+    ];
+    var optHTML = opts.map(function(o,i){
+      return '<button class="btn ghost" data-self="'+i+'" style="text-align:left;">'+o[0]+'</button>';
+    }).join("");
+    screen('<div style="padding:8px 0;">' +
+      (msg ? '<p style="font-size:12px;color:var(--amber);">'+esc(msg)+'</p>' : "") +
+      '<div style="font-size:13px;color:var(--sub);margin-bottom:6px;">正解文</div>' +
+      '<p style="font-size:17px;font-weight:600;line-height:1.6;margin:0 0 4px;">'+esc(q())+'</p>' +
+      '<button class="btn ghost" id="relisten" style="width:auto;display:inline-block;padding:8px 14px;font-size:13px;margin-bottom:16px;">🔊 もう一度聞く</button>' +
+      '<div style="font-size:13px;color:var(--sub);margin-bottom:8px;">どのくらい正確に復唱できましたか?</div>' +
+      '<div style="display:grid;gap:8px;">'+optHTML+'</div></div>');
+    document.getElementById("relisten").addEventListener("click", function(){ speak(q(), function(){}); });
+    var btns = root.querySelectorAll("[data-self]");
+    for(var i=0;i<btns.length;i++){
+      btns[i].addEventListener("click", function(){
+        var o = opts[parseInt(this.getAttribute("data-self"),10)];
+        recordAttempt(o[1], "RS");
+        resultSelf(o[0], o[1]);
+      });
+    }
+  }
+  function result(r, transcript){
+    screen('<div style="padding:4px 0;">' +
+      '<div style="font-size:13px;color:var(--sub);margin-bottom:6px;">正解文(あなたの発話に含まれた単語=緑)</div>' +
+      wordDiffHTML(q(), r.marks) +
+      '<div style="font-size:12px;color:var(--sub);margin-bottom:10px;">認識された発話: <span style="color:var(--ink);">'+esc(transcript||"(なし)")+'</span></div>' +
+      resultBlockHTML(r, "") +
+      '<button class="btn" id="next">次の問題 →</button></div>');
+    document.getElementById("next").addEventListener("click", nextQ);
+  }
+  function resultSelf(label, pct){
+    screen('<div style="padding:4px 0;">' +
+      '<div style="font-size:13px;color:var(--sub);margin-bottom:6px;">自己採点</div>' +
+      '<p style="font-size:15px;font-weight:600;margin:0 0 4px;">'+esc(label)+'</p>' +
+      '<div style="font-size:13px;color:var(--sub);margin-bottom:14px;">推定寄与スコア '+toScale(pct)+'</div>' +
+      '<button class="btn" id="next">次の問題 →</button></div>');
+    document.getElementById("next").addEventListener("click", nextQ);
+  }
+  function nextQ(){
+    qIdx = (qIdx + 1 + Math.floor(Math.random()*(RS_QUESTIONS.length-1))) % RS_QUESTIONS.length;
+    ready();
+  }
+  ready();
+}
+
+/* ================= boot ================= */
+if(window.speechSynthesis) window.speechSynthesis.getVoices();
+renderDash();
+</script>
+</body>
+</html>
