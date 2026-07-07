@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>PTE SUMMIT — 79m峰トレーナー</title>
+<style>
+  :root{
+    --bg:#EEF3F4; --ink:#123039; --sub:#5A7278; --blue:#145C9E;
+    --green:#1F9D6C; --red:#D64545; --amber:#C98A12; --line:#D8E2E4; --card:#FFF;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+    font-family:'Space Grotesk','Avenir Next','Helvetica Neue',system-ui,sans-serif;}
+  #app{max-width:480px;margin:0 auto;padding:16px 14px 40px;}
+  @media(min-width:700px){ #app.wide{max-width:760px;} }
+  mark{background:#FCE8B8;color:inherit;border-radius:3px;padding:0 2px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;}
+  .btn{display:block;width:100%;padding:14px 22px;font-size:15px;font-weight:700;
+    background:var(--blue);color:#fff;border:none;border-radius:10px;font-family:inherit;cursor:pointer;}
+  .btn.ghost{background:#fff;color:var(--blue);border:1px solid var(--blue);font-weight:600;}
+  .btn:active{opacity:.85;}
+  .row{display:flex;gap:8px;}
+  .sub{color:var(--sub);}
+  h1{margin:2px 0 0;font-size:22px;}
+  textarea{width:100%;font-size:16px;padding:12px;border:1px solid var(--line);
+    border-radius:10px;font-family:inherit;resize:none;color:var(--ink);}
+  .taskbtn{display:flex;justify-content:space-between;align-items:center;text-align:left;
+    padding:14px;border-radius:12px;background:var(--card);border:1px solid var(--line);
+    font-family:inherit;cursor:pointer;width:100%;}
+  .taskbtn[disabled]{background:#E4EBEC;opacity:.6;cursor:default;}
+  #err{display:none;background:#FBEAEA;color:#8A2222;font-size:12px;padding:8px 12px;
+    border-radius:8px;margin-bottom:10px;white-space:pre-wrap;}
+</style>
+</head>
+<body>
+<div id="app"><div id="err"></div><div id="root">読み込み中…</div></div>
+<script>
+"use strict";
+/* エラーを画面に表示(モバイルでのデバッグ用) */
+window.onerror = function(msg, src, line){
+  var e = document.getElementById("err");
+  e.style.display = "block";
+  e.textContent = "エラー: " + msg + " (line " + line + ")";
+};
+
+/* ================= data ================= */
+var WFD_QUESTIONS = [
+  "The lecture will be postponed until further notice.",
+  "Undergraduate students are encouraged to attend the seminar.",
+  "The library holds an extensive collection of rare manuscripts.",
+  "Climate change has become a significant global challenge.",
+  "Students must submit their assignments before the deadline.",
+  "The results of the experiment were published in a scientific journal.",
+  "Economic growth depends on innovation and technological progress.",
+  "The university provides a wide range of support services.",
+  "Renewable energy sources are essential for sustainable development.",
+  "Attendance at tutorials is compulsory for all first year students.",
+  "The research team analysed the data over several months.",
+  "A comprehensive review of the literature is required.",
+  "The committee will announce its decision at the end of the week.",
+  "Effective communication skills are highly valued by employers.",
+  "The final examination will cover all topics discussed in class.",
+  "Access to the laboratory is restricted to authorised personnel.",
+  "The professor emphasised the importance of critical thinking.",
+  "Urban populations have increased dramatically in recent decades.",
+  "Scholarship applications must include two academic references.",
+  "The findings suggest a strong correlation between the two variables."
+];
+var RS_QUESTIONS = [
+  "The results will be announced next week.",
+  "Please leave your assignments in the box provided.",
+  "The seminar on economics has been cancelled.",
+  "You can borrow up to ten books from the library.",
+  "The application deadline has been extended by two weeks.",
+  "All students are required to attend the orientation session.",
+  "The cafeteria is closed on public holidays.",
+  "Our professor has published several books on modern history.",
+  "The exam results will be available on the university website.",
+  "Please turn off your mobile phones during the lecture.",
+  "The science building is located next to the main library.",
+  "Tutorials will begin in the second week of the semester.",
+  "Remember to bring your student card to the examination.",
+  "The lecture theatre has been moved to another building.",
+  "Group presentations account for thirty percent of the final grade."
+];
+var DAILY_GOAL = 10;
+
+var SWT_PASSAGES = [
+  "Urban green spaces provide multiple benefits to city residents. Research shows that parks and gardens reduce air pollution, lower urban temperatures, and improve mental health. A recent study of twenty European cities found that residents living within 300 metres of green space reported significantly lower stress levels than those without such access. However, many rapidly growing cities are losing green areas to commercial development, as land values in central districts continue to rise. Urban planners now argue that green infrastructure should be treated as essential public health investment rather than an optional amenity, and several governments have introduced minimum green space requirements for new residential developments.",
+  "The rise of remote work has fundamentally changed how companies think about productivity. While early concerns focused on reduced supervision, large-scale studies during and after the pandemic revealed that many employees were more productive at home, largely due to fewer interruptions and eliminated commutes. However, researchers also identified costs: new employees struggled to build networks, informal knowledge sharing declined, and some workers reported blurred boundaries between work and personal life. As a result, most large organisations have adopted hybrid models, attempting to combine the concentration benefits of remote work with the collaborative advantages of office attendance.",
+  "Language extinction is accelerating worldwide. Linguists estimate that of the approximately seven thousand languages spoken today, nearly half may disappear by the end of this century. When a language dies, communities lose not only a means of communication but also unique knowledge systems, including traditional ecological knowledge about local plants, animals, and weather patterns accumulated over generations. Digital technology presents both a threat and an opportunity: while global platforms favour dominant languages, they also enable small communities to document, teach, and revitalise their languages at unprecedented scale and low cost."
+];
+
+var ESSAY_PROMPTS = [
+  "Some people believe that university education should be free for all students, while others argue that students should pay for their own education. Discuss both views and give your own opinion.",
+  "In many countries, the average working week is becoming shorter. Do the advantages of this trend outweigh the disadvantages?",
+  "Artificial intelligence is increasingly used in workplaces to make decisions previously made by humans. To what extent do you agree that this is a positive development?",
+  "Large cities around the world face growing traffic congestion. Some argue the solution is to improve public transport, while others believe restricting private car use is more effective. Discuss both views and give your opinion."
+];
+
+/* ---------- WFD 問題プール(静的+AI生成、重複防止) ---------- */
+function wfdAllQuestions(){ return WFD_QUESTIONS.concat(state.genWFD || []); }
+function wfdUnused(){
+  var used = state.usedWFD || [];
+  return wfdAllQuestions().filter(function(q){ return used.indexOf(q) < 0; });
+}
+function pickWFD(){
+  var pool = wfdUnused();
+  if(!pool.length){
+    /* 全問消化 → 出題履歴をリセットして最初から */
+    state.usedWFD = [];
+    saveState();
+    pool = wfdAllQuestions();
+  }
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+function markWFDUsed(q){
+  if(state.usedWFD.indexOf(q) < 0){ state.usedWFD.push(q); saveState(); }
+}
+
+/* ================= helpers ================= */
+function norm(s){
+  return s.toLowerCase().replace(/[^a-z0-9\s']/g,"").replace(/\s+/g," ").trim();
+}
+function scoreWords(target, answer){
+  var t = norm(target).split(" ");
+  var pool = {};
+  norm(answer).split(" ").forEach(function(w){ pool[w] = (pool[w]||0)+1; });
+  var marks = t.map(function(w){
+    if(pool[w] > 0){ pool[w]--; return true; }
+    return false;
+  });
+  var correct = marks.filter(Boolean).length;
+  return { marks:marks, correct:correct, total:t.length, pct:correct/t.length };
+}
+function toScale(pct){ return Math.round(10 + pct*80); }
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function esc(s){
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+/* ================= storage ================= */
+var STORE_KEY = "pte-summit-v1";
+function loadState(){
+  try{
+    var r = localStorage.getItem(STORE_KEY);
+    return r ? JSON.parse(r) : null;
+  }catch(e){ return null; }
+}
+var state = loadState() || {
+  attempts: [], streak: 0, lastActive: null, doneToday: 0, doneDate: null
+};
+if(!state.usedWFD) state.usedWFD = [];
+if(!state.genWFD) state.genWFD = [];
+if(!state.reviewWFD) state.reviewWFD = {};
+if(typeof state.xp !== "number") state.xp = 0;
+if(!state.examDate) state.examDate = null;
+if(!state.missionBonusDate) state.missionBonusDate = null;
+if(!state.lastCoach) state.lastCoach = null;
+function saveState(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+  catch(e){ console.error(e); }
+}
+function recordAttempt(pct, taskType, detail){
+  var today = todayStr();
+  var yesterday = new Date(Date.now()-864e5).toISOString().slice(0,10);
+  state.streak = (state.lastActive === today) ? state.streak :
+                 (state.lastActive === yesterday) ? state.streak + 1 : 1;
+  var entry = { date: today, taskType: taskType, pct: pct };
+  if(detail) entry.detail = detail;
+  state.attempts.push(entry);
+  /* XP: 小タスク10 / ライティング30、満点ボーナス+5 */
+  var base = (taskType === "SWT" || taskType === "ESSAY") ? 30 : 10;
+  state.xp += base + (pct >= 0.999 ? 5 : 0);
+  state.doneToday = (state.doneDate === today ? state.doneToday : 0) + 1;
+  state.doneDate = today;
+  state.lastActive = today;
+  saveState();
+}
+function estimateFor(types){
+  var recent = state.attempts.filter(function(a){ return types.indexOf(a.taskType) >= 0; }).slice(-10);
+  if(!recent.length) return null;
+  var avg = recent.reduce(function(s,a){ return s + a.pct; }, 0) / recent.length;
+  return toScale(avg);
+}
+
+/* ================= speech ================= */
+function speak(text, done){
+  try{
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    var voices = window.speechSynthesis.getVoices();
+    var v = null, i;
+    for(i=0;i<voices.length;i++){ if(voices[i].lang === "en-AU"){ v = voices[i]; break; } }
+    if(!v){ for(i=0;i<voices.length;i++){ if(voices[i].lang && voices[i].lang.indexOf("en") === 0){ v = voices[i]; break; } } }
+    if(v) u.voice = v;
+    u.rate = 0.95;
+    u.onend = done; u.onerror = done;
+    window.speechSynthesis.speak(u);
+  }catch(e){ done(); }
+}
+var SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+
+/* ================= rendering ================= */
+var root = document.getElementById("root");
+
+function colorFor(val){
+  if(val === null) return "var(--sub)";
+  if(val >= 79) return "var(--green)";
+  if(val >= 70) return "var(--amber)";
+  return "var(--red)";
+}
+
+function altimeterSVG(skills){
+  var vals = [];
+  for(var k in skills){ if(skills[k] !== null) vals.push(skills[k]); }
+  var alt = vals.length ? Math.min.apply(null, vals) : 0;
+  var H = 190, MAX = 90;
+  function y(v){ return H - (v/MAX)*H; }
+  return '' +
+  '<svg viewBox="0 0 120 214" style="width:120px;flex-shrink:0;">' +
+    '<polygon points="10,'+H+' 60,10 110,'+H+'" fill="#DCE7EA"/>' +
+    '<polygon points="38,'+H+' 60,10 82,'+H+'" fill="#C7D8DD"/>' +
+    '<line x1="4" x2="116" y1="'+y(79)+'" y2="'+y(79)+'" stroke="#1F9D6C" stroke-width="2" stroke-dasharray="4 3"/>' +
+    '<text x="116" y="'+(y(79)-4)+'" text-anchor="end" font-size="10" fill="#1F9D6C" font-weight="700">79 SUMMIT</text>' +
+    '<line x1="4" x2="116" y1="'+y(alt)+'" y2="'+y(alt)+'" stroke="#145C9E" stroke-width="2"/>' +
+    '<circle cx="60" cy="'+y(alt)+'" r="5" fill="#145C9E"/>' +
+    '<text x="4" y="'+(y(alt)-5)+'" font-size="11" fill="#145C9E" font-weight="700">' + (vals.length ? "現在 "+alt : "未計測") + '</text>' +
+    '<text x="60" y="'+(H+18)+'" text-anchor="middle" font-size="10" fill="#5A7278">最低スコア = 現在標高</text>' +
+  '</svg>';
+}
+
+function skillCardHTML(label, jp, val){
+  var c = colorFor(val);
+  var note = val === null ? "未計測" : (val >= 79 ? "登頂圏" : "79まで +" + (79-val));
+  return '<div style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;">' +
+    '<div style="font-size:11px;color:var(--sub);letter-spacing:1px;">'+label+' <span style="letter-spacing:0;">'+jp+'</span></div>' +
+    '<div style="font-size:26px;font-weight:700;color:'+c+';font-variant-numeric:tabular-nums;">'+(val===null?"–":val)+'</div>' +
+    '<div style="font-size:10px;color:'+c+';">'+note+'</div></div>';
+}
+
+function wordDiffHTML(target, marks){
+  var words = norm(target).split(" ");
+  var out = '<p style="line-height:1.9;font-size:16px;margin:0 0 12px;">';
+  for(var i=0;i<words.length;i++){
+    var ok = marks[i];
+    out += '<span style="color:'+(ok?"var(--green)":"var(--red)")+';font-weight:'+(ok?"500":"700")+';' +
+           (ok?"":"text-decoration:underline;")+'margin-right:6px;">'+esc(words[i])+'</span>';
+  }
+  return out + '</p>';
+}
+
+function headerHTML(title){
+  return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">' +
+    '<button id="back" style="background:none;border:none;color:var(--blue);font-size:14px;font-family:inherit;cursor:pointer;padding:0;">← ダッシュボード</button>' +
+    '<div style="font-size:11px;letter-spacing:2px;color:var(--sub);font-weight:700;">'+title+'</div></div>';
+}
+
+function resultBlockHTML(r, extra){
+  var c = r.pct >= 0.9 ? "var(--green)" : r.pct >= 0.7 ? "var(--amber)" : "var(--red)";
+  return '<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;">' +
+    '<div style="font-size:30px;font-weight:700;color:'+c+';">'+r.correct+'/'+r.total+'</div>' +
+    '<div style="font-size:13px;color:var(--sub);">推定寄与スコア '+toScale(r.pct)+(extra||"")+'</div></div>';
+}
+
+/* ---------- 復習キュー(間隔反復: 翌日→3日後→7日後) ---------- */
+function dstr(offsetDays){ return new Date(Date.now()+offsetDays*864e5).toISOString().slice(0,10); }
+function scheduleReview(q, pct){
+  var rv = state.reviewWFD;
+  if(pct >= 0.999){
+    if(rv[q]){
+      var st = rv[q].stage || 0;
+      if(st >= 2){ delete rv[q]; }           /* 3回連続正解で卒業 */
+      else rv[q] = { stage: st+1, due: dstr(st === 0 ? 3 : 7) };
+    }
+  }else{
+    rv[q] = { stage: 0, due: dstr(1) };       /* ミス → 明日再出題 */
+  }
+  saveState();
+}
+function dueReviews(){
+  var t = todayStr(), out = [];
+  for(var k in state.reviewWFD){ if(state.reviewWFD[k].due <= t) out.push(k); }
+  return out;
+}
+
+/* ---------- デイリーミッション(最弱スキルから自動処方) ---------- */
+function getSkills(){
+  return {
+    L: estimateFor(["WFD","RS"]),
+    W: estimateFor(["WFD","ESSAY","SWT"]),
+    S: estimateFor(["RS"]),
+    R: estimateFor(["SWT"])
+  };
+}
+var MISSION_MAP = {
+  L: { t:"WFD", n:5, label:"Write from Dictation 5問" },
+  S: { t:"RS",  n:5, label:"Repeat Sentence 5問" },
+  W: { t:"SWT", n:1, label:"Summarize Written Text 1問" },
+  R: { t:"SWT", n:1, label:"Summarize Written Text 1問" }
+};
+var SKILL_JP = { L:"聞く", W:"書く", S:"話す", R:"読む" };
+function buildMissions(skills){
+  var order = ["L","S","W","R"].map(function(k){
+    return { k:k, v: skills[k] === null ? -1 : skills[k] };  /* 未計測を最優先 */
+  }).sort(function(a,b){ return a.v - b.v; });
+  var missions = [], usedTasks = {};
+  for(var i=0;i<order.length && missions.length<2;i++){
+    var m = MISSION_MAP[order[i].k];
+    if(usedTasks[m.t]) continue;
+    usedTasks[m.t] = true;
+    missions.push({ taskType:m.t, target:m.n, label:m.label, skill:order[i].k });
+  }
+  return missions;
+}
+function todayCount(taskType){
+  var t = todayStr();
+  return state.attempts.filter(function(a){ return a.date === t && a.taskType === taskType; }).length;
+}
+var GOUME = ["一","二","三","四","五","六","七","八","九","十"];
+function xpGoume(){ return GOUME[Math.min(9, Math.floor((state.xp||0)/300))]; }
+
+/* ================= Dashboard ================= */
+function renderDash(){
+  var skills = getSkills();
+  var today = todayStr();
+  var missions = buildMissions(skills);
+  var allDone = true;
+  missions.forEach(function(m){ m.done = todayCount(m.taskType); if(m.done < m.target) allDone = false; });
+
+  /* ミッション完遂ボーナス(1日1回) */
+  var bonusBanner = "";
+  if(allDone && state.missionBonusDate !== today){
+    state.xp += 50;
+    state.missionBonusDate = today;
+    saveState();
+  }
+  if(allDone && state.missionBonusDate === today){
+    bonusBanner = '<div style="background:#E7F5EE;border:1px solid var(--green);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--green);font-weight:700;margin-bottom:12px;text-align:center;">🎉 今日のミッション完遂!+50 XP — 明日も小さく積もう</div>';
+  }
+
+  /* カウントダウン */
+  var cdHTML;
+  if(state.examDate){
+    var daysLeft = Math.ceil((new Date(state.examDate) - new Date(today)) / 864e5);
+    var cdC = daysLeft <= 30 ? "var(--red)" : daysLeft <= 90 ? "var(--amber)" : "var(--blue)";
+    cdHTML = '<button id="setdate" style="all:unset;cursor:pointer;display:flex;justify-content:space-between;align-items:baseline;width:100%;box-sizing:border-box;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:12px;">' +
+      '<span style="font-size:12px;color:var(--sub);">🎯 PR申請目標(' + state.examDate + ')まで</span>' +
+      '<span style="font-size:22px;font-weight:700;color:' + cdC + ';">' + daysLeft + '<span style="font-size:12px;"> 日</span></span></button>';
+  }else{
+    cdHTML = '<button id="setdate" class="btn ghost" style="margin-bottom:12px;font-size:13px;padding:10px;">🎯 申請目標日を設定する(推奨: 180日後)</button>';
+  }
+
+  var missionHTML = missions.map(function(m){
+    var pct = Math.min(m.done / m.target, 1) * 100;
+    var ok = m.done >= m.target;
+    return '<div style="margin-bottom:8px;">' +
+      '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:2px;">' +
+      '<span>' + (ok ? "✅ " : "") + m.label + ' <span style="color:var(--sub);">(' + m.skill + '=' + SKILL_JP[m.skill] + ' 強化)</span></span>' +
+      '<span style="font-weight:700;color:' + (ok ? "var(--green)" : "var(--ink)") + ';">' + m.done + '/' + m.target + '</span></div>' +
+      '<div style="height:6px;background:var(--line);border-radius:3px;overflow:hidden;">' +
+      '<div style="width:' + pct + '%;height:100%;background:' + (ok ? "var(--green)" : "var(--blue)") + ';"></div></div></div>';
+  }).join("");
+
+  var reviewsDue = dueReviews().length;
+
+  var tasks = [
+    { id:"wfd", name:"Write from Dictation", jp:"聞いて書き取る" + (reviewsDue ? "・復習" + reviewsDue + "問待ち" : ""), affects:"L + W", ready:true },
+    { id:"rs", name:"Repeat Sentence", jp:"聞いて復唱する", affects:"S + L", ready:true },
+    { id:"write", name:"Essay / SWT", jp:"AI採点ライティング", affects:"W + R", ready:true },
+    { id:"ra", name:"Read Aloud", jp:"音読", affects:"S + R", ready:false }
+  ];
+  var taskHTML = tasks.map(function(t){
+    return '<button class="taskbtn" data-nav="'+t.id+'"'+(t.ready?"":" disabled")+'>' +
+      '<div><div style="font-size:15px;font-weight:700;">'+t.name+'</div>' +
+      '<div style="font-size:12px;color:var(--sub);">'+t.jp+'</div></div>' +
+      '<div style="text-align:right;"><div style="font-size:12px;font-weight:700;color:'+(t.ready?"var(--blue)":"var(--sub)")+';">'+t.affects+'</div>' +
+      (t.ready?"":'<div style="font-size:10px;color:var(--sub);">準備中</div>')+'</div></button>';
+  }).join("");
+
+  root.innerHTML =
+    '<header style="margin-bottom:14px;">' +
+      '<div style="font-size:11px;letter-spacing:3px;color:var(--blue);font-weight:700;">PTE SUMMIT</div>' +
+      '<h1>79m峰 登頂計画</h1>' +
+      '<div style="font-size:12px;color:var(--sub);">全セクション79 = Australia PR</div>' +
+    '</header>' +
+    bonusBanner + cdHTML +
+    '<div class="card" style="display:flex;gap:12px;padding:12px;margin-bottom:12px;">' +
+      altimeterSVG(skills) +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;flex:1;align-content:center;">' +
+        skillCardHTML("L","聞く",skills.L) + skillCardHTML("W","書く",skills.W) +
+        skillCardHTML("S","話す",skills.S) + skillCardHTML("R","読む",skills.R) +
+      '</div>' +
+    '</div>' +
+    '<div class="row" style="margin-bottom:12px;">' +
+      '<div style="flex:1;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px;">' +
+        '<div style="font-size:11px;color:var(--sub);">ストリーク</div>' +
+        '<div style="font-size:22px;font-weight:700;">'+state.streak+'<span style="font-size:12px;"> 日</span></div>' +
+        '<div style="font-size:11px;color:var(--blue);font-weight:700;margin-top:2px;">⛰ '+xpGoume()+'合目・'+state.xp+' XP</div>' +
+      '</div>' +
+      '<div style="flex:2;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px;">' +
+        '<div style="font-size:11px;color:var(--sub);font-weight:700;margin-bottom:6px;">今日のミッション(弱点から自動処方)</div>' +
+        missionHTML +
+      '</div>' +
+    '</div>' +
+    '<div style="font-size:12px;color:var(--sub);font-weight:700;letter-spacing:1px;margin-bottom:8px;">トレーニング</div>' +
+    '<div style="display:grid;gap:8px;">'+taskHTML+'</div>' +
+    '<div class="row" style="margin-top:10px;">' +
+    '<button class="btn ghost" id="gohist" style="flex:1;font-size:12px;padding:9px;">📋 練習履歴</button>' +
+    '<button class="btn ghost" id="gocoach" style="flex:1;font-size:12px;padding:9px;">🧭 AIコーチ</button>' +
+    '</div>' +
+    '<div class="row" style="margin-top:8px;">' +
+    '<button class="btn ghost" id="expdata" style="flex:1;font-size:12px;padding:9px;">⬆︎ バックアップ書き出し</button>' +
+    '<button class="btn ghost" id="impdata" style="flex:1;font-size:12px;padding:9px;">⬇︎ バックアップ読み込み</button>' +
+    '</div>' +
+    '<input type="file" id="impfile" accept=".json,application/json" style="display:none;">' +
+    '<p style="font-size:11px;color:var(--sub);margin-top:12px;">' +
+      (SR ? "✓ この環境は音声認識に対応しています"
+          : "△ この環境は音声認識非対応(Repeat Sentenceは自己採点)。iPhoneはSafari、AndroidはChromeで開いてください。") +
+    '</p>';
+
+  var btns = root.querySelectorAll("[data-nav]");
+  for(var i=0;i<btns.length;i++){
+    btns[i].addEventListener("click", function(){
+      var id = this.getAttribute("data-nav");
+      if(id === "wfd") renderWFD();
+      if(id === "rs") renderRS();
+      if(id === "write") renderWrite();
+    });
+  }
+  document.getElementById("gohist").addEventListener("click", renderHistory);
+  document.getElementById("gocoach").addEventListener("click", renderCoach);
+  document.getElementById("expdata").addEventListener("click", exportData);
+  document.getElementById("impdata").addEventListener("click", function(){
+    document.getElementById("impfile").click();
+  });
+  document.getElementById("impfile").addEventListener("change", importData);
+  document.getElementById("setdate").addEventListener("click", function(){
+    var def = state.examDate || dstr(180);
+    var v = prompt("PR申請の目標日を入力してください (YYYY-MM-DD)", def);
+    if(v && /^\d{4}-\d{2}-\d{2}$/.test(v.trim())){
+      state.examDate = v.trim();
+      saveState();
+      renderDash();
+    }else if(v !== null){
+      alert("YYYY-MM-DD形式で入力してください(例: 2027-01-03)");
+    }
+  });
+}
+
+/* ================= Write from Dictation ================= */
+function renderWFD(){
+  var SET_SIZE = 5;
+  var setQs = [];      /* このセットの問題 */
+  var setResults = []; /* {q, pct, marks, answer, plays} */
+  var idx = 0;
+  var plays = 0;
+  var q = null;
+
+  function shuffle(arr){
+    arr = arr.slice();
+    for(var i = arr.length - 1; i > 0; i--){
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    }
+    return arr;
+  }
+  function pickSet(){
+    setQs = [];
+    setResults = [];
+    idx = 0;
+    /* 復習期限が来た問題を優先して混ぜる(間隔反復) */
+    var due = shuffle(dueReviews()).slice(0, SET_SIZE);
+    var pool = wfdUnused().filter(function(x){ return due.indexOf(x) < 0; });
+    if(pool.length + due.length < SET_SIZE){
+      state.usedWFD = [];
+      saveState();
+      pool = wfdAllQuestions().filter(function(x){ return due.indexOf(x) < 0; });
+    }
+    setQs = due.concat(shuffle(pool)).slice(0, SET_SIZE);
+    setQs = shuffle(setQs);
+  }
+
+  function screen(html){
+    var prog = setQs.length ? ' — 問' + (idx+1) + '/' + SET_SIZE : "";
+    root.innerHTML = headerHTML("WRITE FROM DICTATION" + prog) + '<div class="card">' + html + '</div>';
+    document.getElementById("back").addEventListener("click", renderDash);
+  }
+
+  function ready(msg){
+    setQs = [];
+    var remaining = wfdUnused().length;
+    var total = wfdAllQuestions().length;
+    screen('<div style="text-align:center;padding:24px 0;">' +
+      '<p style="font-size:13px;color:var(--sub);margin-bottom:6px;">' + SET_SIZE + '問1セットで練習します。セット終了後に<br>弱点分析と聞き取りのコツをフィードバックします。</p>' +
+      '<p style="font-size:11px;color:var(--sub);margin-bottom:16px;">未出題 '+remaining+' / 全'+total+'問' +
+      (dueReviews().length ? ' ・ <span style="color:var(--amber);font-weight:700;">復習期限 '+dueReviews().length+'問(優先出題)</span>' : "") + '</p>' +
+      (msg ? '<p style="font-size:12px;color:var(--green);margin-bottom:12px;">'+esc(msg)+'</p>' : "") +
+      '<button class="btn" id="startset" style="width:auto;display:inline-block;">▶ ' + SET_SIZE + '問セットを開始</button>' +
+      '<div style="margin-top:14px;"><button class="btn ghost" id="genq" style="width:auto;display:inline-block;padding:8px 14px;font-size:13px;">✨ AIで新問題を10問生成</button></div>' +
+      '<div id="genstatus" style="font-size:11px;color:var(--sub);margin-top:8px;"></div></div>');
+    document.getElementById("startset").addEventListener("click", function(){
+      pickSet();
+      q = setQs[0];
+      plays = 0;
+      play();
+    });
+    document.getElementById("genq").addEventListener("click", function(){
+      var st = document.getElementById("genstatus");
+      if(!getApiKey()){
+        st.textContent = "AI生成にはAPIキーが必要です。先にEssay/SWT画面でキーを設定してください。";
+        st.style.color = "var(--amber)";
+        return;
+      }
+      this.disabled = true;
+      st.textContent = "生成中…(10〜20秒)";
+      st.style.color = "var(--sub)";
+      generateWFD(function(added){
+        ready("新しい問題を"+added+"問追加しました!");
+      }, function(err){
+        st.textContent = "生成に失敗しました: " + err;
+        st.style.color = "var(--red)";
+        document.getElementById("genq").disabled = false;
+      });
+    });
+  }
+
+  function play(){
+    plays++;
+    screen('<div style="text-align:center;padding:40px 0;color:var(--blue);font-weight:700;">🔊 再生中…</div>');
+    speak(q, typing);
+  }
+
+  function typing(prev){
+    screen('<textarea id="ans" rows="3" placeholder="聞こえた文をタイプ…"></textarea>' +
+      '<div class="row" style="margin-top:10px;">' +
+      '<button class="btn ghost" id="again" style="flex:1;">もう一度 ('+plays+')</button>' +
+      '<button class="btn" id="submit" style="flex:2;">採点する</button></div>');
+    var ta = document.getElementById("ans");
+    if(typeof prev === "string") ta.value = prev;
+    ta.focus();
+    document.getElementById("again").addEventListener("click", function(){
+      var kept = ta.value;
+      plays++;
+      speak(q, function(){ typing(kept); });
+    });
+    document.getElementById("submit").addEventListener("click", function(){
+      var v = ta.value;
+      if(!v.trim()) return;
+      var r = scoreWords(q, v);
+      recordAttempt(r.pct, "WFD");
+      markWFDUsed(q);
+      scheduleReview(q, r.pct);
+      setResults.push({ q: q, pct: r.pct, marks: r.marks, correct: r.correct, total: r.total, answer: v, plays: plays });
+      result(r, v);
+    });
+  }
+
+  function result(r, answer){
+    var isLast = idx >= SET_SIZE - 1;
+    screen('<textarea rows="3" disabled style="background:#F7FAFA;">'+esc(answer)+'</textarea>' +
+      '<div style="margin-top:14px;">' +
+      '<div style="font-size:13px;color:var(--sub);margin-bottom:6px;">正解文(単語ごとの判定)</div>' +
+      wordDiffHTML(q, r.marks) +
+      resultBlockHTML(r, plays>1 ? "・再生"+plays+"回(本番は1回)" : "") +
+      '<button class="btn" id="next">' + (isLast ? "セット結果を見る 📊" : "次の問題 → (" + (idx+2) + "/" + SET_SIZE + ")") + '</button></div>');
+    document.getElementById("next").addEventListener("click", function(){
+      if(isLast){ setSummary(); return; }
+      idx++;
+      q = setQs[idx];
+      plays = 0;
+      play();
+    });
+  }
+
+  /* ---------- セット後の弱点分析 ---------- */
+  function analyzeSet(results){
+    var ARTICLES = ["a","an","the"];
+    var PREPS = ["of","in","on","at","to","for","with","by","from","into","over","under","between","during"];
+    var cats = {
+      article:  { label:"冠詞(a / the)", words:[], tip:"冠詞は弱形で発音され、ほとんど聞こえません。「聞く」のではなく、可算名詞の前に冠詞が必要かを文法で判断して補うのがコツです。" },
+      prep:     { label:"前置詞", words:[], tip:"前置詞も弱く短く発音されます。動詞とのセット(contribute to / allocated to など)で覚えると、聞こえなくても自動的に補えます。" },
+      pasted:   { label:"過去形・過去分詞の -ed", words:[], tip:"-edは /t/ /d/ の一瞬の音です。文中の時制のヒント(has / was / yesterday等)から過去形かどうかを判断しましょう。" },
+      plural:   { label:"複数形・三単現の -s", words:[], tip:"語尾の-sは非常に弱い音です。many / several / two などの数量表現や、動詞の形から名詞が複数かを文法的に判断します。" },
+      academic: { label:"長い学術語彙", words:[], tip:"長い学術語は「音」で覚えるのが最短です。間違えた単語を3回音読して、スペルと音を一致させましょう。次回から必ず聞き取れます。" },
+      other:    { label:"その他の単語", words:[], tip:"文全体の意味を先に掴むと、聞き逃した単語を文脈から推測して補えます。ディクテーション中はまず動詞と名詞を確保しましょう。" }
+    };
+    var perfect = 0;
+    results.forEach(function(r){
+      if(r.pct >= 0.999) perfect++;
+      var words = norm(r.q).split(" ");
+      words.forEach(function(w, i){
+        if(r.marks[i]) return;
+        var cat = ARTICLES.indexOf(w) >= 0 ? "article" :
+                  PREPS.indexOf(w) >= 0 ? "prep" :
+                  (w.length > 3 && w.slice(-2) === "ed") ? "pasted" :
+                  (w.length > 3 && w.slice(-1) === "s" && w.slice(-2) !== "ss") ? "plural" :
+                  (w.length >= 9) ? "academic" : "other";
+        if(cats[cat].words.indexOf(w) < 0) cats[cat].words.push(w);
+      });
+    });
+    var list = Object.keys(cats).map(function(k){ return cats[k]; })
+      .filter(function(c){ return c.words.length > 0; })
+      .sort(function(a,b){ return b.words.length - a.words.length; });
+    return { cats: list, perfect: perfect };
+  }
+
+  function setSummary(){
+    var totalCorrect = 0, totalWords = 0;
+    var rows = setResults.map(function(r, i){
+      totalCorrect += r.correct; totalWords += r.total;
+      var c = r.pct >= 0.9 ? "var(--green)" : r.pct >= 0.7 ? "var(--amber)" : "var(--red)";
+      return '<div style="display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);">' +
+        '<div style="font-size:12px;line-height:1.5;flex:1;">' + (i+1) + '. ' + esc(r.q) + '</div>' +
+        '<div style="font-size:14px;font-weight:700;color:'+c+';white-space:nowrap;">' + r.correct + '/' + r.total + '</div></div>';
+    }).join("");
+
+    var acc = Math.round((totalCorrect/totalWords)*100);
+    var accC = acc >= 90 ? "var(--green)" : acc >= 70 ? "var(--amber)" : "var(--red)";
+    var an = analyzeSet(setResults);
+
+    var catHTML = an.cats.length ? an.cats.map(function(c){
+      return '<div style="border-left:3px solid var(--amber);padding:8px 10px;margin-bottom:8px;background:#FBF7EE;border-radius:0 8px 8px 0;">' +
+        '<div style="font-size:13px;font-weight:700;">' + c.label + ' <span style="color:var(--red);">×' + c.words.length + '</span></div>' +
+        '<div style="font-size:12px;color:var(--red);margin:2px 0;">落とした語: ' + c.words.slice(0,5).map(esc).join(", ") + '</div>' +
+        '<div style="font-size:12px;color:var(--sub);line-height:1.6;">💡 ' + c.tip + '</div></div>';
+    }).join("") : '<p style="font-size:13px;color:var(--green);font-weight:600;">全問パーフェクト!素晴らしい精度です。</p>';
+
+    var strength = an.perfect > 0 ? '<p style="font-size:12px;color:var(--green);margin:4px 0 0;">✓ 満点 ' + an.perfect + '/' + SET_SIZE + ' 問 — この調子!</p>' : "";
+
+    setQs = []; /* ヘッダーの問番号表示を消す */
+    root.innerHTML = headerHTML("セット結果") +
+      '<div class="card">' +
+      '<div style="text-align:center;margin-bottom:10px;">' +
+      '<div style="font-size:40px;font-weight:700;color:'+accC+';">' + acc + '<span style="font-size:16px;">%</span></div>' +
+      '<div style="font-size:12px;color:var(--sub);">セット正答率(' + totalCorrect + '/' + totalWords + ' 語)</div>' + strength +
+      '</div>' + rows +
+      '<div style="font-size:12px;color:var(--sub);font-weight:700;margin:14px 0 8px;">ミスの傾向と聞き取りのコツ</div>' +
+      catHTML +
+      '<div class="row" style="margin-top:12px;">' +
+      '<button class="btn ghost" id="onemore" style="flex:1;">もう1セット</button>' +
+      '<button class="btn" id="todash" style="flex:1;">ダッシュボード</button></div></div>';
+    document.getElementById("back").addEventListener("click", renderDash);
+    document.getElementById("onemore").addEventListener("click", function(){
+      pickSet(); q = setQs[0]; plays = 0; play();
+    });
+    document.getElementById("todash").addEventListener("click", renderDash);
+  }
+
+  ready();
+}
+
+/* ================= Repeat Sentence ================= */
+function renderRS(){
+  var qIdx = Math.floor(Math.random()*RS_QUESTIONS.length);
+  var srFailed = !SR;
+  var rec = null;
+
+  function q(){ return RS_QUESTIONS[qIdx]; }
+  function screen(html, foot){
+    root.innerHTML = headerHTML("REPEAT SENTENCE") + '<div class="card">' + html + '</div>' +
+      '<p style="font-size:11px;color:var(--sub);margin-top:10px;line-height:1.6;">Repeat SentenceはSpeakingとListeningの最大配点タスク。内容(単語一致)に加え、本番では流暢さと発音も採点されます。</p>';
+    document.getElementById("back").addEventListener("click", function(){
+      try{ if(rec) rec.abort(); }catch(e){}
+      renderDash();
+    });
+  }
+  function ready(){
+    screen('<div style="text-align:center;padding:24px 0;">' +
+      '<p style="font-size:13px;color:var(--sub);margin-bottom:6px;">音声を聞いたら、<b>すぐに同じ文を声に出して</b>復唱します。</p>' +
+      '<p style="font-size:11px;color:'+(srFailed?"var(--amber)":"var(--sub)")+';margin-bottom:16px;">' +
+      (srFailed ? "この環境は音声認識に対応していないため、自己採点モードで練習します。"
+                : "再生終了後、自動でマイクが起動します(初回はマイク許可を求められます)。") +
+      '</p><button class="btn" id="play" style="width:auto;display:inline-block;">▶ 再生する</button></div>');
+    document.getElementById("play").addEventListener("click", play);
+  }
+  function play(){
+    screen('<div style="text-align:center;padding:40px 0;color:var(--blue);font-weight:700;">🔊 再生中…</div>');
+    speak(q(), function(){
+      if(srFailed){ selfMode(""); return; }
+      window.speechSynthesis.cancel();
+      /* iOSはタップ操作から直接認識を開始しないと音声が渡されないため、
+         自動開始ではなくボタンを表示する */
+      screen('<div style="text-align:center;padding:24px 0;">' +
+        '<p style="font-size:13px;color:var(--sub);margin-bottom:16px;">ボタンを押して、すぐに復唱してください。</p>' +
+        '<button class="btn" id="recstart" style="width:auto;display:inline-block;font-size:17px;">🎙️ 録音開始</button>' +
+        '<div style="margin-top:12px;"><button class="btn ghost" id="toself2" style="width:auto;display:inline-block;padding:8px 14px;font-size:13px;">自己採点で答える</button></div></div>');
+      document.getElementById("recstart").addEventListener("click", startRecognition);
+      document.getElementById("toself2").addEventListener("click", function(){ selfMode(""); });
+    });
+  }
+  function startRecognition(){
+    var finalText = "";
+    var interimText = "";
+    var finished = false;
+    function currentText(){ return (finalText + " " + interimText).trim(); }
+    function finalize(){
+      if(finished) return;
+      finished = true;
+      var text = currentText();
+      if(text){
+        var r = scoreWords(q(), text);
+        recordAttempt(r.pct, "RS");
+        result(r, text);
+      }else{
+        recfail("音声を検出できませんでした。iPhoneの場合、設定 > 一般 > キーボード >「音声入力」がオンか確認してください。もう一度試すか、自己採点に切り替えることもできます。");
+      }
+    }
+    try{
+      rec = new SR();
+      rec.lang = "en-AU";
+      rec.continuous = true;        /* 手動停止まで聞き続ける */
+      rec.interimResults = true;    /* iOSは途中結果しか返さないことがある */
+      rec.maxAlternatives = 1;
+      rec.onresult = function(e){
+        interimText = "";
+        for(var i=0;i<e.results.length;i++){
+          if(e.results[i].isFinal){
+            /* finalはresultIndex以降のみ追加(重複防止のため毎回組み直す) */
+          }
+        }
+        finalText = "";
+        for(var j=0;j<e.results.length;j++){
+          if(e.results[j].isFinal) finalText += e.results[j][0].transcript + " ";
+          else interimText += e.results[j][0].transcript + " ";
+        }
+        var live = document.getElementById("live");
+        if(live) live.textContent = currentText() || "…";
+      };
+      rec.onerror = function(e){
+        if(e.error === "not-allowed" || e.error === "service-not-allowed"){
+          finished = true;
+          srFailed = true;
+          selfMode("マイクの使用が許可されませんでした。設定 > Safari > マイク で許可するか、自己採点で練習してください。");
+        }
+        /* no-speech等はonendに任せる */
+      };
+      rec.onend = finalize;
+      rec.start();
+      screen('<div style="text-align:center;padding:24px 0;">' +
+        '<div style="font-size:40px;margin-bottom:8px;">🎙️</div>' +
+        '<div style="color:var(--red);font-weight:700;margin-bottom:8px;">録音中 — いま復唱してください</div>' +
+        '<div id="live" style="min-height:24px;font-size:14px;color:var(--sub);margin-bottom:12px;">…</div>' +
+        '<button class="btn ghost" id="stop" style="width:auto;display:inline-block;">話し終えた(停止)</button></div>');
+      document.getElementById("stop").addEventListener("click", function(){
+        try{ rec.stop(); }catch(e){ finalize(); }
+        /* stopしてもonendが来ない環境向けの保険 */
+        setTimeout(finalize, 1500);
+      });
+    }catch(err){
+      srFailed = true;
+      selfMode("");
+    }
+  }
+  function recfail(msg){
+    screen('<div style="text-align:center;padding:20px 0;">' +
+      '<p style="font-size:13px;color:var(--amber);margin-bottom:16px;">'+esc(msg)+'</p>' +
+      '<div class="row">' +
+      '<button class="btn ghost" id="retry" style="flex:1;">もう一度</button>' +
+      '<button class="btn" id="toself" style="flex:1;">自己採点に切替</button></div></div>');
+    document.getElementById("retry").addEventListener("click", play);
+    document.getElementById("toself").addEventListener("click", function(){ selfMode(""); });
+  }
+  function selfMode(msg){
+    var opts = [
+      ["完璧に言えた(全単語・語順OK)", 1.0],
+      ["ほぼ言えた(1〜2語ミス)", 0.8],
+      ["半分くらい言えた", 0.5],
+      ["ほとんど言えなかった", 0.2]
+    ];
+    var optHTML = opts.map(function(o,i){
+      return '<button class="btn ghost" data-self="'+i+'" style="text-align:left;">'+o[0]+'</button>';
+    }).join("");
+    screen('<div style="padding:8px 0;">' +
+      (msg ? '<p style="font-size:12px;color:var(--amber);">'+esc(msg)+'</p>' : "") +
+      '<div style="font-size:13px;color:var(--sub);margin-bottom:6px;">正解文</div>' +
+      '<p style="font-size:17px;font-weight:600;line-height:1.6;margin:0 0 4px;">'+esc(q())+'</p>' +
+      '<button class="btn ghost" id="relisten" style="width:auto;display:inline-block;padding:8px 14px;font-size:13px;margin-bottom:16px;">🔊 もう一度聞く</button>' +
+      '<div style="font-size:13px;color:var(--sub);margin-bottom:8px;">どのくらい正確に復唱できましたか?</div>' +
+      '<div style="display:grid;gap:8px;">'+optHTML+'</div></div>');
+    document.getElementById("relisten").addEventListener("click", function(){ speak(q(), function(){}); });
+    var btns = root.querySelectorAll("[data-self]");
+    for(var i=0;i<btns.length;i++){
+      btns[i].addEventListener("click", function(){
+        var o = opts[parseInt(this.getAttribute("data-self"),10)];
+        recordAttempt(o[1], "RS");
+        resultSelf(o[0], o[1]);
+      });
+    }
+  }
+  function result(r, transcript){
+    screen('<div style="padding:4px 0;">' +
+      '<div style="font-size:13px;color:var(--sub);margin-bottom:6px;">正解文(あなたの発話に含まれた単語=緑)</div>' +
+      wordDiffHTML(q(), r.marks) +
+      '<div style="font-size:12px;color:var(--sub);margin-bottom:10px;">認識された発話: <span style="color:var(--ink);">'+esc(transcript||"(なし)")+'</span></div>' +
+      resultBlockHTML(r, "") +
+      '<button class="btn" id="next">次の問題 →</button></div>');
+    document.getElementById("next").addEventListener("click", nextQ);
+  }
+  function resultSelf(label, pct){
+    screen('<div style="padding:4px 0;">' +
+      '<div style="font-size:13px;color:var(--sub);margin-bottom:6px;">自己採点</div>' +
+      '<p style="font-size:15px;font-weight:600;margin:0 0 4px;">'+esc(label)+'</p>' +
+      '<div style="font-size:13px;color:var(--sub);margin-bottom:14px;">推定寄与スコア '+toScale(pct)+'</div>' +
+      '<button class="btn" id="next">次の問題 →</button></div>');
+    document.getElementById("next").addEventListener("click", nextQ);
+  }
+  function nextQ(){
+    qIdx = (qIdx + 1 + Math.floor(Math.random()*(RS_QUESTIONS.length-1))) % RS_QUESTIONS.length;
+    ready();
+  }
+  ready();
+}
+
+/* ================= AI scoring (Anthropic API / 自分のAPIキー) ================= */
+var API_KEY_STORE = "pte-api-key";
+function getApiKey(){ try{ return localStorage.getItem(API_KEY_STORE) || ""; }catch(e){ return ""; } }
+function setApiKey(k){ try{ localStorage.setItem(API_KEY_STORE, k); }catch(e){} }
+
+function scoreWithAI(kind, taskText, userText, onDone, onError){
+  var instr;
+  if(kind === "SWT"){
+    instr = "You are a strict PTE Academic rater. Rate this Summarize Written Text response.\n" +
+      "PASSAGE:\n" + taskText + "\n\nSTUDENT RESPONSE:\n" + userText + "\n\n" +
+      "PTE rules: must be ONE single sentence, 5-75 words, capturing the main points.\n";
+  }else{
+    instr = "You are a strict PTE Academic rater. Rate this Write Essay response.\n" +
+      "PROMPT:\n" + taskText + "\n\nSTUDENT ESSAY:\n" + userText + "\n\n" +
+      "PTE rules: 200-300 words, clear position, structure, academic register.\n";
+  }
+  instr += "Rate strictly at the standard needed for PTE 79+ (equivalent to IELTS 8).\n" +
+    "Respond with ONLY minified JSON, no markdown fences, no other text, exactly this shape:\n" +
+    '{"axes":{"content":<0-100>,"form":<0-100>,"structure":<0-100>,"grammar":<0-100>,"vocabulary":<0-100>,"spelling":<0-100>},' +
+    '"overall":<10-90>,' +
+    '"improvements":[{"quote":"<exact short excerpt copied verbatim from the student text>","fix":"<corrected English>","why_ja":"<日本語で理由を1文>"}],' +
+    '"feedback_ja":"<日本語で3〜4文の総評。良かった点1つ、最優先の改善方針2つ>"}\n' +
+    "axes meaning: content=課題への適合と論点, form=語数・形式要件, structure=構成と論理展開の一貫性, grammar=文法, vocabulary=語彙の幅と適切さ, spelling=綴り。\n" +
+    "improvements: the 5 most impactful fixes only (fewer if the text is short). quote must be copied exactly from the student text so it can be highlighted.";
+
+  fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": getApiKey(),
+      "anthropic-version": "2023-06-01",
+      "anthropic-dangerous-direct-browser-access": "true"
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-6",
+      max_tokens: 700,
+      messages: [{ role: "user", content: instr }]
+    })
+  }).then(function(res){
+    if(!res.ok){ return res.text().then(function(t){ throw new Error("API " + res.status + ": " + t.slice(0,200)); }); }
+    return res.json();
+  }).then(function(data){
+    var text = "";
+    (data.content || []).forEach(function(b){ if(b.type === "text") text += b.text; });
+    text = text.replace(/```json|```/g, "").trim();
+    var parsed = JSON.parse(text);
+    onDone(parsed);
+  }).catch(function(err){
+    onError(err.message || String(err));
+  });
+}
+
+/* ---------- WFD AI問題生成 ---------- */
+function generateWFD(onDone, onError){
+  var existing = wfdAllQuestions().slice(-40);
+  var instr = "Generate 10 sentences for PTE Academic 'Write from Dictation' practice at the difficulty needed for a 79+ score.\n" +
+    "Rules: academic register (university lectures, research, campus life), 10-16 words each, natural spoken English, " +
+    "include some challenging elements (plurals, articles, academic vocabulary, numbers).\n" +
+    "Do NOT duplicate any of these existing sentences:\n" + existing.join("\n") + "\n\n" +
+    "Respond with ONLY a minified JSON array of 10 strings, no markdown fences, no other text.";
+  fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": getApiKey(),
+      "anthropic-version": "2023-06-01",
+      "anthropic-dangerous-direct-browser-access": "true"
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-6",
+      max_tokens: 800,
+      messages: [{ role: "user", content: instr }]
+    })
+  }).then(function(res){
+    if(!res.ok){ return res.text().then(function(t){ throw new Error("API " + res.status); }); }
+    return res.json();
+  }).then(function(data){
+    var text = "";
+    (data.content || []).forEach(function(b){ if(b.type === "text") text += b.text; });
+    text = text.replace(/```json|```/g, "").trim();
+    var arr = JSON.parse(text);
+    if(!Array.isArray(arr)) throw new Error("形式エラー");
+    var all = wfdAllQuestions();
+    var added = 0;
+    arr.forEach(function(s){
+      if(typeof s === "string" && s.trim() && all.indexOf(s) < 0){
+        state.genWFD.push(s.trim());
+        added++;
+      }
+    });
+    saveState();
+    onDone(added);
+  }).catch(function(err){
+    onError(err.message || String(err));
+  });
+}
+
+/* ================= Essay / SWT ================= */
+function renderWrite(){
+  var timerId = null;
+  document.getElementById("app").classList.add("wide");
+
+  function stopTimer(){ if(timerId){ clearInterval(timerId); timerId = null; } }
+  function leave(){
+    stopTimer();
+    document.getElementById("app").classList.remove("wide");
+    renderDash();
+  }
+  function screen(html){
+    stopTimer();
+    root.innerHTML = headerHTML("ESSAY / SWT") + html;
+    document.getElementById("back").addEventListener("click", leave);
+  }
+  function wordCount(s){
+    var w = s.trim().split(/\s+/).filter(Boolean);
+    return s.trim() ? w.length : 0;
+  }
+
+  function keySetup(){
+    screen('<div class="card">' +
+      '<div style="font-size:15px;font-weight:700;margin-bottom:8px;">AI採点のセットアップ(初回のみ)</div>' +
+      '<p style="font-size:12px;color:var(--sub);line-height:1.7;margin:0 0 12px;">' +
+      'AI採点にはあなた自身のAnthropic APIキーが必要です。console.anthropic.com で取得できます(従量課金・採点1回1円未満程度)。キーはこの端末のブラウザ内にのみ保存されます。共有端末では使用しないでください。</p>' +
+      '<textarea id="apikey" rows="2" placeholder="sk-ant- で始まるAPIキーを貼り付け"></textarea>' +
+      '<button class="btn" id="savekey" style="margin-top:10px;">保存して開始</button></div>');
+    document.getElementById("savekey").addEventListener("click", function(){
+      var k = document.getElementById("apikey").value.trim();
+      if(k.indexOf("sk-ant") !== 0){ alert("sk-ant で始まるキーを入力してください"); return; }
+      setApiKey(k);
+      chooseTask();
+    });
+  }
+
+  function chooseTask(){
+    screen('<div style="display:grid;gap:8px;">' +
+      '<button class="taskbtn" id="go-swt"><div><div style="font-size:15px;font-weight:700;">Summarize Written Text</div>' +
+      '<div style="font-size:12px;color:var(--sub);">文章を読んで1文に要約(10分・5〜75語)</div></div>' +
+      '<div style="font-size:12px;font-weight:700;color:var(--blue);">R + W</div></button>' +
+      '<button class="taskbtn" id="go-essay"><div><div style="font-size:15px;font-weight:700;">Write Essay</div>' +
+      '<div style="font-size:12px;color:var(--sub);">エッセイ(20分・200〜300語)</div></div>' +
+      '<div style="font-size:12px;font-weight:700;color:var(--blue);">W</div></button>' +
+      '<button class="btn ghost" id="resetkey" style="margin-top:6px;font-size:12px;padding:8px;">APIキーを変更</button></div>');
+    document.getElementById("go-swt").addEventListener("click", function(){ writing("SWT"); });
+    document.getElementById("go-essay").addEventListener("click", function(){ writing("ESSAY"); });
+    document.getElementById("resetkey").addEventListener("click", keySetup);
+  }
+
+  function writing(kind){
+    var isSWT = kind === "SWT";
+    var task = isSWT
+      ? SWT_PASSAGES[Math.floor(Math.random()*SWT_PASSAGES.length)]
+      : ESSAY_PROMPTS[Math.floor(Math.random()*ESSAY_PROMPTS.length)];
+    var limitSec = isSWT ? 600 : 1200;
+    var left = limitSec;
+
+    screen('<div class="card">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">' +
+      '<div style="font-size:11px;letter-spacing:1px;color:var(--sub);font-weight:700;">' + (isSWT ? "SUMMARIZE WRITTEN TEXT" : "WRITE ESSAY") + '</div>' +
+      '<div id="timer" style="font-size:14px;font-weight:700;color:var(--blue);"></div></div>' +
+      '<p style="font-size:14px;line-height:1.7;margin:0 0 12px;">' + esc(task) + '</p>' +
+      '<textarea id="wtext" rows="'+(isSWT?4:10)+'" placeholder="' + (isSWT ? "1文で要約(5〜75語)…" : "エッセイを入力(200〜300語)…") + '"></textarea>' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">' +
+      '<div id="wc" style="font-size:12px;color:var(--sub);">0 words</div>' +
+      '<button class="btn" id="wsubmit" style="width:auto;">AI採点する</button></div>' +
+      '<div id="wstatus" style="font-size:12px;color:var(--sub);margin-top:8px;"></div></div>');
+
+    var ta = document.getElementById("wtext");
+    var wc = document.getElementById("wc");
+    ta.addEventListener("input", function(){
+      var n = wordCount(ta.value);
+      var ok = isSWT ? (n >= 5 && n <= 75) : (n >= 200 && n <= 300);
+      wc.textContent = n + " words";
+      wc.style.color = n === 0 ? "var(--sub)" : ok ? "var(--green)" : "var(--amber)";
+    });
+
+    var timerEl = document.getElementById("timer");
+    function tick(){
+      var m = Math.floor(left/60), s = left%60;
+      timerEl.textContent = m + ":" + (s<10?"0":"") + s;
+      timerEl.style.color = left <= 60 ? "var(--red)" : "var(--blue)";
+      if(left <= 0){ stopTimer(); timerEl.textContent = "0:00 時間切れ"; }
+      left--;
+    }
+    tick();
+    timerId = setInterval(tick, 1000);
+
+    document.getElementById("wsubmit").addEventListener("click", function(){
+      var v = ta.value;
+      if(wordCount(v) < 5){ return; }
+      stopTimer();
+      var st = document.getElementById("wstatus");
+      st.textContent = "AI採点中…(10〜20秒)";
+      this.disabled = true;
+      var self = this;
+      scoreWithAI(kind, task, v, function(r){
+        var pct = Math.max(0, Math.min(1, (r.overall - 10) / 80));
+        var detail = { task: task, userText: v, result: r };
+        recordAttempt(pct, kind, detail);
+        showResult(kind, r, v);
+      }, function(errMsg){
+        st.textContent = "採点に失敗しました: " + errMsg;
+        st.style.color = "var(--red)";
+        self.disabled = false;
+      });
+    });
+  }
+
+  function showResult(kind, r, userText){
+    screen(writingResultHTML(kind, r, userText) +
+      '<div class="row" style="margin-top:12px;">' +
+      '<button class="btn ghost" id="wagain" style="flex:1;">もう1問</button>' +
+      '<button class="btn" id="wdash" style="flex:1;">ダッシュボード</button></div>');
+    document.getElementById("wagain").addEventListener("click", chooseTask);
+    document.getElementById("wdash").addEventListener("click", leave);
+  }
+
+  if(getApiKey()) chooseTask();
+  else keySetup();
+}
+
+
+/* ---------- 共有: ライティング結果表示(採点直後と履歴の両方で使用) ---------- */
+function axisBarHTML(label, val){
+  if(typeof val !== "number") return "";
+  var c = val >= 79 ? "var(--green)" : val >= 60 ? "var(--amber)" : "var(--red)";
+  return '<div style="margin-bottom:8px;">' +
+    '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:2px;">' +
+    '<span>'+label+'</span><span style="font-weight:700;color:'+c+';">'+val+'</span></div>' +
+    '<div style="height:6px;background:var(--line);border-radius:3px;overflow:hidden;">' +
+    '<div style="width:'+val+'%;height:100%;background:'+c+';"></div></div></div>';
+}
+
+function highlightText(userText, improvements){
+  var html = esc(userText);
+  (improvements || []).forEach(function(imp){
+    if(!imp.quote) return;
+    var eq = esc(imp.quote);
+    if(html.indexOf(eq) >= 0) html = html.replace(eq, "<mark>" + eq + "</mark>");
+  });
+  return html;
+}
+
+function writingResultHTML(kind, r, userText){
+  var axes = r.axes || r; /* 旧形式との互換 */
+  var c = r.overall >= 79 ? "var(--green)" : r.overall >= 65 ? "var(--amber)" : "var(--red)";
+  var impHTML = "";
+  (r.improvements || []).slice(0,5).forEach(function(imp){
+    impHTML += '<div style="border-left:3px solid var(--amber);padding:6px 10px;margin-bottom:8px;background:#FBF7EE;border-radius:0 8px 8px 0;">' +
+      '<div style="font-size:12px;color:var(--red);text-decoration:line-through;">'+esc(imp.quote||"")+'</div>' +
+      '<div style="font-size:13px;color:var(--green);font-weight:600;">→ '+esc(imp.fix||"")+'</div>' +
+      '<div style="font-size:11px;color:var(--sub);margin-top:2px;">'+esc(imp.why_ja||"")+'</div></div>';
+  });
+  return '<div class="card">' +
+    '<div style="font-size:11px;letter-spacing:1px;color:var(--sub);font-weight:700;margin-bottom:6px;">AI採点結果 — ' + (kind==="SWT"?"SUMMARIZE WRITTEN TEXT":"WRITE ESSAY") + '</div>' +
+    '<div style="font-size:40px;font-weight:700;color:'+c+';margin-bottom:2px;">'+r.overall+'<span style="font-size:14px;color:var(--sub);font-weight:600;"> / 90</span></div>' +
+    '<div style="font-size:11px;color:'+c+';margin-bottom:14px;">'+(r.overall>=79?"79ライン突破!":"79まで +"+(79-r.overall))+'</div>' +
+    axisBarHTML("Content(内容)", axes.content) +
+    axisBarHTML("Form(形式)", axes.form) +
+    axisBarHTML("Structure(構成・展開)", axes.structure) +
+    axisBarHTML("Grammar(文法)", axes.grammar) +
+    axisBarHTML("Vocabulary(語彙)", axes.vocabulary) +
+    axisBarHTML("Spelling(綴り)", axes.spelling) +
+    (userText ?
+      '<div style="font-size:12px;color:var(--sub);font-weight:700;margin:14px 0 6px;">あなたの回答(黄=改善指摘箇所)</div>' +
+      '<div style="background:#F7FAFA;border:1px solid var(--line);border-radius:10px;padding:12px;font-size:13px;line-height:1.8;">' +
+      highlightText(userText, r.improvements) + '</div>' : "") +
+    (impHTML ?
+      '<div style="font-size:12px;color:var(--sub);font-weight:700;margin:14px 0 6px;">改善ポイント Top' + Math.min(5,(r.improvements||[]).length) + '</div>' + impHTML : "") +
+    '<div style="background:#F2F7F8;border-radius:10px;padding:12px;font-size:13px;line-height:1.7;margin-top:12px;">'+esc(r.feedback_ja||"")+'</div>' +
+    '</div>';
+}
+
+/* ================= 練習履歴 ================= */
+function renderHistory(){
+  document.getElementById("app").classList.add("wide");
+  var recent = state.attempts.slice(-5).reverse();
+  var TYPE_JP = { WFD:"Write from Dictation", RS:"Repeat Sentence", SWT:"Summarize Written Text", ESSAY:"Write Essay" };
+
+  function backToDash(){
+    document.getElementById("app").classList.remove("wide");
+    renderDash();
+  }
+
+  var rows = recent.map(function(a, i){
+    var score = a.detail && a.detail.result ? a.detail.result.overall : toScale(a.pct);
+    var c = score >= 79 ? "var(--green)" : score >= 65 ? "var(--amber)" : "var(--red)";
+    return '<button class="taskbtn" data-hist="'+i+'">' +
+      '<div><div style="font-size:14px;font-weight:700;">'+(TYPE_JP[a.taskType]||a.taskType)+'</div>' +
+      '<div style="font-size:11px;color:var(--sub);">'+a.date+(a.detail?"・タップで詳細":"")+'</div></div>' +
+      '<div style="font-size:20px;font-weight:700;color:'+c+';">'+score+'</div></button>';
+  }).join("");
+
+  root.innerHTML = headerHTML("直近の練習履歴") +
+    (recent.length ? '<div style="display:grid;gap:8px;">'+rows+'</div>'
+                   : '<div class="card" style="text-align:center;color:var(--sub);font-size:13px;">まだ練習記録がありません。</div>');
+  document.getElementById("back").addEventListener("click", backToDash);
+
+  var btns = root.querySelectorAll("[data-hist]");
+  for(var i=0;i<btns.length;i++){
+    btns[i].addEventListener("click", function(){
+      var a = recent[parseInt(this.getAttribute("data-hist"),10)];
+      if(!a.detail) return;
+      root.innerHTML = headerHTML("履歴の詳細 — " + a.date) +
+        '<div style="font-size:12px;color:var(--sub);margin-bottom:8px;">課題: '+esc(a.detail.task.slice(0,120))+(a.detail.task.length>120?"…":"")+'</div>' +
+        writingResultHTML(a.taskType, a.detail.result, a.detail.userText) +
+        '<button class="btn ghost" id="histback" style="margin-top:12px;">← 履歴一覧に戻る</button>';
+      document.getElementById("back").addEventListener("click", backToDash);
+      document.getElementById("histback").addEventListener("click", renderHistory);
+    });
+  }
+}
+
+if(window.speechSynthesis) window.speechSynthesis.getVoices();
+
+/* ================= AIコーチ週次レビュー ================= */
+function coachReview(onDone, onError){
+  var since = dstr(-7);
+  var recent = state.attempts.filter(function(a){ return a.date >= since; });
+  var per = {};
+  recent.forEach(function(a){
+    if(!per[a.taskType]) per[a.taskType] = { n:0, sum:0 };
+    per[a.taskType].n++; per[a.taskType].sum += a.pct;
+  });
+  var lines = [];
+  for(var k in per){
+    lines.push(k + ": " + per[k].n + "回, 平均推定スコア" + toScale(per[k].sum/per[k].n));
+  }
+  var sk = getSkills();
+  var daysLeft = state.examDate ? Math.ceil((new Date(state.examDate) - new Date(todayStr())) / 864e5) : null;
+
+  var instr = "あなたはPTE Academicで全セクション79+(豪州PR要件)を目指す受験者の専属コーチです。受験者は「サボりがちだが、小さな単位なら完遂できる」性格です。\n\n" +
+    "【今週のデータ(直近7日)】\n" +
+    "練習回数: " + recent.length + "回\n" +
+    (lines.length ? lines.join("\n") : "練習記録なし") + "\n" +
+    "現在の推定スコア: L=" + (sk.L===null?"未計測":sk.L) + " W=" + (sk.W===null?"未計測":sk.W) + " S=" + (sk.S===null?"未計測":sk.S) + " R=" + (sk.R===null?"未計測":sk.R) + "\n" +
+    "連続学習: " + state.streak + "日 / 復習待ち問題: " + Object.keys(state.reviewWFD).length + "問\n" +
+    (daysLeft !== null ? "PR申請目標まで: " + daysLeft + "日\n" : "") +
+    "\n以下の構成で、日本語で簡潔に(全体400字以内)出力してください。マークダウン記号は使わず、見出しは【】で:\n" +
+    "【今週の講評】2文\n【強み】1文\n【最優先課題】1文\n【来週の処方箋】1日15分でできる曜日別メニューを月〜日で1行ずつ(例: 月: WFD 1セット)。サボり対策として達成しやすい量にすること";
+
+  fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": getApiKey(),
+      "anthropic-version": "2023-06-01",
+      "anthropic-dangerous-direct-browser-access": "true"
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-6",
+      max_tokens: 800,
+      messages: [{ role: "user", content: instr }]
+    })
+  }).then(function(res){
+    if(!res.ok){ throw new Error("API " + res.status); }
+    return res.json();
+  }).then(function(data){
+    var text = "";
+    (data.content || []).forEach(function(b){ if(b.type === "text") text += b.text; });
+    state.lastCoach = { date: todayStr(), text: text.trim() };
+    saveState();
+    onDone(state.lastCoach);
+  }).catch(function(err){
+    onError(err.message || String(err));
+  });
+}
+
+function renderCoach(){
+  function screen(inner){
+    root.innerHTML = headerHTML("AIコーチ") + inner;
+    document.getElementById("back").addEventListener("click", renderDash);
+  }
+  function show(){
+    var c = state.lastCoach;
+    screen('<div class="card">' +
+      (c ? '<div style="font-size:11px;color:var(--sub);margin-bottom:8px;">最終レビュー: ' + c.date + '</div>' +
+           '<div style="font-size:13px;line-height:1.9;white-space:pre-wrap;">' + esc(c.text) + '</div>'
+         : '<p style="font-size:13px;color:var(--sub);">まだレビューがありません。直近7日の学習データからAIコーチが講評と来週の処方箋を作ります。</p>') +
+      '<button class="btn" id="gencoach" style="margin-top:14px;">' + (c ? "🧭 最新データで再生成" : "🧭 週次レビューを生成") + '</button>' +
+      '<div id="coachstatus" style="font-size:12px;color:var(--sub);margin-top:8px;"></div></div>' +
+      '<p style="font-size:11px;color:var(--sub);margin-top:10px;">おすすめ: 週1回(日曜など)に生成して、翌週の処方箋どおりに小さく積むのが効果的です。</p>');
+    document.getElementById("gencoach").addEventListener("click", function(){
+      var st = document.getElementById("coachstatus");
+      if(!getApiKey()){
+        st.textContent = "APIキーが必要です。Essay/SWT画面で設定してください。";
+        st.style.color = "var(--amber)";
+        return;
+      }
+      this.disabled = true;
+      st.textContent = "コーチが分析中…(10〜20秒)";
+      st.style.color = "var(--sub)";
+      coachReview(function(){ show(); }, function(err){
+        st.textContent = "生成に失敗しました: " + err;
+        st.style.color = "var(--red)";
+        document.getElementById("gencoach").disabled = false;
+      });
+    });
+  }
+  show();
+}
+
+/* ================= バックアップ(エクスポート/インポート) ================= */
+function exportData(){
+  var payload = {
+    app: "pte-summit",
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    state: state
+  };
+  var blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "pte-summit-backup-" + todayStr() + ".json";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 2000);
+}
+
+function importData(ev){
+  var file = ev.target.files && ev.target.files[0];
+  ev.target.value = "";
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(){
+    try{
+      var payload = JSON.parse(reader.result);
+      var s = payload.state || payload; /* stateラッパー無しの形式にも対応 */
+      if(!s || !Array.isArray(s.attempts)) throw new Error("形式が違います");
+
+      var mode = confirm(
+        "読み込み方法を選んでください。\n\n" +
+        "OK = 統合(この端末の記録とバックアップを合体。おすすめ)\n" +
+        "キャンセル = 置き換え(この端末の記録を捨ててバックアップで上書き)"
+      );
+      if(mode){
+        /* 統合: attemptsは日付+内容で重複除外して結合、その他は大きい方/和集合 */
+        var seen = {};
+        state.attempts.forEach(function(a){ seen[JSON.stringify(a)] = true; });
+        s.attempts.forEach(function(a){
+          var k = JSON.stringify(a);
+          if(!seen[k]){ state.attempts.push(a); seen[k] = true; }
+        });
+        state.attempts.sort(function(x,y){ return x.date < y.date ? -1 : 1; });
+        state.streak = Math.max(state.streak||0, s.streak||0);
+        if(!state.lastActive || (s.lastActive && s.lastActive > state.lastActive)){
+          state.lastActive = s.lastActive;
+          state.doneDate = s.doneDate;
+          state.doneToday = s.doneToday;
+        }
+        (s.genWFD||[]).forEach(function(q){ if(state.genWFD.indexOf(q)<0) state.genWFD.push(q); });
+        (s.usedWFD||[]).forEach(function(q){ if(state.usedWFD.indexOf(q)<0) state.usedWFD.push(q); });
+      }else{
+        state = s;
+        if(!state.usedWFD) state.usedWFD = [];
+        if(!state.genWFD) state.genWFD = [];
+        if(!state.reviewWFD) state.reviewWFD = {};
+        if(typeof state.xp !== "number") state.xp = 0;
+      }
+      saveState();
+      alert("読み込みが完了しました(記録 " + state.attempts.length + " 件)");
+      renderDash();
+    }catch(e){
+      alert("読み込みに失敗しました: " + (e.message || e));
+    }
+  };
+  reader.readAsText(file);
+}
+
+/* ---------- 外部コンテンツ読み込み(content.json) ----------
+   アプリ本体を変えずに問題を追加するための仕組み。
+   同じフォルダの content.json を起動時に読み込み、内蔵問題とマージする。
+   形式: {"wfd":[...], "rs":[...], "swt":[...], "essay":[...]}      */
+function mergeContent(c){
+  function mergeInto(arr, add){
+    (add || []).forEach(function(s){
+      if(typeof s === "string" && s.trim() && arr.indexOf(s.trim()) < 0) arr.push(s.trim());
+    });
+  }
+  mergeInto(WFD_QUESTIONS, c.wfd);
+  mergeInto(RS_QUESTIONS, c.rs);
+  mergeInto(SWT_PASSAGES, c.swt);
+  mergeInto(ESSAY_PROMPTS, c.essay);
+}
+var booted = false;
+function boot(){ if(!booted){ booted = true; renderDash(); } }
+/* content.jsonが無い・壊れていても必ず起動する */
+setTimeout(boot, 3000);
+fetch("content.json", { cache: "no-store" })
+  .then(function(r){ return r.ok ? r.json() : null; })
+  .then(function(c){ if(c) mergeContent(c); boot(); })
+  .catch(function(){ boot(); });
+</script>
+</body>
+</html>
