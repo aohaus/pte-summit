@@ -16,7 +16,8 @@
   "wfd":   ["Write from Dictation の文", "..."],
   "rs":    ["Repeat Sentence の文", "..."],
   "swt":   ["Summarize Written Text のパッセージ(100〜150語)", "..."],
-  "essay": ["エッセイのプロンプト", "..."]
+  "essay": ["エッセイのプロンプト", "..."],
+  "ra":    ["Read Aloud のパッセージ(50〜65語)", "..."]
 }
 ```
 
@@ -31,6 +32,8 @@
 - **swt**: アカデミックな評論文、100〜150語、主張+根拠+対立意見の構造を持つ1段落
 - **essay**: PTE頻出形式(Discuss both views / To what extent do you agree / advantages-disadvantages)、
   教育・テクノロジー・都市・環境・労働などの定番テーマ
+- **ra**: Read Aloud用パッセージ。50〜65語の1段落、アカデミックな説明文。
+  読み上げ練習に適した自然な文構造で、固有名詞は控えめに
 
 ## AIモデルへの依頼プロンプト(コピペ用)
 
@@ -42,13 +45,14 @@
 
 以下のJSON形式**のみ**で出力してください(説明文・Markdownコードフェンス不要):
 
-{"wfd": [], "rs": [], "swt": [], "essay": []}
+{"wfd": [], "rs": [], "swt": [], "essay": [], "ra": []}
 
 作成数と基準:
 - wfd: 20文。Write from Dictation用。学術的場面、10〜16語、自然な話し言葉。複数形・冠詞・数字・学術語彙の聞き取りポイントを含める
 - rs: 10文。Repeat Sentence用。大学のアナウンス調、8〜13語
 - swt: 2本。Summarize Written Text用パッセージ。アカデミックな評論、100〜150語、主張+根拠+対立意見を含む1段落
 - essay: 3題。PTE頻出形式(Discuss both views / To what extent do you agree / Do advantages outweigh disadvantages)
+- ra: 5本。Read Aloud用。50〜65語の1段落、アカデミックな説明文
 
 以下の既存問題とは重複しないこと:
 【ここに現在のcontent.jsonの中身を貼る】
