@@ -4,6 +4,12 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>PTE SUMMIT — 79m峰トレーナー</title>
+<link rel="manifest" href="manifest.webmanifest" />
+<meta name="theme-color" content="#BE5A38" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="PTE SUMMIT" />
+<link rel="apple-touch-icon" href="icon.svg" />
 <style>
   :root{
     /* Anthropic-inspired earth palette */
@@ -44,10 +50,12 @@
   .taskbtn[disabled]{background:#E9E4D8;opacity:.6;cursor:default;box-shadow:none;}
   #err{display:none;background:#FBEAEA;color:#8A2222;font-size:12px;padding:8px 12px;
     border-radius:8px;margin-bottom:10px;white-space:pre-wrap;}
+  #offline{display:none;background:#F6EFE0;color:#7A5A1F;border:1px solid #E3D6B8;
+    font-size:12px;padding:8px 12px;border-radius:10px;margin-bottom:10px;line-height:1.6;}
 </style>
 </head>
 <body>
-<div id="app"><div id="err"></div><div id="root">読み込み中…</div></div>
+<div id="app"><div id="err"></div><div id="offline"></div><div id="root">読み込み中…</div></div>
 <script>
 "use strict";
 /* エラーを画面に表示(モバイルでのデバッグ用) */
@@ -435,11 +443,11 @@ function renderDash(){
   var reviewsDue = dueReviews().length;
 
   var tasks = [
-    { id:"wfd", name:"Write from Dictation", jp:"聞いて書き取る" + (reviewsDue ? "・復習" + reviewsDue + "問待ち" : ""), affects:"L + W", ready:true },
-    { id:"rs", name:"Repeat Sentence", jp:"聞いて復唱する", affects:"S + L", ready:true },
-    { id:"write", name:"Essay / SWT", jp:"AI採点ライティング", affects:"W + R", ready:true },
-    { id:"ra", name:"Read Aloud", jp:"音読(AI発音コーチ)", affects:"S + R", ready:true },
-    { id:"vocab", name:"Vocab Sprint", jp:"通勤モード・語彙 " + vocabBand(state.vocabLevel), affects:"R", ready:true }
+    { id:"vocab", name:"Vocab Sprint", jp:(isOffline ? "✈️ オフラインOK・語彙 " : "通勤モード・語彙 ") + vocabBand(state.vocabLevel), affects:"R", ready:true },
+    { id:"wfd", name:"Write from Dictation", jp:(isOffline ? "✈️ オフラインOK" : "聞いて書き取る") + (reviewsDue ? "・復習" + reviewsDue + "問待ち" : ""), affects:"L + W", ready:true },
+    { id:"rs", name:"Repeat Sentence", jp:isOffline ? "要ネット接続(音声認識)" : "聞いて復唱する", affects:"S + L", ready:!isOffline },
+    { id:"ra", name:"Read Aloud", jp:isOffline ? "要ネット接続(音声認識)" : "音読(AI発音コーチ)", affects:"S + R", ready:!isOffline },
+    { id:"write", name:"Essay / SWT", jp:isOffline ? "要ネット接続(AI採点)" : "AI採点ライティング", affects:"W + R", ready:!isOffline }
   ];
   var taskHTML = tasks.map(function(t){
     return '<button class="taskbtn" data-nav="'+t.id+'"'+(t.ready?"":" disabled")+'>' +
@@ -1781,6 +1789,31 @@ function importData(ev){
   reader.readAsText(file);
 }
 
+/* ================= オフライン対応(PWA) ================= */
+var isOffline = !navigator.onLine;
+function updateOfflineBanner(){
+  var el = document.getElementById("offline");
+  if(!el) return;
+  if(isOffline){
+    el.style.display = "block";
+    el.innerHTML = "✈️ <b>オフラインモード</b> — Vocab Sprint と Write from Dictation は通信なしで練習できます。" +
+      "音声認識(Repeat Sentence / Read Aloud)とAI採点は接続復帰後に利用可能です。記録は端末に保存され、失われません。";
+  }else{
+    el.style.display = "none";
+  }
+}
+window.addEventListener("online", function(){
+  isOffline = false; updateOfflineBanner(); renderDash();
+});
+window.addEventListener("offline", function(){
+  isOffline = true; updateOfflineBanner(); renderDash();
+});
+if("serviceWorker" in navigator){
+  window.addEventListener("load", function(){
+    navigator.serviceWorker.register("sw.js").catch(function(e){ console.log("SW register failed", e); });
+  });
+}
+
 /* ---------- 外部コンテンツ読み込み(content.json) ----------
    アプリ本体を変えずに問題を追加するための仕組み。
    同じフォルダの content.json を起動時に読み込み、内蔵問題とマージする。
@@ -1804,10 +1837,11 @@ function mergeContent(c){
   });
 }
 var booted = false;
-function boot(){ if(!booted){ booted = true; renderDash(); } }
+function boot(){ if(!booted){ booted = true; updateOfflineBanner(); renderDash(); } }
 /* content.jsonが無い・壊れていても必ず起動する */
 setTimeout(boot, 3000);
-fetch("content.json", { cache: "no-store" })
+/* オフライン時はService Workerのキャッシュから返るため、no-storeは使わない */
+fetch("content.json")
   .then(function(r){ return r.ok ? r.json() : null; })
   .then(function(c){ if(c) mergeContent(c); boot(); })
   .catch(function(){ boot(); });
