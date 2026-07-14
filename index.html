@@ -235,6 +235,7 @@ if(typeof state.vocabLevel !== "number") state.vocabLevel = 2;
 if(typeof state.vocabCC !== "number") state.vocabCC = 0;
 if(typeof state.vocabCW !== "number") state.vocabCW = 0;
 if(!state.vocabReview) state.vocabReview = {};
+if(!state.vocabStats) state.vocabStats = {};
 function saveState(){
   try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
   catch(e){ console.error(e); }
@@ -486,6 +487,7 @@ function renderDash(){
     '<div style="display:grid;gap:8px;">'+taskHTML+'</div>' +
     '<div class="row" style="margin-top:10px;">' +
     '<button class="btn ghost" id="gohist" style="flex:1;font-size:12px;padding:9px;">📋 練習履歴</button>' +
+    '<button class="btn ghost" id="gowords" style="flex:1;font-size:12px;padding:9px;">📖 単語帳</button>' +
     '<button class="btn ghost" id="gocoach" style="flex:1;font-size:12px;padding:9px;">🧭 AIコーチ</button>' +
     '</div>' +
     '<div class="row" style="margin-top:8px;">' +
@@ -510,6 +512,7 @@ function renderDash(){
     });
   }
   document.getElementById("gohist").addEventListener("click", renderHistory);
+  document.getElementById("gowords").addEventListener("click", renderWordList);
   document.getElementById("gocoach").addEventListener("click", renderCoach);
   document.getElementById("expdata").addEventListener("click", exportData);
   document.getElementById("impdata").addEventListener("click", function(){
@@ -1343,6 +1346,9 @@ function renderVocab(){
       if(state.vocabCW >= 2 && state.vocabLevel > 1){ state.vocabLevel--; state.vocabCW = 0; }
     }
     vocabSchedule(it.q, ok);
+    var vst = state.vocabStats[it.q] || { n:0, c:0 };
+    vst.n++; if(ok) vst.c++;
+    state.vocabStats[it.q] = vst;
     saveState();
     var isLast = idx >= SET - 1;
     var fb = document.createElement("div");
@@ -1391,6 +1397,113 @@ function renderVocab(){
   }
 
   ready();
+}
+
+/* ================= 単語帳(Word List) ================= */
+function vocabHeadword(it){
+  var m = it.q.match(/'([^']+)'/);
+  if(m) return m[1];
+  if(it.d){
+    var d = it.d.match(/^([A-Za-z][A-Za-z\- ]*?)(?:\s*\([^)]*\))?\s*:/);
+    if(d) return d[1].trim();
+  }
+  return it.c[it.a];
+}
+function vocabExample(it){
+  if(it.type === "fib") return it.q.replace("___", it.c[it.a]);
+  if(it.type === "col") return it.c[it.a];
+  return null;
+}
+function renderWordList(){
+  document.getElementById("app").classList.add("wide");
+  var filter = "all";
+
+  function backToDash(){
+    document.getElementById("app").classList.remove("wide");
+    renderDash();
+  }
+
+  function draw(){
+    var rows = VOCAB_BANK.map(function(it){
+      var st = state.vocabStats[it.q] || { n:0, c:0 };
+      return { it: it, n: st.n, c: st.c, rate: st.n ? st.c/st.n : null };
+    });
+    if(filter === "weak") rows = rows.filter(function(r){ return r.n > 0 && r.rate < 0.7; });
+    if(filter === "seen") rows = rows.filter(function(r){ return r.n > 0; });
+    rows.sort(function(a,b){
+      if(a.it.lv !== b.it.lv) return a.it.lv - b.it.lv;
+      return vocabHeadword(a.it).toLowerCase() < vocabHeadword(b.it).toLowerCase() ? -1 : 1;
+    });
+
+    var seenAll = VOCAB_BANK.filter(function(it){ return state.vocabStats[it.q]; }).length;
+
+    var html = "";
+    var lastLv = null;
+    rows.forEach(function(r){
+      if(r.it.lv !== lastLv){
+        lastLv = r.it.lv;
+        html += '<div style="font-size:11px;letter-spacing:1px;color:var(--blue);font-weight:700;margin:16px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--line);">' +
+          vocabBand(r.it.lv) + ' <span style="color:var(--sub);font-weight:600;">(\u8a9e\u5f59\u30ec\u30d9\u30eb ' + r.it.lv + ')</span></div>';
+      }
+      var rateHTML;
+      if(r.n === 0){
+        rateHTML = '<span style="font-size:11px;color:var(--sub);">\u672a\u51fa\u984c</span>';
+      }else{
+        var pc = Math.round(r.rate * 100);
+        var rc = pc >= 80 ? "var(--green)" : pc >= 50 ? "var(--amber)" : "var(--red)";
+        rateHTML = '<span style="font-size:13px;font-weight:700;color:' + rc + ';">' + pc + '%</span>' +
+                   '<span style="font-size:10px;color:var(--sub);"> (' + r.c + '/' + r.n + ')</span>';
+      }
+      var ex = vocabExample(r.it);
+      html += '<div style="padding:10px 0;border-bottom:1px solid var(--line);">' +
+        '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;">' +
+        '<div style="font-family:var(--serif);font-size:17px;font-weight:600;">' + esc(vocabHeadword(r.it)) + '</div>' +
+        '<div style="white-space:nowrap;">' + rateHTML + '</div></div>' +
+        (r.it.d ? '<div style="font-size:12px;color:var(--sub);line-height:1.6;margin-top:2px;">' + esc(r.it.d) + '</div>' : "") +
+        (ex ? '<div style="font-size:12px;color:var(--ink);line-height:1.6;margin-top:3px;font-style:italic;">e.g. ' + esc(ex) + '</div>' : "") +
+        '</div>';
+    });
+    if(!rows.length) html = '<p style="font-size:13px;color:var(--sub);text-align:center;padding:20px 0;">\u8a72\u5f53\u3059\u308b\u5358\u8a9e\u304c\u3042\u308a\u307e\u305b\u3093\u3002</p>';
+
+    function fbtn(id, label, on){
+      return '<button class="btn ghost" data-f="' + id + '" style="flex:1;font-size:12px;padding:8px;' +
+        (on ? 'background:var(--blue);color:#fff;border-color:var(--blue);' : '') + '">' + label + '</button>';
+    }
+
+    root.innerHTML = headerHTML("\u5358\u8a9e\u5e33 \u2014 " + VOCAB_BANK.length + "\u8a9e") +
+      '<div class="card">' +
+      '<div style="font-size:12px;color:var(--sub);margin-bottom:10px;">\u51fa\u984c\u6e08 ' + seenAll + ' / ' + VOCAB_BANK.length + ' \u8a9e\u3002\u6b63\u7b54\u7387\u306f\u81ea\u5206\u306e\u89e3\u7b54\u5c65\u6b74\u306b\u57fa\u3065\u304d\u307e\u3059\u3002</div>' +
+      '<div class="row" style="margin-bottom:6px;">' +
+      fbtn("all", "\u3059\u3079\u3066", filter === "all") +
+      fbtn("seen", "\u51fa\u984c\u6e08", filter === "seen") +
+      fbtn("weak", "\u82e6\u624b(70%\u672a\u6e80)", filter === "weak") +
+      '</div>' +
+      html +
+      '<div style="margin-top:22px;padding-top:14px;border-top:2px solid var(--line);">' +
+      '<div style="font-size:12px;font-weight:700;color:var(--sub);margin-bottom:6px;">\u30ec\u30d9\u30eb\u533a\u5206\u306b\u3064\u3044\u3066(\u53c2\u8003\u6587\u732e)</div>' +
+      '<p style="font-size:11px;color:var(--sub);line-height:1.7;margin:0 0 8px;">' +
+      '\u26a0\uFE0F \u8868\u793a\u3057\u3066\u3044\u308b\u300cPTE 30\u201349\u300d\u7b49\u306e\u30b9\u30b3\u30a2\u5e2f\u306f\u3001<b>Pearson\u516c\u5f0f\u306e\u5358\u8a9e\u5225\u30b9\u30b3\u30a2\u5bfe\u5fdc\u8868\u3067\u306f\u3042\u308a\u307e\u305b\u3093</b>\u3002' +
+      '\u516c\u5f0f\u306b\u306f\u305d\u306e\u3088\u3046\u306a\u5bfe\u5fdc\u8868\u306f\u516c\u958b\u3055\u308c\u3066\u3044\u306a\u3044\u305f\u3081\u3001\u672c\u30a2\u30d7\u30ea\u3067\u306f\u4ee5\u4e0b\u306e\u5b66\u8853\u8a9e\u5f59\u30ea\u30b9\u30c8\u306e\u96e3\u6613\u5ea6\u968e\u5c64\u3068CEFR\u5bfe\u5fdc\u3092\u53c2\u7167\u3057\u3001' +
+      '\u5404\u8a9e\u3092\u63a8\u5b9a\u914d\u7f6e\u3057\u3066\u3044\u307e\u3059\u3002\u5b66\u7fd2\u306e\u76ee\u5b89\u3068\u3057\u3066\u3054\u5229\u7528\u304f\u3060\u3055\u3044\u3002</p>' +
+      '<ol style="font-size:11px;color:var(--sub);line-height:1.8;margin:0;padding-left:18px;">' +
+      '<li>Coxhead, A. (2000). A New Academic Word List. <i>TESOL Quarterly</i>, 34(2), 213\u2013238.\uFF08AWL\u30fb\u30b5\u30d6\u30ea\u30b9\u30c81\u201310\uFF09</li>' +
+      '<li>Gardner, D. &amp; Davies, M. (2014). A New Academic Vocabulary List. <i>Applied Linguistics</i>, 35(3), 305\u2013327.\uFF08AVL\uFF09</li>' +
+      '<li>West, M. (1953). <i>A General Service List of English Words</i>. Longman.\uFF08\u57fa\u790e2,000\u8a9e\u30fb\u30ec\u30d9\u30eb1\u306e\u57fa\u6e96\uFF09</li>' +
+      '<li>Council of Europe (2020). <i>CEFR Companion Volume</i>.\uFF08B1\u2013C2\u306e\u8a9e\u5f59\u8a18\u8ff0\uFF09</li>' +
+      '<li>Pearson (2019). <i>Global Scale of English (GSE) Learning Objectives</i>.\uFF08GSE\u3068PTE Academic\u306e\u5171\u901a\u5c3a\u5ea6\uFF09</li>' +
+      '</ol></div></div>';
+
+    document.getElementById("back").addEventListener("click", backToDash);
+    var fs = root.querySelectorAll("[data-f]");
+    for(var i=0;i<fs.length;i++){
+      fs[i].addEventListener("click", function(){
+        filter = this.getAttribute("data-f");
+        draw();
+        window.scrollTo(0, 0);
+      });
+    }
+  }
+  draw();
 }
 
 /* ================= Read Aloud ================= */
