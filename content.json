@@ -1,93 +1,2175 @@
 {
-  "_comment": "PTE SUMMIT 追加コンテンツ。このファイルに追記するだけで問題が増えます。index.htmlは変更不要。",
-  "wfd": [
-    "Participation in the group discussion will contribute to your overall grade.",
-    "The theoretical framework was developed by researchers at several institutions.",
-    "Laboratory safety procedures must be followed at all times without exception.",
-    "The survey revealed significant differences between the two age groups.",
-    "Preliminary results indicate that the new treatment is highly effective.",
-    "Students should familiarise themselves with the university's academic integrity policy.",
-    "The conference has attracted delegates from more than forty countries.",
-    "An electronic copy of the reading list is available on the course website.",
-    "The hypothesis was tested under a variety of controlled conditions.",
-    "Applications received after the closing date will not be considered.",
-    "The lecture covered the economic consequences of rapid population growth.",
-    "All laboratory equipment must be returned to its designated storage area.",
-    "The questionnaire was distributed to participants across three different faculties.",
-    "Recent advances in technology have transformed the way students conduct research.",
-    "The seminar will examine the relationship between climate and agricultural production.",
-    "A significant proportion of the budget was allocated to student services.",
-    "The findings challenge several widely accepted assumptions about consumer behaviour.",
-    "Extensions will only be granted in exceptional circumstances with supporting documentation.",
-    "The medical school requires applicants to complete an additional entrance examination.",
-    "Historical records provide valuable insights into patterns of urban development.",
-    "The professor encouraged students to evaluate sources critically before citing them.",
-    "Enrolment figures have risen steadily over the past two decades.",
-    "The committee recommended substantial changes to the undergraduate curriculum.",
-    "Access to the archive collection requires written permission from the librarian.",
-    "The experiment demonstrated a clear relationship between temperature and reaction rate.",
-    "International students make up nearly a quarter of the university population.",
-    "The revised timetable will be published on the departmental notice board.",
-    "Researchers observed considerable variation in the responses of individual participants.",
-    "The scholarship covers tuition fees and provides a modest living allowance.",
-    "Successful completion of the foundation course guarantees entry to the degree programme."
-  ],
-  "rs": [
-    "The assignment is due at the beginning of next month.",
-    "You will need your password to access the online portal.",
-    "The workshop has been rescheduled to Friday afternoon.",
-    "Most of the lectures are recorded and available online.",
-    "The bookstore offers a discount to all registered students.",
-    "The library will remain open until midnight during exam week.",
-    "Please collect your student card from the administration office.",
-    "The field trip has been cancelled due to bad weather.",
-    "You can renew your books online or at the front desk.",
-    "The next tutorial will focus on essay writing skills.",
-    "Lecture notes are uploaded to the website every Monday morning.",
-    "The computer laboratory is located on the third floor.",
-    "Students must register for the exam by the end of this week.",
-    "The professor's office hours are Tuesday and Thursday afternoons.",
-    "A copy of the syllabus was emailed to all students.",
-    "The results of the midterm exam will be posted online.",
-    "Please switch off all electronic devices before the test begins.",
-    "The graduation ceremony will take place in the main hall.",
-    "The new sports centre opens to students next semester.",
-    "Attendance will be taken at the start of every class."
-  ],
-  "swt": [
-    "Sleep researchers have long argued that adolescents are biologically programmed to fall asleep and wake later than adults, yet most secondary schools begin classes early in the morning. A growing body of evidence links early start times to chronic sleep deprivation among teenagers, which in turn is associated with poorer academic performance, mood disorders, and higher rates of traffic accidents among young drivers. Several school districts that delayed their start times by one hour reported measurable improvements in attendance, grades, and student wellbeing. Critics point to practical obstacles, including bus schedules, after-school sports, and parents' working hours, but supporters argue that the health benefits justify the logistical costs of change.",
-    "Microplastics, fragments of plastic smaller than five millimetres, have now been detected in drinking water, sea salt, and even human blood. They originate from the breakdown of larger plastic waste as well as from synthetic clothing fibres and vehicle tyres. While the long-term health effects remain uncertain, laboratory studies suggest that microplastics can carry toxic chemicals and cross biological barriers. Governments have responded with bans on microbeads in cosmetics, but scientists argue these measures address only a small fraction of the problem. Effective solutions, they contend, require redesigning products for durability and recyclability, improving waste management infrastructure in developing countries, and reducing overall plastic production rather than focusing solely on consumer behaviour.",
-    "Urban agriculture is expanding rapidly in cities around the world, from rooftop gardens in New York to vertical farms in Singapore. Advocates argue that growing food close to consumers reduces transport emissions, provides fresh produce in neighbourhoods with limited access to healthy food, and strengthens community ties. Vertical farming, which grows crops indoors under artificial light, can produce far more food per square metre than conventional fields while using less water and no pesticides. However, critics note that the energy required for lighting and climate control can outweigh the environmental benefits, and that high operating costs currently limit production to premium salad greens rather than the staple crops that feed most of the world's population.",
-    "The rapid expansion of online education has prompted intense debate about its effectiveness compared with traditional classroom teaching. Large-scale studies suggest that well-designed online courses can match face-to-face instruction for motivated adult learners, particularly when they include interactive elements and regular feedback. However, completion rates for massive open online courses remain remarkably low, often below ten percent, and younger students appear to benefit significantly from the structure and social interaction of physical classrooms. Researchers increasingly conclude that the question is not whether online learning works, but for whom and under what conditions, with blended models combining online flexibility and in-person support showing the most consistent results across age groups.",
-    "Populations of bees and other pollinating insects have declined sharply in many regions over recent decades, raising concerns about global food security. Approximately three quarters of the world's food crops depend at least partly on animal pollination, and the economic value of this service is estimated in the hundreds of billions of dollars annually. Scientists attribute the decline to a combination of habitat loss, pesticide exposure, disease, and climate change rather than any single cause. Some governments have restricted certain pesticides, while farmers are being encouraged to plant wildflower margins around their fields. Researchers emphasise that protecting diverse wild pollinator species is more effective than relying on managed honeybee colonies alone.",
-    "The four-day working week has moved from a fringe idea to a serious policy experiment, with large-scale trials conducted in Iceland, the United Kingdom, and Japan. In most trials, employees worked reduced hours for the same pay, and the majority of participating companies reported stable or improved productivity alongside significant gains in employee wellbeing and retention. Supporters argue that shorter weeks force organisations to eliminate unproductive meetings and processes. Sceptics counter that results from self-selected volunteer companies may not generalise to industries requiring continuous customer service or physical presence, and that reduced hours could suppress wages over time. Nevertheless, several governments are now considering legislation to encourage more flexible working arrangements.",
-    "Space around Earth is becoming increasingly crowded with debris, including defunct satellites, spent rocket stages, and millions of fragments from collisions and explosions. Travelling at speeds of up to twenty-eight thousand kilometres per hour, even a paint fleck can damage a spacecraft, while larger objects pose catastrophic risks to the satellites that support navigation, communication, and weather forecasting. Scientists warn of a possible chain reaction in which collisions generate more debris, making certain orbits unusable for generations. Proposed solutions include international rules requiring satellites to deorbit at the end of their missions, as well as experimental technologies such as harpoons, nets, and lasers designed to remove existing debris.",
-    "Antibiotic resistance is widely regarded as one of the most serious threats to global health. When bacteria evolve to survive the drugs designed to kill them, common infections and routine surgeries become far more dangerous. The problem is driven by overprescription of antibiotics in human medicine and their widespread use in livestock farming to promote growth. Meanwhile, few new antibiotics are being developed, because they offer pharmaceutical companies little profit compared with drugs for chronic conditions. Health authorities advocate a combination of responses, including stricter prescribing guidelines, public education campaigns, financial incentives for drug development, and improved surveillance systems to track the spread of resistant strains across borders.",
-    "Many of the world's most popular destinations are struggling with overtourism, a situation in which visitor numbers overwhelm local infrastructure and degrade the quality of life for residents. Cities such as Venice, Barcelona, and Kyoto have experienced rising rents, crowded public spaces, and the replacement of local shops with souvenir stores. In response, authorities have introduced measures including tourist taxes, caps on cruise ship arrivals, and restrictions on short-term holiday rentals. Tourism advocates caution that such policies risk harming an industry that supports millions of jobs, particularly in developing economies. Researchers suggest the challenge is not to reduce tourism itself but to manage its distribution across seasons and locations.",
-    "Electric vehicles are frequently promoted as the key to decarbonising transport, and their global sales have grown dramatically over the past decade. Studies confirm that over their lifetime, electric cars produce substantially lower emissions than petrol vehicles, even when charged from electricity grids that still rely partly on fossil fuels. However, researchers highlight important caveats: manufacturing batteries requires energy-intensive mining of lithium, cobalt, and nickel, often in countries with weak environmental and labour protections. Moreover, replacing every petrol car with an electric one would not address urban congestion or the resources consumed by car manufacturing. Many experts therefore argue that electrification must be combined with investment in public transport, cycling infrastructure, and compact urban planning."
-  ],
-  "essay": [
-    "Some people think that governments should invest more in public transportation, while others believe building more roads is a better solution to traffic problems. Discuss both views and give your own opinion.",
-    "Many companies now allow employees to work from home several days a week. Do the advantages of this arrangement outweigh the disadvantages?",
-    "Some people believe that technology has made our lives more complicated rather than simpler. To what extent do you agree or disagree?",
-    "In some countries, young people are encouraged to work or travel for a year between finishing high school and starting university. Discuss the advantages and disadvantages of this practice.",
-    "Some argue that social media companies should be held responsible for the content published on their platforms, while others believe individuals should bear this responsibility. Discuss both views and give your opinion.",
-    "An increasing number of people choose to live alone in many countries today. Do you think this is a positive or negative development for individuals and society?",
-    "Some people believe that unpaid community service should be a compulsory part of high school education. To what extent do you agree or disagree?",
-    "Climate change is a global problem that requires international cooperation, yet some argue that individual countries should focus on their own economic interests first. Discuss both views and give your own opinion.",
-    "Some people think that museums and art galleries should be free of charge, while others believe visitors should pay for admission. Discuss both views and give your opinion.",
-    "In many countries, the gap between the rich and the poor is widening. What problems does this cause, and what measures can be taken to address them?"
-  ],
-  "ra": [
-    "Photosynthesis is the process by which green plants convert sunlight into chemical energy. Using carbon dioxide from the air and water from the soil, plants produce glucose and release oxygen as a by-product. This remarkable process not only sustains plant growth but also provides the oxygen that nearly all living organisms depend upon for survival.",
-    "The invention of the printing press in the fifteenth century transformed European society. Books that once took months to copy by hand could suddenly be produced in large quantities, making knowledge accessible to ordinary people. Literacy rates rose steadily, new ideas spread rapidly across borders, and the foundations of modern science and education were established.",
-    "Coral reefs occupy less than one percent of the ocean floor, yet they support approximately a quarter of all marine species. These delicate ecosystems are highly sensitive to changes in water temperature, and even a rise of one or two degrees can cause widespread bleaching. Scientists warn that without urgent action, most reefs could disappear within decades.",
-    "Economists have long debated the relationship between minimum wage increases and employment levels. Traditional theory suggests that higher wages reduce the number of available jobs, yet several recent studies have found little evidence of significant job losses. The actual impact appears to depend heavily on local economic conditions and the size of the increase.",
-    "The ancient silk road was far more than a trade route for luxury goods. As merchants travelled between Asia and Europe, they carried not only silk and spices but also technologies, religious beliefs, artistic styles, and scientific knowledge. This exchange of ideas shaped the development of civilisations at both ends of the route.",
-    "Renewable energy technologies have become dramatically cheaper over the past decade. The cost of solar panels has fallen by nearly ninety percent, making solar power the least expensive source of electricity in many regions. This shift is transforming global energy markets and accelerating the transition away from fossil fuels in both developed and developing countries.",
-    "Sleep plays an essential role in memory consolidation and learning. During deep sleep, the brain replays experiences from the day and transfers important information into long-term storage. Students who sacrifice sleep to study longer often perform worse on examinations than those who maintain regular sleep schedules, according to numerous studies conducted at universities worldwide.",
-    "Urban planners increasingly recognise that walkable neighbourhoods improve both public health and local economies. When shops, schools, and workplaces are located within walking distance of homes, residents drive less, exercise more, and spend more money at local businesses. Cities that invest in pedestrian infrastructure consistently report higher levels of resident satisfaction.",
-    "The global demand for fresh water is expected to exceed supply by forty percent within the next decade. Agriculture accounts for roughly seventy percent of water consumption, so improving irrigation efficiency offers the greatest opportunity for conservation. Meanwhile, many cities are investing in recycling systems that treat wastewater for industrial and agricultural reuse.",
-    "Archaeological discoveries continue to reshape our understanding of early human history. Recent excavations have revealed that ancient societies developed agriculture, complex architecture, and long-distance trade networks far earlier than previously believed. Each new finding reminds researchers that the story of human civilisation is still being written, one careful excavation at a time."
-  ]
+ "_comment": "PTE SUMMIT 追加コンテンツ。このファイルに追記するだけで問題が増えます。index.htmlは変更不要。",
+ "wfd": [
+  "Participation in the group discussion will contribute to your overall grade.",
+  "The theoretical framework was developed by researchers at several institutions.",
+  "Laboratory safety procedures must be followed at all times without exception.",
+  "The survey revealed significant differences between the two age groups.",
+  "Preliminary results indicate that the new treatment is highly effective.",
+  "Students should familiarise themselves with the university's academic integrity policy.",
+  "The conference has attracted delegates from more than forty countries.",
+  "An electronic copy of the reading list is available on the course website.",
+  "The hypothesis was tested under a variety of controlled conditions.",
+  "Applications received after the closing date will not be considered.",
+  "The lecture covered the economic consequences of rapid population growth.",
+  "All laboratory equipment must be returned to its designated storage area.",
+  "The questionnaire was distributed to participants across three different faculties.",
+  "Recent advances in technology have transformed the way students conduct research.",
+  "The seminar will examine the relationship between climate and agricultural production.",
+  "A significant proportion of the budget was allocated to student services.",
+  "The findings challenge several widely accepted assumptions about consumer behaviour.",
+  "Extensions will only be granted in exceptional circumstances with supporting documentation.",
+  "The medical school requires applicants to complete an additional entrance examination.",
+  "Historical records provide valuable insights into patterns of urban development.",
+  "The professor encouraged students to evaluate sources critically before citing them.",
+  "Enrolment figures have risen steadily over the past two decades.",
+  "The committee recommended substantial changes to the undergraduate curriculum.",
+  "Access to the archive collection requires written permission from the librarian.",
+  "The experiment demonstrated a clear relationship between temperature and reaction rate.",
+  "International students make up nearly a quarter of the university population.",
+  "The revised timetable will be published on the departmental notice board.",
+  "Researchers observed considerable variation in the responses of individual participants.",
+  "The scholarship covers tuition fees and provides a modest living allowance.",
+  "Successful completion of the foundation course guarantees entry to the degree programme."
+ ],
+ "rs": [
+  "The assignment is due at the beginning of next month.",
+  "You will need your password to access the online portal.",
+  "The workshop has been rescheduled to Friday afternoon.",
+  "Most of the lectures are recorded and available online.",
+  "The bookstore offers a discount to all registered students.",
+  "The library will remain open until midnight during exam week.",
+  "Please collect your student card from the administration office.",
+  "The field trip has been cancelled due to bad weather.",
+  "You can renew your books online or at the front desk.",
+  "The next tutorial will focus on essay writing skills.",
+  "Lecture notes are uploaded to the website every Monday morning.",
+  "The computer laboratory is located on the third floor.",
+  "Students must register for the exam by the end of this week.",
+  "The professor's office hours are Tuesday and Thursday afternoons.",
+  "A copy of the syllabus was emailed to all students.",
+  "The results of the midterm exam will be posted online.",
+  "Please switch off all electronic devices before the test begins.",
+  "The graduation ceremony will take place in the main hall.",
+  "The new sports centre opens to students next semester.",
+  "Attendance will be taken at the start of every class."
+ ],
+ "swt": [
+  "Sleep researchers have long argued that adolescents are biologically programmed to fall asleep and wake later than adults, yet most secondary schools begin classes early in the morning. A growing body of evidence links early start times to chronic sleep deprivation among teenagers, which in turn is associated with poorer academic performance, mood disorders, and higher rates of traffic accidents among young drivers. Several school districts that delayed their start times by one hour reported measurable improvements in attendance, grades, and student wellbeing. Critics point to practical obstacles, including bus schedules, after-school sports, and parents' working hours, but supporters argue that the health benefits justify the logistical costs of change.",
+  "Microplastics, fragments of plastic smaller than five millimetres, have now been detected in drinking water, sea salt, and even human blood. They originate from the breakdown of larger plastic waste as well as from synthetic clothing fibres and vehicle tyres. While the long-term health effects remain uncertain, laboratory studies suggest that microplastics can carry toxic chemicals and cross biological barriers. Governments have responded with bans on microbeads in cosmetics, but scientists argue these measures address only a small fraction of the problem. Effective solutions, they contend, require redesigning products for durability and recyclability, improving waste management infrastructure in developing countries, and reducing overall plastic production rather than focusing solely on consumer behaviour.",
+  "Urban agriculture is expanding rapidly in cities around the world, from rooftop gardens in New York to vertical farms in Singapore. Advocates argue that growing food close to consumers reduces transport emissions, provides fresh produce in neighbourhoods with limited access to healthy food, and strengthens community ties. Vertical farming, which grows crops indoors under artificial light, can produce far more food per square metre than conventional fields while using less water and no pesticides. However, critics note that the energy required for lighting and climate control can outweigh the environmental benefits, and that high operating costs currently limit production to premium salad greens rather than the staple crops that feed most of the world's population.",
+  "The rapid expansion of online education has prompted intense debate about its effectiveness compared with traditional classroom teaching. Large-scale studies suggest that well-designed online courses can match face-to-face instruction for motivated adult learners, particularly when they include interactive elements and regular feedback. However, completion rates for massive open online courses remain remarkably low, often below ten percent, and younger students appear to benefit significantly from the structure and social interaction of physical classrooms. Researchers increasingly conclude that the question is not whether online learning works, but for whom and under what conditions, with blended models combining online flexibility and in-person support showing the most consistent results across age groups.",
+  "Populations of bees and other pollinating insects have declined sharply in many regions over recent decades, raising concerns about global food security. Approximately three quarters of the world's food crops depend at least partly on animal pollination, and the economic value of this service is estimated in the hundreds of billions of dollars annually. Scientists attribute the decline to a combination of habitat loss, pesticide exposure, disease, and climate change rather than any single cause. Some governments have restricted certain pesticides, while farmers are being encouraged to plant wildflower margins around their fields. Researchers emphasise that protecting diverse wild pollinator species is more effective than relying on managed honeybee colonies alone.",
+  "The four-day working week has moved from a fringe idea to a serious policy experiment, with large-scale trials conducted in Iceland, the United Kingdom, and Japan. In most trials, employees worked reduced hours for the same pay, and the majority of participating companies reported stable or improved productivity alongside significant gains in employee wellbeing and retention. Supporters argue that shorter weeks force organisations to eliminate unproductive meetings and processes. Sceptics counter that results from self-selected volunteer companies may not generalise to industries requiring continuous customer service or physical presence, and that reduced hours could suppress wages over time. Nevertheless, several governments are now considering legislation to encourage more flexible working arrangements.",
+  "Space around Earth is becoming increasingly crowded with debris, including defunct satellites, spent rocket stages, and millions of fragments from collisions and explosions. Travelling at speeds of up to twenty-eight thousand kilometres per hour, even a paint fleck can damage a spacecraft, while larger objects pose catastrophic risks to the satellites that support navigation, communication, and weather forecasting. Scientists warn of a possible chain reaction in which collisions generate more debris, making certain orbits unusable for generations. Proposed solutions include international rules requiring satellites to deorbit at the end of their missions, as well as experimental technologies such as harpoons, nets, and lasers designed to remove existing debris.",
+  "Antibiotic resistance is widely regarded as one of the most serious threats to global health. When bacteria evolve to survive the drugs designed to kill them, common infections and routine surgeries become far more dangerous. The problem is driven by overprescription of antibiotics in human medicine and their widespread use in livestock farming to promote growth. Meanwhile, few new antibiotics are being developed, because they offer pharmaceutical companies little profit compared with drugs for chronic conditions. Health authorities advocate a combination of responses, including stricter prescribing guidelines, public education campaigns, financial incentives for drug development, and improved surveillance systems to track the spread of resistant strains across borders.",
+  "Many of the world's most popular destinations are struggling with overtourism, a situation in which visitor numbers overwhelm local infrastructure and degrade the quality of life for residents. Cities such as Venice, Barcelona, and Kyoto have experienced rising rents, crowded public spaces, and the replacement of local shops with souvenir stores. In response, authorities have introduced measures including tourist taxes, caps on cruise ship arrivals, and restrictions on short-term holiday rentals. Tourism advocates caution that such policies risk harming an industry that supports millions of jobs, particularly in developing economies. Researchers suggest the challenge is not to reduce tourism itself but to manage its distribution across seasons and locations.",
+  "Electric vehicles are frequently promoted as the key to decarbonising transport, and their global sales have grown dramatically over the past decade. Studies confirm that over their lifetime, electric cars produce substantially lower emissions than petrol vehicles, even when charged from electricity grids that still rely partly on fossil fuels. However, researchers highlight important caveats: manufacturing batteries requires energy-intensive mining of lithium, cobalt, and nickel, often in countries with weak environmental and labour protections. Moreover, replacing every petrol car with an electric one would not address urban congestion or the resources consumed by car manufacturing. Many experts therefore argue that electrification must be combined with investment in public transport, cycling infrastructure, and compact urban planning."
+ ],
+ "essay": [
+  "Some people think that governments should invest more in public transportation, while others believe building more roads is a better solution to traffic problems. Discuss both views and give your own opinion.",
+  "Many companies now allow employees to work from home several days a week. Do the advantages of this arrangement outweigh the disadvantages?",
+  "Some people believe that technology has made our lives more complicated rather than simpler. To what extent do you agree or disagree?",
+  "In some countries, young people are encouraged to work or travel for a year between finishing high school and starting university. Discuss the advantages and disadvantages of this practice.",
+  "Some argue that social media companies should be held responsible for the content published on their platforms, while others believe individuals should bear this responsibility. Discuss both views and give your opinion.",
+  "An increasing number of people choose to live alone in many countries today. Do you think this is a positive or negative development for individuals and society?",
+  "Some people believe that unpaid community service should be a compulsory part of high school education. To what extent do you agree or disagree?",
+  "Climate change is a global problem that requires international cooperation, yet some argue that individual countries should focus on their own economic interests first. Discuss both views and give your own opinion.",
+  "Some people think that museums and art galleries should be free of charge, while others believe visitors should pay for admission. Discuss both views and give your opinion.",
+  "In many countries, the gap between the rich and the poor is widening. What problems does this cause, and what measures can be taken to address them?"
+ ],
+ "ra": [
+  "Photosynthesis is the process by which green plants convert sunlight into chemical energy. Using carbon dioxide from the air and water from the soil, plants produce glucose and release oxygen as a by-product. This remarkable process not only sustains plant growth but also provides the oxygen that nearly all living organisms depend upon for survival.",
+  "The invention of the printing press in the fifteenth century transformed European society. Books that once took months to copy by hand could suddenly be produced in large quantities, making knowledge accessible to ordinary people. Literacy rates rose steadily, new ideas spread rapidly across borders, and the foundations of modern science and education were established.",
+  "Coral reefs occupy less than one percent of the ocean floor, yet they support approximately a quarter of all marine species. These delicate ecosystems are highly sensitive to changes in water temperature, and even a rise of one or two degrees can cause widespread bleaching. Scientists warn that without urgent action, most reefs could disappear within decades.",
+  "Economists have long debated the relationship between minimum wage increases and employment levels. Traditional theory suggests that higher wages reduce the number of available jobs, yet several recent studies have found little evidence of significant job losses. The actual impact appears to depend heavily on local economic conditions and the size of the increase.",
+  "The ancient silk road was far more than a trade route for luxury goods. As merchants travelled between Asia and Europe, they carried not only silk and spices but also technologies, religious beliefs, artistic styles, and scientific knowledge. This exchange of ideas shaped the development of civilisations at both ends of the route.",
+  "Renewable energy technologies have become dramatically cheaper over the past decade. The cost of solar panels has fallen by nearly ninety percent, making solar power the least expensive source of electricity in many regions. This shift is transforming global energy markets and accelerating the transition away from fossil fuels in both developed and developing countries.",
+  "Sleep plays an essential role in memory consolidation and learning. During deep sleep, the brain replays experiences from the day and transfers important information into long-term storage. Students who sacrifice sleep to study longer often perform worse on examinations than those who maintain regular sleep schedules, according to numerous studies conducted at universities worldwide.",
+  "Urban planners increasingly recognise that walkable neighbourhoods improve both public health and local economies. When shops, schools, and workplaces are located within walking distance of homes, residents drive less, exercise more, and spend more money at local businesses. Cities that invest in pedestrian infrastructure consistently report higher levels of resident satisfaction.",
+  "The global demand for fresh water is expected to exceed supply by forty percent within the next decade. Agriculture accounts for roughly seventy percent of water consumption, so improving irrigation efficiency offers the greatest opportunity for conservation. Meanwhile, many cities are investing in recycling systems that treat wastewater for industrial and agricultural reuse.",
+  "Archaeological discoveries continue to reshape our understanding of early human history. Recent excavations have revealed that ancient societies developed agriculture, complex architecture, and long-distance trade networks far earlier than previously believed. Each new finding reminds researchers that the story of human civilisation is still being written, one careful excavation at a time."
+ ],
+ "vocab": [
+  {
+   "lv": 1,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'benefit'?",
+   "c": [
+    "advantage",
+    "damage",
+    "payment",
+    "opinion"
+   ],
+   "a": 0,
+   "d": "Benefit: a helpful or good effect."
+  },
+  {
+   "lv": 1,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'purchase'?",
+   "c": [
+    "buy",
+    "sell",
+    "borrow",
+    "repair"
+   ],
+   "a": 0,
+   "d": "Purchase: to buy something."
+  },
+  {
+   "lv": 1,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'assist'?",
+   "c": [
+    "help",
+    "stop",
+    "watch",
+    "train"
+   ],
+   "a": 0,
+   "d": "Assist: to help someone do something."
+  },
+  {
+   "lv": 1,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'require'?",
+   "c": [
+    "need",
+    "offer",
+    "refuse",
+    "forget"
+   ],
+   "a": 0,
+   "d": "Require: to need something as necessary."
+  },
+  {
+   "lv": 1,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'method'?",
+   "c": [
+    "approach",
+    "mistake",
+    "reason",
+    "result"
+   ],
+   "a": 0,
+   "d": "Method: a particular way of doing something."
+  },
+  {
+   "lv": 1,
+   "type": "fib",
+   "q": "The company plans to ___ its services to rural areas.",
+   "c": [
+    "expand",
+    "expend",
+    "expel",
+    "exceed"
+   ],
+   "a": 0,
+   "d": "Expand: to make or become larger."
+  },
+  {
+   "lv": 1,
+   "type": "col",
+   "q": "Which word best follows 'make'?",
+   "c": [
+    "a decision",
+    "a research",
+    "a homework",
+    "an advice"
+   ],
+   "a": 0,
+   "d": "Make a decision: to decide after thinking."
+  },
+  {
+   "lv": 1,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'indicate'?",
+   "c": [
+    "show",
+    "hide",
+    "doubt",
+    "copy"
+   ],
+   "a": 0,
+   "d": "Indicate: to show or point out something."
+  },
+  {
+   "lv": 1,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'major'?",
+   "c": [
+    "main",
+    "minor",
+    "recent",
+    "local"
+   ],
+   "a": 0,
+   "d": "Major: very large or important."
+  },
+  {
+   "lv": 1,
+   "type": "fib",
+   "q": "Prices ___ depending on the season.",
+   "c": [
+    "vary",
+    "carry",
+    "marry",
+    "bury"
+   ],
+   "a": 0,
+   "d": "Vary: to change according to the situation."
+  },
+  {
+   "lv": 1,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'occur'?",
+   "c": [
+    "happen",
+    "finish",
+    "cancel",
+    "repeat"
+   ],
+   "a": 0,
+   "d": "Occur: to happen or take place."
+  },
+  {
+   "lv": 1,
+   "type": "col",
+   "q": "Which word best follows 'solve'?",
+   "c": [
+    "a problem",
+    "a decision",
+    "an effort",
+    "a conclusion"
+   ],
+   "a": 0,
+   "d": "Solve a problem: to find an answer to it."
+  },
+  {
+   "lv": 1,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'create'?",
+   "c": [
+    "produce",
+    "destroy",
+    "hide",
+    "borrow"
+   ],
+   "a": 0,
+   "d": "Create: to make something new exist."
+  },
+  {
+   "lv": 1,
+   "type": "fib",
+   "q": "Students must ___ to the new rules.",
+   "c": [
+    "adapt",
+    "adopt",
+    "adept",
+    "addict"
+   ],
+   "a": 0,
+   "d": "Adapt to: to change behaviour to suit new conditions."
+  },
+  {
+   "lv": 1,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'similar'?",
+   "c": [
+    "alike",
+    "opposite",
+    "separate",
+    "strange"
+   ],
+   "a": 0,
+   "d": "Similar: almost the same as something else."
+  },
+  {
+   "lv": 1,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'respond'?",
+   "c": [
+    "reply",
+    "request",
+    "remove",
+    "remain"
+   ],
+   "a": 0,
+   "d": "Respond: to answer or react to something."
+  },
+  {
+   "lv": 1,
+   "type": "col",
+   "q": "Which word best follows 'pay'?",
+   "c": [
+    "attention",
+    "a listen",
+    "an interest",
+    "a notice"
+   ],
+   "a": 0,
+   "d": "Pay attention: to watch or listen carefully."
+  },
+  {
+   "lv": 1,
+   "type": "fib",
+   "q": "The chart ___ a steady increase in sales.",
+   "c": [
+    "shows",
+    "says",
+    "speaks",
+    "tells"
+   ],
+   "a": 0,
+   "d": "Show: to make information visible or clear."
+  },
+  {
+   "lv": 1,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'entire'?",
+   "c": [
+    "whole",
+    "empty",
+    "early",
+    "equal"
+   ],
+   "a": 0,
+   "d": "Entire: including everything; whole."
+  },
+  {
+   "lv": 1,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'error'?",
+   "c": [
+    "mistake",
+    "answer",
+    "effort",
+    "excuse"
+   ],
+   "a": 0,
+   "d": "Error: something done incorrectly; a mistake."
+  },
+  {
+   "lv": 1,
+   "type": "fib",
+   "q": "It is difficult to ___ the exact cause.",
+   "c": [
+    "identify",
+    "identity",
+    "identical",
+    "idealise"
+   ],
+   "a": 0,
+   "d": "Identify: to recognise and name something."
+  },
+  {
+   "lv": 1,
+   "type": "col",
+   "q": "Which phrase best follows 'take'?",
+   "c": [
+    "advantage of",
+    "advantage on",
+    "advantage in",
+    "advantage at"
+   ],
+   "a": 0,
+   "d": "Take advantage of: to use an opportunity well."
+  },
+  {
+   "lv": 1,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'rapid'?",
+   "c": [
+    "fast",
+    "careful",
+    "loud",
+    "simple"
+   ],
+   "a": 0,
+   "d": "Rapid: happening very quickly."
+  },
+  {
+   "lv": 1,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'annual'?",
+   "c": [
+    "yearly",
+    "monthly",
+    "daily",
+    "weekly"
+   ],
+   "a": 0,
+   "d": "Annual: happening once every year."
+  },
+  {
+   "lv": 1,
+   "type": "fib",
+   "q": "A large ___ of students passed the exam.",
+   "c": [
+    "number",
+    "amount",
+    "deal",
+    "piece"
+   ],
+   "a": 0,
+   "d": "Number is used with countable nouns like students."
+  },
+  {
+   "lv": 1,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'select'?",
+   "c": [
+    "choose",
+    "collect",
+    "correct",
+    "connect"
+   ],
+   "a": 0,
+   "d": "Select: to choose from a group."
+  },
+  {
+   "lv": 1,
+   "type": "col",
+   "q": "Which word best follows 'reach'?",
+   "c": [
+    "a conclusion",
+    "a research",
+    "an attention",
+    "a progress"
+   ],
+   "a": 0,
+   "d": "Reach a conclusion: to decide after considering facts."
+  },
+  {
+   "lv": 1,
+   "type": "fib",
+   "q": "The library ___ students with free internet access.",
+   "c": [
+    "provides",
+    "produces",
+    "prevents",
+    "promotes"
+   ],
+   "a": 0,
+   "d": "Provide someone with: to supply what is needed."
+  },
+  {
+   "lv": 1,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'attempt'?",
+   "c": [
+    "try",
+    "avoid",
+    "agree",
+    "allow"
+   ],
+   "a": 0,
+   "d": "Attempt: to try to do something."
+  },
+  {
+   "lv": 1,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'frequent'?",
+   "c": [
+    "happening often",
+    "very loud",
+    "quite rare",
+    "rather slow"
+   ],
+   "a": 0,
+   "d": "Frequent: happening many times."
+  },
+  {
+   "lv": 1,
+   "type": "fib",
+   "q": "Exercise has a positive ___ on health.",
+   "c": [
+    "effect",
+    "affect",
+    "effort",
+    "afford"
+   ],
+   "a": 0,
+   "d": "Effect: a change caused by something (noun)."
+  },
+  {
+   "lv": 1,
+   "type": "col",
+   "q": "Which word best follows 'gain'?",
+   "c": [
+    "experience",
+    "a homework",
+    "an advice",
+    "a furniture"
+   ],
+   "a": 0,
+   "d": "Gain experience: to get knowledge by doing."
+  },
+  {
+   "lv": 2,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'ensure'?",
+   "c": [
+    "make certain",
+    "make worse",
+    "make quiet",
+    "make small"
+   ],
+   "a": 0,
+   "d": "Ensure: to make sure something happens."
+  },
+  {
+   "lv": 2,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'previous'?",
+   "c": [
+    "earlier",
+    "later",
+    "current",
+    "future"
+   ],
+   "a": 0,
+   "d": "Previous: happening before the present one."
+  },
+  {
+   "lv": 2,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'potential'?",
+   "c": [
+    "possible",
+    "impossible",
+    "proven",
+    "typical"
+   ],
+   "a": 0,
+   "d": "Potential: capable of happening or developing."
+  },
+  {
+   "lv": 2,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'relevant'?",
+   "c": [
+    "related to the topic",
+    "away from the topic",
+    "longer than usual",
+    "hard to believe"
+   ],
+   "a": 0,
+   "d": "Relevant: directly connected to the matter."
+  },
+  {
+   "lv": 2,
+   "type": "fib",
+   "q": "The survey was ___ among first-year students.",
+   "c": [
+    "conducted",
+    "constructed",
+    "consumed",
+    "converted"
+   ],
+   "a": 0,
+   "d": "Conduct a survey: to organise and carry it out."
+  },
+  {
+   "lv": 2,
+   "type": "fib",
+   "q": "Solar panels ___ sunlight into electricity.",
+   "c": [
+    "convert",
+    "invert",
+    "divert",
+    "revert"
+   ],
+   "a": 0,
+   "d": "Convert: to change from one form to another."
+  },
+  {
+   "lv": 2,
+   "type": "col",
+   "q": "Which phrase best follows 'place emphasis'?",
+   "c": [
+    "on",
+    "at",
+    "in",
+    "by"
+   ],
+   "a": 0,
+   "d": "Place emphasis on: to give special importance to."
+  },
+  {
+   "lv": 2,
+   "type": "col",
+   "q": "Which phrase best completes 'a wide ___ of options'?",
+   "c": [
+    "range",
+    "row",
+    "rank",
+    "root"
+   ],
+   "a": 0,
+   "d": "A wide range of: many different kinds of."
+  },
+  {
+   "lv": 2,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'contribute'?",
+   "c": [
+    "add to",
+    "take from",
+    "argue with",
+    "depend on"
+   ],
+   "a": 0,
+   "d": "Contribute: to give or add something to a result."
+  },
+  {
+   "lv": 2,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'consist of'?",
+   "c": [
+    "be made up of",
+    "be free of",
+    "be afraid of",
+    "be short of"
+   ],
+   "a": 0,
+   "d": "Consist of: to be formed from parts."
+  },
+  {
+   "lv": 2,
+   "type": "fib",
+   "q": "Please ___ that all devices are switched off.",
+   "c": [
+    "ensure",
+    "insure",
+    "assure",
+    "reassure"
+   ],
+   "a": 0,
+   "d": "Ensure: to make certain of something."
+  },
+  {
+   "lv": 2,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'primary'?",
+   "c": [
+    "most important",
+    "most recent",
+    "most distant",
+    "most unusual"
+   ],
+   "a": 0,
+   "d": "Primary: main; first in importance."
+  },
+  {
+   "lv": 2,
+   "type": "fib",
+   "q": "The new policy will ___ all part-time staff.",
+   "c": [
+    "affect",
+    "effect",
+    "infect",
+    "defect"
+   ],
+   "a": 0,
+   "d": "Affect: to influence or cause change (verb)."
+  },
+  {
+   "lv": 2,
+   "type": "col",
+   "q": "Which word best follows 'raise'?",
+   "c": [
+    "awareness",
+    "a research",
+    "an attention",
+    "a knowledge"
+   ],
+   "a": 0,
+   "d": "Raise awareness: to make people know about an issue."
+  },
+  {
+   "lv": 2,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'secure'?",
+   "c": [
+    "obtain with effort",
+    "lose by accident",
+    "hide from view",
+    "doubt strongly"
+   ],
+   "a": 0,
+   "d": "Secure (verb): to get something with effort."
+  },
+  {
+   "lv": 2,
+   "type": "fib",
+   "q": "Participants were asked to ___ in a short interview.",
+   "c": [
+    "participate",
+    "precipitate",
+    "anticipate",
+    "participateing"
+   ],
+   "a": 0,
+   "d": "Participate in: to take part in an activity."
+  },
+  {
+   "lv": 2,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'strategy'?",
+   "c": [
+    "a plan to achieve a goal",
+    "a sudden accident",
+    "a strong opinion",
+    "a final result"
+   ],
+   "a": 0,
+   "d": "Strategy: a plan designed to reach an aim."
+  },
+  {
+   "lv": 2,
+   "type": "fib",
+   "q": "Tuition fees vary from ___ to region.",
+   "c": [
+    "region",
+    "legion",
+    "religion",
+    "reunion"
+   ],
+   "a": 0,
+   "d": "Region: a large area of a country or world."
+  },
+  {
+   "lv": 2,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'transfer'?",
+   "c": [
+    "move from one place to another",
+    "stay in one place",
+    "break into pieces",
+    "grow very slowly"
+   ],
+   "a": 0,
+   "d": "Transfer: to move someone or something elsewhere."
+  },
+  {
+   "lv": 2,
+   "type": "col",
+   "q": "Which word best follows 'meet'?",
+   "c": [
+    "the requirements",
+    "the awareness",
+    "the emphasis",
+    "the improvement"
+   ],
+   "a": 0,
+   "d": "Meet the requirements: to satisfy the conditions."
+  },
+  {
+   "lv": 2,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'feature'?",
+   "c": [
+    "characteristic",
+    "failure",
+    "future",
+    "fraction"
+   ],
+   "a": 0,
+   "d": "Feature: a typical quality or important part."
+  },
+  {
+   "lv": 2,
+   "type": "fib",
+   "q": "The report placed a strong ___ on staff training.",
+   "c": [
+    "emphasis",
+    "emphasise",
+    "emphatic",
+    "empathy"
+   ],
+   "a": 0,
+   "d": "Emphasis: special importance given to something."
+  },
+  {
+   "lv": 2,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'constant'?",
+   "c": [
+    "unchanging",
+    "unusual",
+    "unclear",
+    "unlikely"
+   ],
+   "a": 0,
+   "d": "Constant: staying the same; continuous."
+  },
+  {
+   "lv": 2,
+   "type": "fib",
+   "q": "Households ___ more energy in winter.",
+   "c": [
+    "consume",
+    "assume",
+    "resume",
+    "presume"
+   ],
+   "a": 0,
+   "d": "Consume: to use energy, goods, or resources."
+  },
+  {
+   "lv": 2,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'distinct'?",
+   "c": [
+    "clearly different",
+    "closely related",
+    "poorly made",
+    "widely known"
+   ],
+   "a": 0,
+   "d": "Distinct: clearly separate or different."
+  },
+  {
+   "lv": 2,
+   "type": "col",
+   "q": "Which phrase best follows 'invest'?",
+   "c": [
+    "in education",
+    "at education",
+    "to education",
+    "on education"
+   ],
+   "a": 0,
+   "d": "Invest in: to spend money or effort for future benefit."
+  },
+  {
+   "lv": 2,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'available'?",
+   "c": [
+    "ready to be used",
+    "broken beyond repair",
+    "hidden from sight",
+    "sold at a loss"
+   ],
+   "a": 0,
+   "d": "Available: able to be used or obtained."
+  },
+  {
+   "lv": 2,
+   "type": "fib",
+   "q": "The museum attracts visitors from the local ___.",
+   "c": [
+    "community",
+    "commodity",
+    "committee",
+    "commuter"
+   ],
+   "a": 0,
+   "d": "Community: the people living in one area."
+  },
+  {
+   "lv": 2,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'positive'?",
+   "c": [
+    "favourable",
+    "doubtful",
+    "harmful",
+    "careless"
+   ],
+   "a": 0,
+   "d": "Positive: good, useful, or hopeful."
+  },
+  {
+   "lv": 2,
+   "type": "fib",
+   "q": "Researchers must ___ reliable sources.",
+   "c": [
+    "seek",
+    "sink",
+    "soak",
+    "sack"
+   ],
+   "a": 0,
+   "d": "Seek: to look for or try to find."
+  },
+  {
+   "lv": 2,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'exclude'?",
+   "c": [
+    "leave out",
+    "point out",
+    "carry out",
+    "find out"
+   ],
+   "a": 0,
+   "d": "Exclude: to keep out or not include."
+  },
+  {
+   "lv": 2,
+   "type": "col",
+   "q": "Which word best follows 'draw'?",
+   "c": [
+    "a comparison",
+    "a research",
+    "an attention",
+    "a progress"
+   ],
+   "a": 0,
+   "d": "Draw a comparison: to compare two things."
+  },
+  {
+   "lv": 3,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'facilitate'?",
+   "c": [
+    "make easier",
+    "make harder",
+    "make louder",
+    "make cheaper"
+   ],
+   "a": 0,
+   "d": "Facilitate: to make a process easier."
+  },
+  {
+   "lv": 3,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'considerable'?",
+   "c": [
+    "large in amount",
+    "small in amount",
+    "kind and polite",
+    "quick and easy"
+   ],
+   "a": 0,
+   "d": "Considerable: great in amount or degree."
+  },
+  {
+   "lv": 3,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'emerge'?",
+   "c": [
+    "appear",
+    "vanish",
+    "divide",
+    "descend"
+   ],
+   "a": 0,
+   "d": "Emerge: to come out or become known."
+  },
+  {
+   "lv": 3,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'exceed'?",
+   "c": [
+    "go beyond",
+    "fall below",
+    "stay within",
+    "turn around"
+   ],
+   "a": 0,
+   "d": "Exceed: to be greater than a limit."
+  },
+  {
+   "lv": 3,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'justify'?",
+   "c": [
+    "give good reasons for",
+    "take full control of",
+    "make a copy of",
+    "lose track of"
+   ],
+   "a": 0,
+   "d": "Justify: to show something is right or reasonable."
+  },
+  {
+   "lv": 3,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'retain'?",
+   "c": [
+    "keep",
+    "return",
+    "reduce",
+    "reveal"
+   ],
+   "a": 0,
+   "d": "Retain: to keep or continue to have."
+  },
+  {
+   "lv": 3,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'valid'?",
+   "c": [
+    "reasonable and acceptable",
+    "old and broken",
+    "quick and careless",
+    "loud and clear"
+   ],
+   "a": 0,
+   "d": "Valid: based on sound reasoning; acceptable."
+  },
+  {
+   "lv": 3,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'presume'?",
+   "c": [
+    "suppose",
+    "promise",
+    "prevent",
+    "present"
+   ],
+   "a": 0,
+   "d": "Presume: to suppose something is true."
+  },
+  {
+   "lv": 3,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'prohibit'?",
+   "c": [
+    "forbid",
+    "permit",
+    "promote",
+    "prolong"
+   ],
+   "a": 0,
+   "d": "Prohibit: to officially forbid something."
+  },
+  {
+   "lv": 3,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'undergo'?",
+   "c": [
+    "experience",
+    "understand",
+    "undertake",
+    "underline"
+   ],
+   "a": 0,
+   "d": "Undergo: to experience a process or change."
+  },
+  {
+   "lv": 3,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'generate'?",
+   "c": [
+    "produce",
+    "protect",
+    "prefer",
+    "pretend"
+   ],
+   "a": 0,
+   "d": "Generate: to produce or create something."
+  },
+  {
+   "lv": 3,
+   "type": "fib",
+   "q": "The committee will ___ the new policy next year.",
+   "c": [
+    "implement",
+    "implicate",
+    "implant",
+    "imprint"
+   ],
+   "a": 0,
+   "d": "Implement: to put a plan into action."
+  },
+  {
+   "lv": 3,
+   "type": "fib",
+   "q": "A working ___ was proposed to explain the results.",
+   "c": [
+    "hypothesis",
+    "hypocrisy",
+    "hierarchy",
+    "hysteria"
+   ],
+   "a": 0,
+   "d": "Hypothesis: an idea to be tested by research."
+  },
+  {
+   "lv": 3,
+   "type": "fib",
+   "q": "The preliminary findings ___ earlier studies.",
+   "c": [
+    "contradict",
+    "contract",
+    "construct",
+    "instruct"
+   ],
+   "a": 0,
+   "d": "Contradict: to state or show the opposite."
+  },
+  {
+   "lv": 3,
+   "type": "fib",
+   "q": "Tax breaks act as an ___ for private investment.",
+   "c": [
+    "incentive",
+    "initiative",
+    "instance",
+    "incident"
+   ],
+   "a": 0,
+   "d": "Incentive: something that motivates action."
+  },
+  {
+   "lv": 3,
+   "type": "fib",
+   "q": "Margarine is often used as a ___ for butter.",
+   "c": [
+    "substitute",
+    "substance",
+    "subsidy",
+    "suburb"
+   ],
+   "a": 0,
+   "d": "Substitute: a thing used instead of another."
+  },
+  {
+   "lv": 3,
+   "type": "col",
+   "q": "Which word best follows 'meet'?",
+   "c": [
+    "the criteria",
+    "the hypothesis",
+    "the emergence",
+    "the incentive"
+   ],
+   "a": 0,
+   "d": "Meet the criteria: to satisfy the required standards."
+  },
+  {
+   "lv": 3,
+   "type": "col",
+   "q": "Which word best follows 'pose'?",
+   "c": [
+    "a threat",
+    "a criteria",
+    "an emergence",
+    "a retain"
+   ],
+   "a": 0,
+   "d": "Pose a threat: to be a possible danger."
+  },
+  {
+   "lv": 3,
+   "type": "col",
+   "q": "Which word best follows 'bridge'?",
+   "c": [
+    "the gap",
+    "the threat",
+    "the notion",
+    "the excess"
+   ],
+   "a": 0,
+   "d": "Bridge the gap: to reduce a difference."
+  },
+  {
+   "lv": 3,
+   "type": "fib",
+   "q": "Oil prices continued to rise, with serious ___ for airlines.",
+   "c": [
+    "implications",
+    "implements",
+    "impressions",
+    "imitations"
+   ],
+   "a": 0,
+   "d": "Implication: a likely consequence or effect."
+  },
+  {
+   "lv": 3,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'notion'?",
+   "c": [
+    "idea",
+    "nation",
+    "motion",
+    "portion"
+   ],
+   "a": 0,
+   "d": "Notion: a belief or idea about something."
+  },
+  {
+   "lv": 3,
+   "type": "fib",
+   "q": "The study aims to ___ the effectiveness of the training.",
+   "c": [
+    "evaluate",
+    "evacuate",
+    "elevate",
+    "escalate"
+   ],
+   "a": 0,
+   "d": "Evaluate: to judge the value or quality of."
+  },
+  {
+   "lv": 3,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'dominate'?",
+   "c": [
+    "control",
+    "donate",
+    "decorate",
+    "calculate"
+   ],
+   "a": 0,
+   "d": "Dominate: to have control or major influence."
+  },
+  {
+   "lv": 3,
+   "type": "fib",
+   "q": "Migration patterns ___ from long-term climate records.",
+   "c": [
+    "can be derived",
+    "can be arrived",
+    "can be survived",
+    "can be revived"
+   ],
+   "a": 0,
+   "d": "Derive from: to obtain something from a source."
+  },
+  {
+   "lv": 3,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'preliminary'?",
+   "c": [
+    "coming before the main part",
+    "coming after everything",
+    "lasting a long time",
+    "having little value"
+   ],
+   "a": 0,
+   "d": "Preliminary: done first, before the main stage."
+  },
+  {
+   "lv": 3,
+   "type": "fib",
+   "q": "Volunteers helped to ___ the impact of the flood.",
+   "c": [
+    "offset",
+    "onset",
+    "upset",
+    "outset"
+   ],
+   "a": 0,
+   "d": "Offset: to balance or compensate for something."
+  },
+  {
+   "lv": 3,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'phenomenon'?",
+   "c": [
+    "an observed event or fact",
+    "a personal opinion",
+    "a written agreement",
+    "a financial loss"
+   ],
+   "a": 0,
+   "d": "Phenomenon: a fact or event that is observed."
+  },
+  {
+   "lv": 3,
+   "type": "fib",
+   "q": "Wind farms can ___ enough power for a small city.",
+   "c": [
+    "generate",
+    "celebrate",
+    "tolerate",
+    "moderate"
+   ],
+   "a": 0,
+   "d": "Generate: to produce energy or results."
+  },
+  {
+   "lv": 3,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'constrain'?",
+   "c": [
+    "limit",
+    "train",
+    "complain",
+    "maintain"
+   ],
+   "a": 0,
+   "d": "Constrain: to limit or restrict something."
+  },
+  {
+   "lv": 3,
+   "type": "fib",
+   "q": "The findings remain valid ___ certain conditions.",
+   "c": [
+    "under",
+    "above",
+    "beside",
+    "toward"
+   ],
+   "a": 0,
+   "d": "Under certain conditions: when specific factors apply."
+  },
+  {
+   "lv": 3,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'sustain'?",
+   "c": [
+    "keep going over time",
+    "give up quickly",
+    "cut into pieces",
+    "push to one side"
+   ],
+   "a": 0,
+   "d": "Sustain: to maintain something over time."
+  },
+  {
+   "lv": 3,
+   "type": "col",
+   "q": "Which phrase best follows 'a considerable'?",
+   "c": [
+    "amount of time",
+    "numbers of time",
+    "much of time",
+    "few of time"
+   ],
+   "a": 0,
+   "d": "A considerable amount of: a large quantity of."
+  },
+  {
+   "lv": 4,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'feasible'?",
+   "c": [
+    "achievable",
+    "fashionable",
+    "favourable",
+    "forgettable"
+   ],
+   "a": 0,
+   "d": "Feasible: possible and practical to do."
+  },
+  {
+   "lv": 4,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'plausible'?",
+   "c": [
+    "believable",
+    "valuable",
+    "predictable",
+    "noticeable"
+   ],
+   "a": 0,
+   "d": "Plausible: seeming reasonable or likely true."
+  },
+  {
+   "lv": 4,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'empirical'?",
+   "c": [
+    "based on observation",
+    "based on emotion",
+    "based on tradition",
+    "based on imagination"
+   ],
+   "a": 0,
+   "d": "Empirical: based on experiment and observation."
+  },
+  {
+   "lv": 4,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'implicit'?",
+   "c": [
+    "suggested but not stated",
+    "clearly written down",
+    "spoken very loudly",
+    "known to everyone"
+   ],
+   "a": 0,
+   "d": "Implicit: implied without being directly said."
+  },
+  {
+   "lv": 4,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'negligible'?",
+   "c": [
+    "too small to matter",
+    "too large to measure",
+    "too new to test",
+    "too old to use"
+   ],
+   "a": 0,
+   "d": "Negligible: so small it can be ignored."
+  },
+  {
+   "lv": 4,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'rigorous'?",
+   "c": [
+    "thorough and exact",
+    "loose and casual",
+    "brief and simple",
+    "kind and gentle"
+   ],
+   "a": 0,
+   "d": "Rigorous: extremely careful and strict."
+  },
+  {
+   "lv": 4,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'tentative'?",
+   "c": [
+    "provisional",
+    "permanent",
+    "attractive",
+    "talkative"
+   ],
+   "a": 0,
+   "d": "Tentative: not certain or fixed; provisional."
+  },
+  {
+   "lv": 4,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'comprise'?",
+   "c": [
+    "consist of",
+    "compete with",
+    "compare to",
+    "complain about"
+   ],
+   "a": 0,
+   "d": "Comprise: to be made up of parts."
+  },
+  {
+   "lv": 4,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'infer'?",
+   "c": [
+    "conclude from evidence",
+    "state directly",
+    "interfere with",
+    "refer to"
+   ],
+   "a": 0,
+   "d": "Infer: to reach a conclusion from evidence."
+  },
+  {
+   "lv": 4,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'elicit'?",
+   "c": [
+    "draw out a response",
+    "write down a list",
+    "make illegal",
+    "leave out"
+   ],
+   "a": 0,
+   "d": "Elicit: to draw out information or a reaction."
+  },
+  {
+   "lv": 4,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'preclude'?",
+   "c": [
+    "prevent from happening",
+    "prepare in advance",
+    "present clearly",
+    "preserve carefully"
+   ],
+   "a": 0,
+   "d": "Preclude: to make something impossible."
+  },
+  {
+   "lv": 4,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'manifest'?",
+   "c": [
+    "show clearly",
+    "hide away",
+    "measure twice",
+    "move slowly"
+   ],
+   "a": 0,
+   "d": "Manifest: to show something clearly."
+  },
+  {
+   "lv": 4,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'viable'?",
+   "c": [
+    "workable",
+    "visible",
+    "valuable",
+    "variable"
+   ],
+   "a": 0,
+   "d": "Viable: able to work successfully."
+  },
+  {
+   "lv": 4,
+   "type": "fib",
+   "q": "The two financial reports contain a serious ___.",
+   "c": [
+    "discrepancy",
+    "dependency",
+    "deficiency",
+    "delicacy"
+   ],
+   "a": 0,
+   "d": "Discrepancy: a difference between things that should match."
+  },
+  {
+   "lv": 4,
+   "type": "fib",
+   "q": "Trust is ___ to any long-term partnership.",
+   "c": [
+    "integral",
+    "internal",
+    "interim",
+    "intense"
+   ],
+   "a": 0,
+   "d": "Integral: necessary as an essential part."
+  },
+  {
+   "lv": 4,
+   "type": "fib",
+   "q": "These unusual results ___ further investigation.",
+   "c": [
+    "warrant",
+    "grant",
+    "imprint",
+    "distort"
+   ],
+   "a": 0,
+   "d": "Warrant: to make an action necessary or justified."
+  },
+  {
+   "lv": 4,
+   "type": "fib",
+   "q": "Data from six countries were ___ into a single index.",
+   "c": [
+    "aggregated",
+    "aggravated",
+    "agitated",
+    "allocated"
+   ],
+   "a": 0,
+   "d": "Aggregate: to combine many items into a total."
+  },
+  {
+   "lv": 4,
+   "type": "fib",
+   "q": "The outlier was treated as an ___ in the dataset.",
+   "c": [
+    "anomaly",
+    "analogy",
+    "anatomy",
+    "amnesty"
+   ],
+   "a": 0,
+   "d": "Anomaly: something that differs from the normal pattern."
+  },
+  {
+   "lv": 4,
+   "type": "col",
+   "q": "Which word best follows 'empirical'?",
+   "c": [
+    "evidence",
+    "furniture",
+    "weather",
+    "luggage"
+   ],
+   "a": 0,
+   "d": "Empirical evidence: information gained by observation."
+  },
+  {
+   "lv": 4,
+   "type": "col",
+   "q": "Which word best follows 'a rigorous'?",
+   "c": [
+    "analysis",
+    "anomaly",
+    "attention",
+    "awareness"
+   ],
+   "a": 0,
+   "d": "A rigorous analysis: a very careful, exact examination."
+  },
+  {
+   "lv": 4,
+   "type": "col",
+   "q": "Which phrase best completes 'within the ___ of this study'?",
+   "c": [
+    "scope",
+    "scale",
+    "slope",
+    "scheme"
+   ],
+   "a": 0,
+   "d": "Scope: the range a subject or study covers."
+  },
+  {
+   "lv": 4,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'predominant'?",
+   "c": [
+    "most common or noticeable",
+    "least expected",
+    "strictly forbidden",
+    "newly invented"
+   ],
+   "a": 0,
+   "d": "Predominant: the strongest or most common."
+  },
+  {
+   "lv": 4,
+   "type": "fib",
+   "q": "Smoking is a ___ cause of preventable disease.",
+   "c": [
+    "predominant",
+    "redundant",
+    "reluctant",
+    "resistant"
+   ],
+   "a": 0,
+   "d": "Predominant: main; most frequent or powerful."
+  },
+  {
+   "lv": 4,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'redundant'?",
+   "c": [
+    "no longer needed",
+    "recently updated",
+    "highly efficient",
+    "widely praised"
+   ],
+   "a": 0,
+   "d": "Redundant: unnecessary because duplicated."
+  },
+  {
+   "lv": 4,
+   "type": "fib",
+   "q": "Higher wages may ___ people to change jobs.",
+   "c": [
+    "induce",
+    "deduce",
+    "reduce",
+    "produce"
+   ],
+   "a": 0,
+   "d": "Induce: to persuade or cause someone to act."
+  },
+  {
+   "lv": 4,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'confine'?",
+   "c": [
+    "restrict within limits",
+    "confirm officially",
+    "confuse deliberately",
+    "conclude finally"
+   ],
+   "a": 0,
+   "d": "Confine: to keep within certain limits."
+  },
+  {
+   "lv": 4,
+   "type": "fib",
+   "q": "The report failed to ___ between correlation and causation.",
+   "c": [
+    "distinguish",
+    "extinguish",
+    "diminish",
+    "distort"
+   ],
+   "a": 0,
+   "d": "Distinguish: to recognise the difference between things."
+  },
+  {
+   "lv": 4,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'exploit'?",
+   "c": [
+    "make full use of",
+    "take poor care of",
+    "keep away from",
+    "give freely to"
+   ],
+   "a": 0,
+   "d": "Exploit: to use something fully for benefit."
+  },
+  {
+   "lv": 4,
+   "type": "fib",
+   "q": "A clear ___ exists between management and staff.",
+   "c": [
+    "hierarchy",
+    "hierarchic",
+    "hemisphere",
+    "heritage"
+   ],
+   "a": 0,
+   "d": "Hierarchy: a system ranking people by authority."
+  },
+  {
+   "lv": 4,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'concurrent'?",
+   "c": [
+    "happening at the same time",
+    "happening one by one",
+    "happening by accident",
+    "happening in secret"
+   ],
+   "a": 0,
+   "d": "Concurrent: occurring simultaneously."
+  },
+  {
+   "lv": 4,
+   "type": "fib",
+   "q": "The theory rests on several ___ assumptions.",
+   "c": [
+    "implicit",
+    "impolite",
+    "immense",
+    "immune"
+   ],
+   "a": 0,
+   "d": "Implicit assumption: an unstated underlying belief."
+  },
+  {
+   "lv": 4,
+   "type": "col",
+   "q": "Which word best follows 'a feasible'?",
+   "c": [
+    "solution",
+    "weather",
+    "scenery",
+    "laughter"
+   ],
+   "a": 0,
+   "d": "A feasible solution: a practical, achievable answer."
+  },
+  {
+   "lv": 5,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'corroborate'?",
+   "c": [
+    "confirm with evidence",
+    "contradict openly",
+    "collect quickly",
+    "conceal partly"
+   ],
+   "a": 0,
+   "d": "Corroborate: to support a claim with evidence."
+  },
+  {
+   "lv": 5,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'cogent'?",
+   "c": [
+    "convincing",
+    "confusing",
+    "cautious",
+    "casual"
+   ],
+   "a": 0,
+   "d": "Cogent: clear, logical, and persuasive."
+  },
+  {
+   "lv": 5,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'ephemeral'?",
+   "c": [
+    "short-lived",
+    "everlasting",
+    "essential",
+    "enormous"
+   ],
+   "a": 0,
+   "d": "Ephemeral: lasting only a very short time."
+  },
+  {
+   "lv": 5,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'equivocal'?",
+   "c": [
+    "deliberately vague",
+    "perfectly clear",
+    "strongly supportive",
+    "entirely false"
+   ],
+   "a": 0,
+   "d": "Equivocal: open to more than one interpretation."
+  },
+  {
+   "lv": 5,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'esoteric'?",
+   "c": [
+    "understood by few",
+    "enjoyed by all",
+    "forbidden by law",
+    "forgotten by most"
+   ],
+   "a": 0,
+   "d": "Esoteric: intended for a small expert group."
+  },
+  {
+   "lv": 5,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'exhaustive'?",
+   "c": [
+    "fully comprehensive",
+    "extremely tiring",
+    "partly finished",
+    "quickly done"
+   ],
+   "a": 0,
+   "d": "Exhaustive: covering every possible detail."
+  },
+  {
+   "lv": 5,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'intractable'?",
+   "c": [
+    "hard to solve or control",
+    "easy to persuade",
+    "ready to break",
+    "slow to arrive"
+   ],
+   "a": 0,
+   "d": "Intractable: very difficult to manage or solve."
+  },
+  {
+   "lv": 5,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'juxtapose'?",
+   "c": [
+    "place side by side for contrast",
+    "move far apart",
+    "copy exactly",
+    "erase completely"
+   ],
+   "a": 0,
+   "d": "Juxtapose: to place together to show contrast."
+  },
+  {
+   "lv": 5,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'pernicious'?",
+   "c": [
+    "harmful in a gradual way",
+    "helpful in a small way",
+    "famous for a short time",
+    "hidden for a long time"
+   ],
+   "a": 0,
+   "d": "Pernicious: causing harm gradually or subtly."
+  },
+  {
+   "lv": 5,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'pertinent'?",
+   "c": [
+    "directly relevant",
+    "politely spoken",
+    "permanently fixed",
+    "personally owned"
+   ],
+   "a": 0,
+   "d": "Pertinent: directly related to the matter."
+  },
+  {
+   "lv": 5,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'spurious'?",
+   "c": [
+    "false",
+    "spacious",
+    "sudden",
+    "spare"
+   ],
+   "a": 0,
+   "d": "Spurious: false though seeming genuine."
+  },
+  {
+   "lv": 5,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'tenuous'?",
+   "c": [
+    "weak and slight",
+    "tense and angry",
+    "thick and heavy",
+    "true and proven"
+   ],
+   "a": 0,
+   "d": "Tenuous: very weak or thin; barely valid."
+  },
+  {
+   "lv": 5,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'elucidate'?",
+   "c": [
+    "make clear",
+    "make longer",
+    "make legal",
+    "make cheaper"
+   ],
+   "a": 0,
+   "d": "Elucidate: to explain and make clear."
+  },
+  {
+   "lv": 5,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'extrapolate'?",
+   "c": [
+    "estimate beyond known data",
+    "remove from a list",
+    "translate word by word",
+    "argue against a claim"
+   ],
+   "a": 0,
+   "d": "Extrapolate: to extend known results to predict."
+  },
+  {
+   "lv": 5,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'quintessential'?",
+   "c": [
+    "most typical",
+    "most recent",
+    "most expensive",
+    "most doubtful"
+   ],
+   "a": 0,
+   "d": "Quintessential: the perfect example of something."
+  },
+  {
+   "lv": 5,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'conflate'?",
+   "c": [
+    "mix together wrongly",
+    "measure precisely",
+    "reduce gradually",
+    "announce publicly"
+   ],
+   "a": 0,
+   "d": "Conflate: to combine distinct things confusingly."
+  },
+  {
+   "lv": 5,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'obfuscate'?",
+   "c": [
+    "make unclear",
+    "make brighter",
+    "make smaller",
+    "make legal"
+   ],
+   "a": 0,
+   "d": "Obfuscate: to deliberately make something confusing."
+  },
+  {
+   "lv": 5,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'delineate'?",
+   "c": [
+    "describe precisely",
+    "deliver promptly",
+    "delay repeatedly",
+    "delete permanently"
+   ],
+   "a": 0,
+   "d": "Delineate: to describe or outline exactly."
+  },
+  {
+   "lv": 5,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'idiosyncratic'?",
+   "c": [
+    "peculiar to an individual",
+    "common to everyone",
+    "approved by experts",
+    "borrowed from abroad"
+   ],
+   "a": 0,
+   "d": "Idiosyncratic: unique to a particular person."
+  },
+  {
+   "lv": 5,
+   "type": "syn",
+   "q": "Which is closest in meaning to 'vindicate'?",
+   "c": [
+    "prove right",
+    "punish harshly",
+    "forget quickly",
+    "copy carefully"
+   ],
+   "a": 0,
+   "d": "Vindicate: to clear of blame; prove justified."
+  },
+  {
+   "lv": 5,
+   "type": "fib",
+   "q": "The witness's account ___ the defendant's version of events.",
+   "c": [
+    "corroborated",
+    "collaborated",
+    "corroded",
+    "correlatedly"
+   ],
+   "a": 0,
+   "d": "Corroborate: to confirm with supporting evidence."
+  },
+  {
+   "lv": 5,
+   "type": "fib",
+   "q": "The link between the two variables is ___ at best.",
+   "c": [
+    "tenuous",
+    "tedious",
+    "tremendous",
+    "tenacious"
+   ],
+   "a": 0,
+   "d": "Tenuous: weak and possibly not valid."
+  },
+  {
+   "lv": 5,
+   "type": "fib",
+   "q": "Critics dismissed the correlation as ___.",
+   "c": [
+    "spurious",
+    "spacious",
+    "gracious",
+    "precious"
+   ],
+   "a": 0,
+   "d": "Spurious: false or fake despite appearing real."
+  },
+  {
+   "lv": 5,
+   "type": "fib",
+   "q": "Further experiments may ___ the underlying mechanism.",
+   "c": [
+    "elucidate",
+    "eradicate",
+    "elongate",
+    "evacuate"
+   ],
+   "a": 0,
+   "d": "Elucidate: to make a subject clear."
+  },
+  {
+   "lv": 5,
+   "type": "fib",
+   "q": "The article tends to ___ correlation and causation.",
+   "c": [
+    "conflate",
+    "inflate",
+    "deflate",
+    "reflate"
+   ],
+   "a": 0,
+   "d": "Conflate: to wrongly treat two things as one."
+  },
+  {
+   "lv": 5,
+   "type": "fib",
+   "q": "Budget cuts will only ___ the staffing crisis.",
+   "c": [
+    "exacerbate",
+    "exonerate",
+    "excavate",
+    "exaggerate"
+   ],
+   "a": 0,
+   "d": "Exacerbate: to make a bad situation worse."
+  },
+  {
+   "lv": 5,
+   "type": "fib",
+   "q": "Her subsequent success ___ the committee's decision.",
+   "c": [
+    "vindicated",
+    "validatedly",
+    "evacuated",
+    "ventilated"
+   ],
+   "a": 0,
+   "d": "Vindicate: to show a decision was right."
+  },
+  {
+   "lv": 5,
+   "type": "fib",
+   "q": "The essay ___ the key factors behind the reform.",
+   "c": [
+    "delineates",
+    "deteriorates",
+    "denominates",
+    "designatesly"
+   ],
+   "a": 0,
+   "d": "Delineate: to describe precisely."
+  },
+  {
+   "lv": 5,
+   "type": "col",
+   "q": "Which phrase best follows 'a cogent'?",
+   "c": [
+    "argument",
+    "furniture",
+    "scenery",
+    "laughter"
+   ],
+   "a": 0,
+   "d": "A cogent argument: a logically convincing case."
+  },
+  {
+   "lv": 5,
+   "type": "col",
+   "q": "Which phrase best follows 'draw a'?",
+   "c": [
+    "sharp distinction",
+    "sharp extinction",
+    "sharp instinct",
+    "sharp restriction"
+   ],
+   "a": 0,
+   "d": "Draw a distinction: to point out a clear difference."
+  },
+  {
+   "lv": 5,
+   "type": "fib",
+   "q": "The committee's ___ reply satisfied neither side.",
+   "c": [
+    "equivocal",
+    "equivalent",
+    "equitable",
+    "equestrian"
+   ],
+   "a": 0,
+   "d": "Equivocal: intentionally ambiguous or unclear."
+  },
+  {
+   "lv": 5,
+   "type": "fib",
+   "q": "Fashion trends are notoriously ___.",
+   "c": [
+    "ephemeral",
+    "elemental",
+    "external",
+    "eternal"
+   ],
+   "a": 0,
+   "d": "Ephemeral: lasting for a very short time."
+  }
+ ]
 }
