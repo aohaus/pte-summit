@@ -107,6 +107,62 @@ var RS_QUESTIONS = [
 ];
 var DAILY_GOAL = 10;
 
+/* Error Hunt: s=誤り文, wrong=誤り語句, c=修正4択, a=正解index,
+   why=正しい理由(英語1行), cat=型, lv=レベル(1-5) */
+var GRAMMAR_BANK = [
+ /* --- Adv/Adj confusion (Hayatoの "development is rapidly" 型) --- */
+ {s:"The development of the city is rapidly.",wrong:"is rapidly",c:["is rapid","rapidly","is rapidity","are rapid"],a:0,why:"After 'is', use the adjective 'rapid' to describe the subject, not the adverb 'rapidly'.",cat:"Adjective vs Adverb",lv:1},
+ {s:"The results were surprisingly clear and the trend grew steady.",wrong:"grew steady",c:["grew steadily","grew steadier","grow steady","grew steadiness"],a:0,why:"'grew' describes how the trend changed, so it needs the adverb 'steadily'.",cat:"Adjective vs Adverb",lv:2},
+ {s:"This factor is importantly for economic growth.",wrong:"is importantly","c":["is important","importantly","is importance","be important"],a:0,why:"After the linking verb 'is', use the adjective 'important'.",cat:"Adjective vs Adverb",lv:1},
+ {s:"The two theories differ significant in their assumptions.",wrong:"differ significant",c:["differ significantly","differ significance","differs significant","differ signify"],a:0,why:"The verb 'differ' is modified by the adverb 'significantly'.",cat:"Adjective vs Adverb",lv:2},
+ {s:"Students who study consistent tend to perform better.",wrong:"study consistent",c:["study consistently","study consistent","studies consistent","study consistency"],a:0,why:"'study' is a verb, so use the adverb 'consistently' to describe how they study.",cat:"Adjective vs Adverb",lv:2},
+ {s:"The policy was implemented quick and without consultation.",wrong:"implemented quick",c:["implemented quickly","implemented quicker","implement quick","implementing quick"],a:0,why:"Use the adverb 'quickly' to describe how the policy was implemented.",cat:"Adjective vs Adverb",lv:1},
+ {s:"Air pollution has risen dramatic over the past decade.",wrong:"risen dramatic",c:["risen dramatically","risen dramatic","rose dramatic","rising dramatic"],a:0,why:"The verb 'risen' needs the adverb 'dramatically'.",cat:"Adjective vs Adverb",lv:2},
+ {s:"These findings are relative consistent with earlier studies.",wrong:"relative consistent",c:["relatively consistent","relative consistency","relatively consistency","relative consistent"],a:0,why:"Use the adverb 'relatively' to modify the adjective 'consistent'.",cat:"Adjective vs Adverb",lv:3},
+
+ /* --- Unnatural collocation (Hayatoの "ideating ideas" 型) --- */
+ {s:"Researchers spent months ideating ideas for the project.",wrong:"ideating ideas",c:["generating ideas","ideating ideas","making ideas","thinking ideas"],a:0,why:"'generate ideas' is the natural academic collocation; 'ideate ideas' is redundant and non-standard.",cat:"Collocation",lv:3},
+ {s:"The company wants to make a research on consumer behaviour.",wrong:"make a research",c:["conduct research","make a research","do a research","make research"],a:0,why:"Research collocates with 'conduct'; it is also uncountable, so no 'a'.",cat:"Collocation",lv:2},
+ {s:"The government should take actions to reduce emissions.",wrong:"take actions",c:["take action","take actions","make actions","do actions"],a:0,why:"'take action' is the fixed phrase and is uncountable here.",cat:"Collocation",lv:2},
+ {s:"Scientists have done a big progress in this field.",wrong:"done a big progress",c:["made significant progress","done a big progress","made a big progress","did big progress"],a:0,why:"Progress collocates with 'make' and pairs with 'significant', not 'big', in academic writing.",cat:"Collocation",lv:3},
+ {s:"This essay will talk about the causes of inflation.",wrong:"talk about",c:["examine","talk about","say about","tell about"],a:0,why:"In academic writing, use 'examine' or 'discuss' rather than the informal 'talk about'.",cat:"Register",lv:2},
+ {s:"The theory gives a big influence on modern economics.",wrong:"gives a big influence",c:["has a major influence","gives a big influence","makes a big influence","puts a big influence"],a:0,why:"Influence collocates with 'have', and 'major' is the academic choice over 'big'.",cat:"Collocation",lv:3},
+ {s:"We need to solve this question before proceeding.",wrong:"solve this question",c:["address this question","solve this question","answer this question","fix this question"],a:0,why:"You 'solve a problem' but 'address a question'; solve+question is a mismatch.",cat:"Collocation",lv:3},
+ {s:"The reform brought many good results to the economy.",wrong:"brought many good results",c:["yielded positive outcomes","brought many good results","made many good results","gave many good results"],a:0,why:"'yield positive outcomes' is the precise academic collocation.",cat:"Register",lv:4},
+
+ /* --- Easy word upgrade (Hayatoの "easy words" 指摘) --- */
+ {s:"This is a very big problem for many countries.",wrong:"very big",c:["significant","very big","really big","so big"],a:0,why:"Replace the weak 'very big' with the precise academic adjective 'significant'.",cat:"Word Upgrade",lv:2},
+ {s:"The new law is very good for the environment.",wrong:"very good",c:["beneficial","very good","really good","pretty good"],a:0,why:"'beneficial' is a stronger, more academic choice than 'very good'.",cat:"Word Upgrade",lv:2},
+ {s:"Many people think that education is important.",wrong:"Many people think",c:["It is widely argued","Many people think","A lot of people think","Many persons think"],a:0,why:"'It is widely argued' is a more formal, essay-appropriate opener.",cat:"Word Upgrade",lv:3},
+ {s:"Pollution makes a lot of health problems in cities.",wrong:"makes a lot of",c:["causes numerous","makes a lot of","makes lots of","does a lot of"],a:0,why:"'causes numerous' is more precise and academic than 'makes a lot of'.",cat:"Word Upgrade",lv:3},
+ {s:"The situation got worse because of the crisis.",wrong:"got worse",c:["deteriorated","got worse","became worse","turned worse"],a:0,why:"The single verb 'deteriorated' is more concise and academic.",cat:"Word Upgrade",lv:4},
+ {s:"Governments should give money to renewable energy.",wrong:"give money to",c:["invest in","give money to","put money to","spend money to"],a:0,why:"'invest in' is the precise term for allocating funds for future benefit.",cat:"Word Upgrade",lv:3},
+ {s:"This problem is getting bigger every year.",wrong:"getting bigger",c:["escalating","getting bigger","growing bigger","becoming bigger"],a:0,why:"'escalating' captures 'getting rapidly bigger' in one academic verb.",cat:"Word Upgrade",lv:4},
+ {s:"There are a lot of reasons for this change.",wrong:"a lot of",c:["numerous","a lot of","lots of","plenty of"],a:0,why:"'numerous' is the formal equivalent of 'a lot of'.",cat:"Word Upgrade",lv:2},
+
+ /* --- Articles / number --- */
+ {s:"Technology has changed way we communicate.",wrong:"changed way",c:["changed the way","changed way","changed a way","changed ways"],a:0,why:"'the way' needs the definite article because it is specified by the clause that follows.",cat:"Articles",lv:2},
+ {s:"Education is one of most important factors in development.",wrong:"one of most",c:["one of the most","one of most","one of a most","one the most"],a:0,why:"Superlatives take 'the': 'one of the most important'.",cat:"Articles",lv:1},
+ {s:"Research show that exercise improves memory.",wrong:"Research show",c:["Research shows","Research show","Researches show","Research showing"],a:0,why:"'Research' is uncountable and singular, so the verb is 'shows'.",cat:"Subject-Verb",lv:2},
+ {s:"The number of students are increasing each year.",wrong:"are increasing",c:["is increasing","are increasing","were increasing","be increasing"],a:0,why:"'The number of' takes a singular verb: 'is increasing'.",cat:"Subject-Verb",lv:3},
+ {s:"Each of the participants were given a questionnaire.",wrong:"were given",c:["was given","were given","are given","have given"],a:0,why:"'Each' is singular, so the verb is 'was given'.",cat:"Subject-Verb",lv:3},
+ {s:"Informations about the course is available online.",wrong:"Informations",c:["Information","Informations","An information","The informations"],a:0,why:"'Information' is uncountable and has no plural form.",cat:"Countability",lv:1},
+
+ /* --- Sentence logic / linking --- */
+ {s:"Although the plan was expensive, but it was effective.",wrong:"but it was",c:["it was","but it was","so it was","and but it was"],a:0,why:"'Although' already signals contrast, so 'but' is redundant.",cat:"Linking",lv:2},
+ {s:"Despite of the risks, the project went ahead.",wrong:"Despite of",c:["Despite","Despite of","Despite for","Despite about"],a:0,why:"'Despite' is never followed by 'of'; use 'despite' or 'in spite of'.",cat:"Linking",lv:2},
+ {s:"The economy grew, however, unemployment remained high.",wrong:", however,",c:["; however,",", however,",", however",", but however,"],a:0,why:"'however' joining two clauses needs a semicolon before it.",cat:"Punctuation",lv:4},
+ {s:"There are many benefits, for example, better health.",wrong:"benefits, for example,",c:["benefits, such as","benefits, for example,","benefits, as example,","benefits, for sample,"],a:0,why:"Before a noun phrase like 'better health', use 'such as' rather than 'for example'.",cat:"Linking",lv:3},
+ {s:"In conclusion to summarise, the evidence is clear.",wrong:"In conclusion to summarise",c:["In conclusion","In conclusion to summarise","To conclusion summarise","In concluding summary"],a:0,why:"'In conclusion' and 'to summarise' are redundant together; use one.",cat:"Redundancy",lv:3},
+
+ /* --- Verb form / tense --- */
+ {s:"The study was conducted to investigating the effects.",wrong:"to investigating",c:["to investigate","to investigating","for investigate","to investigated"],a:0,why:"After 'to' as an infinitive marker, use the base verb 'investigate'.",cat:"Verb Form",lv:2},
+ {s:"If governments would invest more, outcomes would improve.",wrong:"would invest",c:["invested","would invest","will invest","would invested"],a:0,why:"In a second conditional, the 'if' clause uses the past simple: 'If governments invested'.",cat:"Conditionals",lv:4},
+ {s:"Since 2010, the population has grew rapidly.",wrong:"has grew",c:["has grown","has grew","has growing","had grew"],a:0,why:"The present perfect needs the past participle 'grown'.",cat:"Verb Form",lv:2},
+ {s:"The data suggests that prices will rose next year.",wrong:"will rose",c:["will rise","will rose","will risen","will rising"],a:0,why:"After 'will', use the base form 'rise'.",cat:"Verb Form",lv:1},
+ {s:"Many researchers has studied this phenomenon.",wrong:"has studied",c:["have studied","has studied","has study","having studied"],a:0,why:"The plural subject 'researchers' takes 'have studied'.",cat:"Subject-Verb",lv:2}
+];
+
 /* Vocab Sprint: type syn=同義語 fib=空所補充 col=コロケーション, a=正解index */
 var VOCAB_BANK = [
  {lv:1,type:"syn",q:"Which is closest in meaning to 'significant'?",c:["important","colourful","frequent","distant"],a:0,d:"Significant: important or large enough to matter."},
@@ -236,6 +292,13 @@ if(typeof state.vocabCC !== "number") state.vocabCC = 0;
 if(typeof state.vocabCW !== "number") state.vocabCW = 0;
 if(!state.vocabReview) state.vocabReview = {};
 if(!state.vocabStats) state.vocabStats = {};
+if(typeof state.gramLevel !== "number") state.gramLevel = 2;
+if(typeof state.gramCC !== "number") state.gramCC = 0;
+if(typeof state.gramCW !== "number") state.gramCW = 0;
+if(!state.gramReview) state.gramReview = {};
+if(!state.gramStats) state.gramStats = {};
+if(!state.gramHistory) state.gramHistory = [];   /* セット正答率の推移 */
+if(!state.gramPersonal) state.gramPersonal = []; /* 履歴から自動生成した問題 */
 function saveState(){
   try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
   catch(e){ console.error(e); }
@@ -367,7 +430,7 @@ function dueReviews(){
 function getSkills(){
   return {
     L: estimateFor(["WFD","RS"]),
-    W: estimateFor(["WFD","ESSAY","SWT"]),
+    W: estimateFor(["WFD","ESSAY","SWT","GRAM"]),
     S: estimateFor(["RS","RA"]),
     R: estimateFor(["SWT","RA","VOCAB"])
   };
@@ -445,6 +508,7 @@ function renderDash(){
 
   var tasks = [
     { id:"vocab", name:"Vocab Sprint", jp:(isOffline ? "✈️ オフラインOK・語彙 " : "通勤モード・語彙 ") + vocabBand(state.vocabLevel), affects:"R", ready:true },
+    { id:"gram", name:"Error Hunt", jp:(isOffline ? "✈️ オフラインOK・文法 " : "文法ドリル・") + gramBand(state.gramLevel), affects:"W", ready:true },
     { id:"wfd", name:"Write from Dictation", jp:(isOffline ? "✈️ オフラインOK" : "聞いて書き取る") + (reviewsDue ? "・復習" + reviewsDue + "問待ち" : ""), affects:"L + W", ready:true },
     { id:"rs", name:"Repeat Sentence", jp:isOffline ? "要ネット接続(音声認識)" : "聞いて復唱する", affects:"S + L", ready:!isOffline },
     { id:"ra", name:"Read Aloud", jp:isOffline ? "要ネット接続(音声認識)" : "音読(AI発音コーチ)", affects:"S + R", ready:!isOffline },
@@ -509,6 +573,7 @@ function renderDash(){
       if(id === "write") renderWrite();
       if(id === "ra") renderRA();
       if(id === "vocab") renderVocab();
+      if(id === "gram") renderErrorHunt();
     });
   }
   document.getElementById("gohist").addEventListener("click", renderHistory);
@@ -1112,6 +1177,7 @@ function renderWrite(){
         var pct = Math.max(0, Math.min(1, (r.overall - 10) / 80));
         var detail = { task: task, userText: v, result: r };
         recordAttempt(pct, kind, detail);
+        harvestPersonalDrills(r);
         showResult(kind, r, v);
       }, function(errMsg){
         st.textContent = "採点に失敗しました: " + errMsg;
@@ -1190,7 +1256,7 @@ function writingResultHTML(kind, r, userText){
 function renderHistory(){
   document.getElementById("app").classList.add("wide");
   var recent = state.attempts.slice(-5).reverse();
-  var TYPE_JP = { WFD:"Write from Dictation", RS:"Repeat Sentence", SWT:"Summarize Written Text", ESSAY:"Write Essay", RA:"Read Aloud", VOCAB:"Vocab Sprint" };
+  var TYPE_JP = { WFD:"Write from Dictation", RS:"Repeat Sentence", SWT:"Summarize Written Text", ESSAY:"Write Essay", RA:"Read Aloud", VOCAB:"Vocab Sprint", GRAM:"Error Hunt" };
 
   function backToDash(){
     document.getElementById("app").classList.remove("wide");
@@ -1394,6 +1460,229 @@ function renderVocab(){
       question();
     });
     document.getElementById("vdash").addEventListener("click", renderDash);
+  }
+
+  ready();
+}
+
+/* ================= Error Hunt(文法ドリル・パーソナライズ) ================= */
+/* エッセイ採点のimprovements(quote->fix)を個人ドリル化 */
+function harvestPersonalDrills(result){
+  if(!result || !result.improvements) return;
+  var added = 0;
+  result.improvements.forEach(function(imp){
+    if(!imp.quote || !imp.fix) return;
+    if(imp.quote.trim() === imp.fix.trim()) return;
+    if(state.gramPersonal.some(function(g){ return g.wrong === imp.quote; })) return;
+    /* 誤り語句を含む短い文脈が作れない場合はquote自体を文として扱う */
+    state.gramPersonal.push({
+      s: imp.quote,               /* 誤り表現 */
+      wrong: imp.quote,
+      correct: imp.fix,           /* 4択の正解 */
+      why: imp.why_ja || "AI\u304c\u63a1\u70b9\u3067\u6307\u6458\u3057\u305f\u3042\u306a\u305f\u81ea\u8eab\u306e\u8aa4\u308a\u3067\u3059\u3002",
+      cat: "\u3042\u306a\u305f\u306e\u904e\u53bb\u306e\u8aa4\u308a",
+      lv: state.gramLevel,
+      personal: true
+    });
+    added++;
+  });
+  if(added) saveState();
+}
+
+/* 個人ドリルは正解のみ既知なので、他の問題のfixからダミー選択肢を借りる */
+function buildPersonalChoices(item){
+  var pool = GRAMMAR_BANK.map(function(g){ return g.c[g.a]; })
+    .concat(state.gramPersonal.filter(function(g){ return g.correct; }).map(function(g){ return g.correct; }));
+  var distractors = [];
+  var seen = {};
+  seen[item.correct] = true;
+  /* 誤り表現そのものをダミーに含める(自分のミスを見分ける訓練) */
+  if(item.wrong && item.wrong !== item.correct){ distractors.push(item.wrong); seen[item.wrong] = true; }
+  var shuffledPool = pool.slice().sort(function(){ return Math.random()-0.5; });
+  for(var i=0;i<shuffledPool.length && distractors.length<3;i++){
+    var cand = shuffledPool[i];
+    if(!seen[cand]){ distractors.push(cand); seen[cand] = true; }
+  }
+  while(distractors.length < 3) distractors.push("(no change)");
+  var choices = [item.correct].concat(distractors.slice(0,3));
+  /* シャッフルして正解indexを返す */
+  for(var j=choices.length-1;j>0;j--){ var k=Math.floor(Math.random()*(j+1)); var t=choices[j];choices[j]=choices[k];choices[k]=t; }
+  return { c: choices, a: choices.indexOf(item.correct) };
+}
+
+function gramBand(lv){ return vocabBand(lv); }
+function gramDue(){
+  var t = todayStr(), out = [];
+  for(var k in state.gramReview){ if(state.gramReview[k].due <= t) out.push(k); }
+  return out;
+}
+function gramSchedule(key, ok){
+  var rv = state.gramReview;
+  if(ok){
+    if(rv[key]){ var st = rv[key].stage||0; if(st>=2) delete rv[key]; else rv[key] = {stage:st+1, due:dstr(st===0?3:7)}; }
+  }else{ rv[key] = {stage:0, due:dstr(1)}; }
+}
+
+function renderErrorHunt(){
+  var SET = 5;
+  var items = [], idx = 0, correct = 0, missed = [], levelStart = state.gramLevel;
+
+  function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;} return a; }
+
+  /* 全問題を統一フォーマットに(内蔵=選択肢固定 / 個人=動的生成) */
+  function normalize(raw){
+    if(raw.personal){
+      var built = buildPersonalChoices(raw);
+      return { key:"p:"+raw.wrong, s:raw.s, wrong:raw.wrong, c:built.c, a:built.a, why:raw.why, cat:raw.cat, lv:raw.lv, personal:true };
+    }
+    return { key:"b:"+raw.s, s:raw.s, wrong:raw.wrong, c:raw.c, a:raw.a, why:raw.why, cat:raw.cat, lv:raw.lv };
+  }
+
+  function pool(lv){
+    return GRAMMAR_BANK.filter(function(g){ return g.lv===lv; }).map(normalize);
+  }
+  function pickItems(){
+    /* 個人ドリル(自分の誤り)を最優先で最大2問、次に復習期限、残りを現在レベル */
+    var personal = shuffle(state.gramPersonal.map(normalize)).slice(0,2);
+    var used = {}; personal.forEach(function(p){ used[p.key]=true; });
+    var due = shuffle(gramDue());
+    var dueItems = [];
+    GRAMMAR_BANK.map(normalize).concat(state.gramPersonal.map(normalize)).forEach(function(it){
+      if(due.indexOf(it.key)>=0 && !used[it.key]){ dueItems.push(it); used[it.key]=true; }
+    });
+    dueItems = dueItems.slice(0,2);
+    dueItems.forEach(function(d){ used[d.key]=true; });
+    var lv = state.gramLevel, rest = shuffle(pool(lv)).filter(function(x){ return !used[x.key]; });
+    var spread=1;
+    while(personal.length+dueItems.length+rest.length < SET && (lv-spread>=1 || lv+spread<=5)){
+      if(lv-spread>=1) rest = rest.concat(shuffle(pool(lv-spread)).filter(function(x){return !used[x.key];}));
+      if(lv+spread<=5) rest = rest.concat(shuffle(pool(lv+spread)).filter(function(x){return !used[x.key];}));
+      spread++;
+    }
+    items = personal.concat(dueItems).concat(rest).slice(0,SET);
+    items = shuffle(items);
+  }
+
+  function screen(html){
+    root.innerHTML = headerHTML("ERROR HUNT" + (items.length ? " \u2014 " + (idx+1) + "/" + SET : "")) +
+      '<div class="card">' + html + '</div>';
+    document.getElementById("back").addEventListener("click", renderDash);
+  }
+
+  function ready(){
+    items = [];
+    var pc = state.gramPersonal.length, due = gramDue().length;
+    /* 上達メーター(直近履歴の平均) */
+    var recent = state.gramHistory.slice(-10);
+    var trend = "";
+    if(recent.length >= 2){
+      var firstHalf = recent.slice(0, Math.floor(recent.length/2));
+      var lastHalf = recent.slice(Math.floor(recent.length/2));
+      var avg = function(a){ return Math.round(a.reduce(function(s,x){return s+x;},0)/a.length*100); };
+      var d = avg(lastHalf) - avg(firstHalf);
+      trend = '<div style="background:#F1ECDF;border-radius:10px;padding:10px 12px;margin-bottom:14px;">' +
+        '<div style="font-size:11px;color:var(--sub);">\u4e0a\u9054\u30e1\u30fc\u30bf\u30fc\uFF08\u76f4\u8fd1\u306e\u6b63\u7b54\u7387\uFF09</div>' +
+        '<div style="font-size:18px;font-weight:700;color:' + (d>=0?"var(--green)":"var(--amber)") + ';">' +
+        avg(lastHalf) + '% ' + (d>0?'\u2191 +'+d+'\u30dd\u30a4\u30f3\u30c8':(d<0?'\u2193 '+d+'\u30dd\u30a4\u30f3\u30c8':'\u2192 \u7dad\u6301')) + '</div>' +
+        '<div style="font-size:10px;color:var(--sub);">\u76f4\u8fd1' + recent.length + '\u30bb\u30c3\u30c8\u306e\u63a8\u79fb</div></div>';
+    }
+    screen(
+      '<div style="text-align:center;padding:20px 0;">' +
+      '<div style="font-family:var(--serif);font-size:30px;font-weight:600;color:var(--blue);margin-bottom:2px;">' + gramBand(state.gramLevel) + '</div>' +
+      '<p style="font-size:11px;color:var(--sub);margin:0 0 6px;">\u6587\u6cd5\u30ec\u30d9\u30eb ' + state.gramLevel + ' / 5\u3000\u5185\u8535' + GRAMMAR_BANK.length + '\u554f' + (pc?' + \u3042\u306a\u305f\u5c02\u7528'+pc+'\u554f':'') + '</p>' +
+      (pc ? '<p style="font-size:11px;color:var(--green);font-weight:700;margin:0 0 6px;">\u2728 \u904e\u53bb\u306e\u30a8\u30c3\u30bb\u30a4\u306e\u8aa4\u308a\u304c' + pc + '\u554f\u3001\u3042\u306a\u305f\u5c02\u7528\u554f\u984c\u3068\u3057\u3066\u51fa\u984c\u3055\u308c\u307e\u3059</p>' : '') +
+      (due ? '<p style="font-size:11px;color:var(--amber);font-weight:700;margin:0 0 6px;">\u5fa9\u7fd2\u671f\u9650 ' + due + '\u554f\uFF08\u512a\u5148\u51fa\u984c\uFF09</p>' : '') +
+      '<div style="margin:6px 0 14px;"></div>' + trend +
+      '<button class="btn" id="ghstart" style="width:auto;display:inline-block;">\u25b6 5\u554f\u30bb\u30c3\u30c8\u958b\u59cb</button>' +
+      '<p style="font-size:11px;color:var(--sub);margin-top:12px;">\u{1F686} \u97f3\u58f0\u306a\u3057\u30fb\u30bf\u30c3\u30d7\u306e\u307f\u3002\u8aa4\u308a\u3092\u898b\u3064\u3051\u3066\u6b63\u3057\u3044\u5f62\u3092\u9078\u3073\u307e\u3059\u3002</p></div>');
+    document.getElementById("ghstart").addEventListener("click", function(){
+      pickItems(); idx=0; correct=0; missed=[]; levelStart=state.gramLevel; question();
+    });
+  }
+
+  function question(){
+    var it = items[idx];
+    var opts = it.c.map(function(choice, i){
+      return '<button class="btn ghost" data-opt="' + i + '" style="text-align:left;font-size:15px;">' +
+        String.fromCharCode(65+i) + '. ' + esc(choice) + '</button>';
+    }).join("");
+    screen(
+      '<div style="font-size:10px;letter-spacing:2px;color:var(--sub);font-weight:700;margin-bottom:8px;">' +
+      esc(it.cat) + ' \u30fb ' + gramBand(it.lv) + (it.personal ? ' \u30fb <span style="color:var(--green);">\u3042\u306a\u305f\u5c02\u7528</span>' : '') + '</div>' +
+      '<div style="font-size:12px;color:var(--sub);margin-bottom:6px;">\u6b21\u306e\u4e0b\u7dda\u90e8\u3092\u6b63\u3057\u3044\u5f62\u306b\u76f4\u3059\u306a\u3089\uFF1F</div>' +
+      '<p style="font-size:16px;line-height:1.8;margin:0 0 14px;">' +
+      esc(it.s).replace(esc(it.wrong), '<u style="text-decoration:underline;text-decoration-color:var(--red);text-decoration-thickness:2px;">' + esc(it.wrong) + '</u>') +
+      '</p><div style="display:grid;gap:8px;">' + opts + '</div>');
+    var btns = root.querySelectorAll("[data-opt]");
+    for(var i=0;i<btns.length;i++){
+      btns[i].addEventListener("click", function(){ answer(it, parseInt(this.getAttribute("data-opt"),10)); });
+    }
+  }
+
+  function answer(it, chosen){
+    var ok = chosen === it.a;
+    var btns = root.querySelectorAll("[data-opt]");
+    for(var i=0;i<btns.length;i++){
+      btns[i].disabled = true;
+      var oi = parseInt(btns[i].getAttribute("data-opt"),10);
+      if(oi === it.a){ btns[i].style.borderColor="var(--green)"; btns[i].style.color="var(--green)"; btns[i].style.fontWeight="700"; }
+      else if(oi === chosen){ btns[i].style.borderColor="var(--red)"; btns[i].style.color="var(--red)"; }
+      else btns[i].style.opacity=".5";
+    }
+    if(ok){ correct++; state.gramCC++; state.gramCW=0; if(state.gramCC>=3 && state.gramLevel<5){state.gramLevel++;state.gramCC=0;} }
+    else { missed.push(it); state.gramCW++; state.gramCC=0; if(state.gramCW>=2 && state.gramLevel>1){state.gramLevel--;state.gramCW=0;} }
+    gramSchedule(it.key, ok);
+    var gs = state.gramStats[it.cat] || {n:0,c:0}; gs.n++; if(ok) gs.c++; state.gramStats[it.cat]=gs;
+    saveState();
+    var isLast = idx >= SET-1;
+    var fb = document.createElement("div");
+    /* 正解でも「なぜ正しいか」を必ず表示(学習補足) */
+    fb.innerHTML =
+      '<div style="background:' + (ok?"#EAEFE2":"#F6EFE0") + ';border-radius:10px;padding:10px 12px;margin-top:12px;font-size:12px;line-height:1.7;">' +
+      '<b style="color:' + (ok?"var(--green)":"var(--red)") + ';">' + (ok?"\u2713 Correct":"\u2717 Answer: "+esc(it.c[it.a])) + '</b><br>' +
+      '<span style="color:var(--sub);">\u{1F4A1} ' + esc(it.why) + '</span></div>' +
+      '<div style="display:flex;justify-content:flex-end;margin-top:12px;">' +
+      '<button class="btn" id="ghnext" style="width:auto;padding:10px 20px;">' + (isLast?"\u7d50\u679c\u3092\u898b\u308b \u{1F4CA}":"\u6b21\u3078 \u2192") + '</button></div>';
+    root.querySelector(".card").appendChild(fb);
+    document.getElementById("ghnext").addEventListener("click", function(){
+      if(isLast) summary(); else { idx++; question(); }
+    });
+  }
+
+  function summary(){
+    var pct = correct/SET;
+    recordAttempt(pct, "GRAM");
+    state.gramHistory.push(pct);
+    saveState();
+    var c = pct>=0.8?"var(--green)":pct>=0.6?"var(--amber)":"var(--red)";
+    var lvMsg = state.gramLevel>levelStart ? '<p style="font-size:13px;color:var(--green);font-weight:700;">\u2b06 \u30ec\u30d9\u30eb\u30a2\u30c3\u30d7\uFF01' + gramBand(state.gramLevel) + ' \u3078</p>' :
+                state.gramLevel<levelStart ? '<p style="font-size:13px;color:var(--amber);font-weight:700;">\u2b07 ' + gramBand(state.gramLevel) + ' \u306b\u8abf\u6574\u3057\u307e\u3057\u305f</p>' : "";
+    /* カテゴリ別の弱点 */
+    var cats = Object.keys(state.gramStats).map(function(k){ var s=state.gramStats[k]; return {k:k,rate:s.c/s.n,n:s.n}; })
+      .filter(function(x){ return x.n>=2; }).sort(function(a,b){ return a.rate-b.rate; }).slice(0,3);
+    var catHTML = cats.length ? '<div style="font-size:12px;color:var(--sub);font-weight:700;margin:14px 0 6px;">\u7d2f\u7a4d\u306e\u5f31\u70b9\u30ab\u30c6\u30b4\u30ea</div>' +
+      cats.map(function(x){
+        var rc = x.rate>=0.8?"var(--green)":x.rate>=0.5?"var(--amber)":"var(--red)";
+        return '<div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;"><span>'+esc(x.k)+'</span><span style="color:'+rc+';font-weight:700;">'+Math.round(x.rate*100)+'%</span></div>';
+      }).join("") : "";
+    var missHTML = missed.length ? missed.map(function(m){
+      return '<div style="border-left:3px solid var(--amber);padding:6px 10px;margin-bottom:8px;background:#F6EFE0;border-radius:0 8px 8px 0;">' +
+        '<div style="font-size:12px;color:var(--red);line-height:1.5;">' + esc(m.wrong) + '</div>' +
+        '<div style="font-size:13px;color:var(--green);font-weight:700;">\u2192 ' + esc(m.c[m.a]) + '</div>' +
+        '<div style="font-size:11px;color:var(--sub);line-height:1.5;">\u{1F4A1} ' + esc(m.why) + '</div></div>';
+    }).join("") : '<p style="font-size:13px;color:var(--green);font-weight:600;">\u5168\u554f\u6b63\u89e3\uFF01</p>';
+    items = [];
+    root.innerHTML = headerHTML("\u30bb\u30c3\u30c8\u7d50\u679c") +
+      '<div class="card"><div style="text-align:center;margin-bottom:8px;">' +
+      '<div style="font-family:var(--serif);font-size:40px;font-weight:600;color:'+c+';">'+correct+'<span style="font-size:16px;color:var(--sub);"> / '+SET+'</span></div>' + lvMsg + '</div>' +
+      catHTML +
+      '<div style="font-size:12px;color:var(--sub);font-weight:700;margin:14px 0 8px;">' + (missed.length?"\u9593\u9055\u3048\u305f\u554f\u984c\uFF08\u5fa9\u7fd2\u30ad\u30e5\u30fc\u306b\u8ffd\u52a0\uFF09":"\u7d50\u679c") + '</div>' + missHTML +
+      '<div class="row" style="margin-top:12px;">' +
+      '<button class="btn ghost" id="ghagain" style="flex:1;">\u3082\u30461\u30bb\u30c3\u30c8</button>' +
+      '<button class="btn" id="ghdash" style="flex:1;">\u30c0\u30c3\u30b7\u30e5\u30dc\u30fc\u30c9</button></div></div>';
+    document.getElementById("back").addEventListener("click", renderDash);
+    document.getElementById("ghagain").addEventListener("click", function(){ pickItems(); idx=0;correct=0;missed=[];levelStart=state.gramLevel; question(); });
+    document.getElementById("ghdash").addEventListener("click", renderDash);
   }
 
   ready();
@@ -1946,6 +2235,12 @@ function mergeContent(c){
     if(v && v.q && v.c && typeof v.a === "number" &&
        !VOCAB_BANK.some(function(x){ return x.q === v.q; })){
       VOCAB_BANK.push(v);
+    }
+  });
+  (c.grammar || []).forEach(function(g){
+    if(g && g.s && g.c && typeof g.a === "number" &&
+       !GRAMMAR_BANK.some(function(x){ return x.s === g.s; })){
+      GRAMMAR_BANK.push(g);
     }
   });
 }
