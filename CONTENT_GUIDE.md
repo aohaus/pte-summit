@@ -17,7 +17,8 @@
   "rs":    ["Repeat Sentence の文", "..."],
   "swt":   ["Summarize Written Text のパッセージ(100〜150語)", "..."],
   "essay": ["エッセイのプロンプト", "..."],
-  "ra":    ["Read Aloud のパッセージ(50〜65語)", "..."]
+  "ra":    ["Read Aloud のパッセージ(50〜65語)", "..."],
+  "grammar": [{"s":"誤りを含む文", "wrong":"誤り語句", "c":["正しい形","誤り1","誤り2","誤り3"], "a":0, "why":"why it is correct (English)", "cat":"Adjective vs Adverb", "lv":2}]
 }
 ```
 
@@ -34,6 +35,9 @@
   教育・テクノロジー・都市・環境・労働などの定番テーマ
 - **ra**: Read Aloud用パッセージ。50〜65語の1段落、アカデミックな説明文。
   読み上げ練習に適した自然な文構造で、固有名詞は控えめに
+- **grammar**: Error Hunt用。誤りを1つ含む文(s)、下線を引く誤り語句(wrong)、修正4択(c、正解はa番目)、
+  正しい理由の英語1行(why)、カテゴリ(cat)、レベル(lv 1-5)。catは "Adjective vs Adverb" "Collocation"
+  "Word Upgrade" "Articles" "Subject-Verb" "Verb Form" "Linking" 等
 
 ## AIモデルへの依頼プロンプト(コピペ用)
 
