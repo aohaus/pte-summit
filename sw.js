@@ -22,8 +22,12 @@ self.addEventListener("install", (e) => {
 self.addEventListener("activate", (e) => {
   e.waitUntil(
     caches.keys()
+      // 自分の古い版だけを掃除する。
+      // 同じオリジンに /show/ の Owl Studio が別キャッシュを持っているので、
+      // 接頭辞で絞らないと互いのオフラインキャッシュを消し合ってしまう。
       .then((keys) => Promise.all(
-        keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))
+        keys.filter((k) => k.startsWith("pte-summit-") && k !== CACHE)
+            .map((k) => caches.delete(k))
       ))
       .then(() => self.clients.claim())
   );

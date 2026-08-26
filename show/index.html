@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Show Don't Tell — Owl Studio</title>
+<link rel="manifest" href="manifest.webmanifest" />
+<meta name="theme-color" content="#17897C" />
+<meta name="description" content="Turn flat 'telling' sentences into vivid 'showing' ones. A writing trainer for three ages." />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="Show Studio" />
+<link rel="icon" href="icon-192.png" type="image/png" />
+<link rel="apple-touch-icon" href="icon-192.png" />
+<style>
+  :root{
+    --bg:#FFF8F0;        /* warm cream */
+    --card:#FFFDF9;
+    --ink:#33281F;
+    --sub:#8A7B6B;
+    --line:#EFE3D4;
+    --brand:#17897C;     /* owl bow tie — teal */
+    --brand-soft:#E3F1EE;
+    --accent:#F59B23;    /* beak orange */
+    --peach:#E9A96A;     /* plumage */
+    --good:#3E8E68;
+    --warn:#C7861F;
+    --bad:#B2503A;
+    --serif:'Iowan Old Style','Palatino Linotype','Palatino','Georgia',serif;
+    --sans:'Avenir Next','Helvetica Neue',-apple-system,system-ui,'Segoe UI',sans-serif;
+    --fs:16px;           /* base font size, retuned per band */
+    --radius:16px;
+  }
+  /* --- age-band skins --- */
+  [data-band="1"]{ --brand:#E07C1F; --brand-soft:#FDEBD6; --accent:#17897C; --fs:18px; --radius:20px; }
+  [data-band="2"]{ --brand:#17897C; --brand-soft:#E3F1EE; --accent:#F59B23; --fs:16px; --radius:16px; }
+  [data-band="3"]{ --bg:#F4F1EA; --card:#FCFAF5; --brand:#9C5334; --brand-soft:#F1E5DC;
+                   --accent:#6E7F5E; --line:#E4DCCE; --fs:15px; --radius:12px; }
+
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+    font-size:var(--fs);-webkit-font-smoothing:antialiased;overscroll-behavior-y:contain;}
+  #app{max-width:520px;margin:0 auto;padding:14px 14px calc(40px + env(safe-area-inset-bottom));}
+  h1,h2{font-family:var(--serif);font-weight:600;letter-spacing:-.015em;margin:0;}
+  h1{font-size:1.55em;} h2{font-size:1.2em;}
+  p{margin:0 0 .6em;line-height:1.6;}
+  .sub{color:var(--sub);}
+  .xs{font-size:.72em;} .sm{font-size:.82em;} .lg{font-size:1.1em;}
+  .mt{margin-top:12px;} .mb{margin-bottom:12px;}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;
+    box-shadow:0 1px 2px rgba(80,60,40,.05),0 6px 18px rgba(80,60,40,.045);}
+  .btn{display:block;width:100%;padding:14px 20px;font-size:.95em;font-weight:700;letter-spacing:.01em;
+    background:var(--brand);color:#fff;border:none;border-radius:calc(var(--radius) - 4px);
+    font-family:inherit;cursor:pointer;transition:transform .12s ease,opacity .12s ease,box-shadow .12s ease;
+    box-shadow:0 2px 0 rgba(0,0,0,.10);}
+  .btn:active{transform:translateY(2px);box-shadow:none;}
+  .btn[disabled]{opacity:.45;cursor:default;transform:none;}
+  .btn.ghost{background:var(--card);color:var(--brand);border:1.5px solid var(--brand);box-shadow:none;font-weight:600;}
+  .btn.quiet{background:transparent;color:var(--sub);border:1px solid var(--line);box-shadow:none;font-weight:600;}
+  .btn.sm{padding:10px 12px;font-size:.8em;}
+  .row{display:flex;gap:8px;} .row>*{flex:1;}
+  .stack{display:grid;gap:8px;}
+
+  textarea,input[type=text]{width:100%;font-size:16px;padding:13px;border:1.5px solid var(--line);
+    border-radius:calc(var(--radius) - 4px);font-family:inherit;color:var(--ink);background:#fff;
+    resize:none;line-height:1.55;transition:border-color .15s ease,box-shadow .15s ease;}
+  textarea:focus,input[type=text]:focus{outline:none;border-color:var(--brand);
+    box-shadow:0 0 0 3px var(--brand-soft);}
+
+  .pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:.7em;font-weight:800;
+    letter-spacing:.06em;text-transform:uppercase;background:var(--brand-soft);color:var(--brand);}
+  .pill.grey{background:#EFEAE2;color:var(--sub);}
+  .pill.good{background:#E2F0E9;color:var(--good);}
+  .pill.bad{background:#F7E5E0;color:var(--bad);}
+
+  /* mascot */
+  .owl{width:88px;height:auto;display:block;flex:none;
+    filter:drop-shadow(0 6px 10px rgba(90,60,30,.18));}
+  .owl.bob{animation:bob 3.4s ease-in-out infinite;}
+  .owl.cheer{animation:cheer .7s ease-out;}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(-1deg);}50%{transform:translateY(-7px) rotate(1deg);}}
+  @keyframes cheer{0%{transform:scale(1) rotate(0);}30%{transform:scale(1.14) rotate(-6deg);}
+    60%{transform:scale(1.02) rotate(5deg);}100%{transform:scale(1) rotate(0);}}
+  .speech{position:relative;background:var(--brand-soft);border-radius:14px;padding:11px 13px;
+    font-size:.85em;line-height:1.5;color:var(--ink);flex:1;}
+  .speech:before{content:"";position:absolute;left:-7px;top:20px;width:0;height:0;
+    border:7px solid transparent;border-right-color:var(--brand-soft);border-left:0;}
+  .mascot{display:flex;gap:10px;align-items:flex-start;margin-bottom:14px;}
+
+  /* layer colours */
+  .lay-physical{--lc:#C2703A;} .lay-internal{--lc:#B0446B;} .lay-mental{--lc:#4B6FB5;}
+  .laychip{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:999px;
+    font-size:.72em;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
+    background:color-mix(in srgb,var(--lc) 12%,#fff);color:var(--lc);border:1px solid color-mix(in srgb,var(--lc) 28%,#fff);}
+
+  /* score bars */
+  .bar{height:9px;background:#EDE6DC;border-radius:5px;overflow:hidden;}
+  .bar>i{display:block;height:100%;width:0;border-radius:5px;background:var(--brand);
+    transition:width .75s cubic-bezier(.22,1,.36,1);}
+  .axis{display:grid;grid-template-columns:1fr auto;gap:2px 8px;font-size:.76em;margin-bottom:9px;}
+  .axis .bar{grid-column:1/-1;}
+
+  .big{font-family:var(--serif);font-size:2.6em;font-weight:600;line-height:1;}
+  .tellcard{background:linear-gradient(160deg,var(--brand-soft),transparent 70%);
+    border:1.5px dashed color-mix(in srgb,var(--brand) 35%,#fff);border-radius:var(--radius);
+    padding:18px 16px;text-align:center;}
+  .tellcard .q{font-family:var(--serif);font-size:1.35em;line-height:1.35;}
+
+  .ref{border-left:3px solid var(--lc,var(--brand));padding:7px 0 7px 11px;margin-bottom:9px;
+    font-family:var(--serif);font-size:.98em;line-height:1.5;}
+
+  .screen{animation:in .32s cubic-bezier(.22,1,.36,1);}
+  @keyframes in{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+  .pop{animation:pop .35s cubic-bezier(.22,1.4,.4,1);}
+  @keyframes pop{from{opacity:0;transform:scale(.94);}to{opacity:1;transform:none;}}
+
+  .prog{display:flex;gap:4px;margin-bottom:12px;}
+  .prog i{flex:1;height:5px;border-radius:3px;background:#E7DED2;transition:background .3s;}
+  .prog i.on{background:var(--brand);} .prog i.now{background:var(--accent);}
+
+  .tile{display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:left;
+    padding:14px;border-radius:var(--radius);background:var(--card);border:1.5px solid var(--line);
+    font-family:inherit;font-size:1em;color:var(--ink);cursor:pointer;width:100%;
+    transition:border-color .15s,transform .12s,background .15s;}
+  .tile:active{transform:scale(.985);}
+  .tile[aria-pressed="true"]{border-color:var(--brand);background:var(--brand-soft);}
+  .tile[disabled]{opacity:.5;cursor:default;}
+
+  mark{background:#FBE7B8;color:inherit;border-radius:3px;padding:0 2px;}
+  mark.tellhit{background:#F8DAD2;text-decoration:underline wavy var(--bad);}
+  code{background:#F1EBE2;padding:1px 5px;border-radius:5px;font-size:.85em;}
+  hr{border:none;border-top:1px solid var(--line);margin:14px 0;}
+  a{color:var(--brand);}
+  #err{display:none;background:#FBEAEA;color:#8A2222;font-size:12px;padding:8px 12px;
+    border-radius:8px;margin-bottom:10px;white-space:pre-wrap;}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+</style>
+</head>
+<body>
+<div id="app"><div id="err"></div><div id="root" class="sub">Loading…</div></div>
+<script>
+"use strict";
+window.onerror=function(m,s,l){var e=document.getElementById("err");
+  e.style.display="block";e.textContent="Error: "+m+" (line "+l+")";};
+/* ================= prompt bank (built-in) =================
+   band: 1 = Explorer (9), 2 = Storyteller (12), 3 = Novelist (adult)
+   tell    : the abstract "telling" sentence to rewrite
+   context : the situation, so the writer has something to picture
+   hint    : one guiding question per layer
+   show    : reference "showing" lines, per layer                       */
+var PROMPT_BANK = [
+
+/* ---------------- Band 1 — Explorer (age 9) ---------------- */
+{id:"b1-01",band:1,theme:"school",tell:"He was nervous.",tellWord:"nervous",
+ context:"It is his first morning at a new school. The bell has just rung.",
+ hint:{physical:"What are his hands and feet doing?",internal:"What is happening inside his tummy or chest?",mental:"What does he keep thinking about?"},
+ show:{physical:["He gripped the strap of his bag until his knuckles turned white.","His feet would not stop shuffling on the tiles."],
+       internal:["A small cold stone sat at the bottom of his stomach.","His breath came out in short, shallow puffs."],
+       mental:["He rehearsed his own name three times, just in case."]}},
+
+{id:"b1-02",band:1,theme:"holiday",tell:"She was excited.",tellWord:"excited",
+ context:"Tomorrow morning the family leaves for the beach.",
+ hint:{physical:"What can't her body keep still?",internal:"What is fizzing inside her?",mental:"What is she picturing?"},
+ show:{physical:["She bounced on the bed until the springs squeaked.","Her packed bag was by the door six hours early."],
+       internal:["Something fizzed under her ribs like a shaken bottle."],
+       mental:["She had already counted the hours twice, and got a different answer each time.","Every time she shut her eyes she saw the same stretch of sand."]}},
+
+{id:"b1-03",band:1,theme:"family",tell:"He was angry.",tellWord:"angry",
+ context:"His little sister has snapped the wing off the model plane he spent a week building.",
+ hint:{physical:"What do his hands and jaw do?",internal:"What gets hot or tight?",mental:"What words is he swallowing?"},
+ show:{physical:["His fists curled at his sides and stayed there.","He slammed the door hard enough to rattle the picture frames."],
+       internal:["Heat climbed up his neck and spread across his ears.","His jaw locked so tight his teeth ached."],
+       mental:["He counted to ten. Then he counted to ten again."]}},
+
+{id:"b1-04",band:1,theme:"friends",tell:"She was sad.",tellWord:"sad",
+ context:"Her best friend moved to another country last week.",
+ hint:{physical:"What does she do with the empty seat?",internal:"What sits in her throat or chest?",mental:"What does she keep almost doing?"},
+ show:{physical:["She saved the seat beside her anyway, and ate her lunch alone.","Her shoulders folded inward, as if she were trying to take up less room."],
+       internal:["Something thick sat in her throat and would not go down."],
+       mental:["She started three messages and deleted all of them.","She kept turning round to share the joke, and there was no one there."]}},
+
+{id:"b1-05",band:1,theme:"home",tell:"He was scared.",tellWord:"scared",
+ context:"He is alone upstairs and something knocks against the window in the dark.",
+ hint:{physical:"How does his body freeze or move?",internal:"What is his heart doing?",mental:"What is his brain inventing?"},
+ show:{physical:["He pulled the duvet up until only his eyes showed.","He stayed absolutely still, as if moving would give him away."],
+       internal:["His heart banged so hard he could hear it in his ears.","All the warmth drained out of his hands."],
+       mental:["He told himself it was only the tree. He did not believe himself."]}},
+
+{id:"b1-06",band:1,theme:"school",tell:"She was embarrassed.",tellWord:"embarrassed",
+ context:"She tripped over her own feet walking to the front of the class.",
+ hint:{physical:"What goes red, or what does she hide behind?",internal:"What burns or prickles?",mental:"What does she wish for?"},
+ show:{physical:["She studied her shoes as if they were the most interesting things in the room.","Her hair fell forward and she left it there, like a curtain."],
+       internal:["Her cheeks burned all the way to her ears.","A hot prickle spread across the back of her neck."],
+       mental:["For three whole seconds she wished the floor would simply open."]}},
+
+{id:"b1-07",band:1,theme:"sport",tell:"He was tired.",tellWord:"tired",
+ context:"He has just finished a long swimming lesson.",
+ hint:{physical:"How does his body move now?",internal:"How heavy does he feel inside?",mental:"How clearly is he thinking?"},
+ show:{physical:["He dragged his towel along the floor instead of lifting it.","He sat down on the changing-room bench and did not get up for a while."],
+       internal:["His arms hung off his shoulders like wet rope.","Every breath came slow and deep, the way it does after a long run."],
+       mental:["His mum asked him a question twice before the words made any sense."]}},
+
+{id:"b1-08",band:1,theme:"achievement",tell:"She was proud.",tellWord:"proud",
+ context:"She has just finished a five-hundred-piece jigsaw on her own.",
+ hint:{physical:"What does she do with her body or the puzzle?",internal:"What lifts or warms inside?",mental:"What does she want to do next?"},
+ show:{physical:["She sat back on her heels and grinned at it for a full minute.","She would not let anyone put it back in the box."],
+       internal:["Something warm spread through her chest and stayed there."],
+       mental:["She had already worked out exactly how she would tell her dad.","She kept finding excuses to walk past the table."]}},
+
+{id:"b1-09",band:1,theme:"friends",tell:"He felt left out.",tellWord:"lonely",
+ context:"Two teams are being picked at break time. His name has not been called.",
+ hint:{physical:"Where is his body, and what is it doing?",internal:"What sinks or tightens?",mental:"What is he pretending?"},
+ show:{physical:["He tied his shoelace very slowly, then tied it again.","He stood a little apart, close enough to look included."],
+       internal:["His stomach sank the way it does in a fast lift."],
+       mental:["He decided he had never really wanted to play anyway."]}},
+
+{id:"b1-10",band:1,theme:"family",tell:"She was jealous.",tellWord:"jealous",
+ context:"Her brother has been given a brand-new bike for his birthday.",
+ hint:{physical:"What does she do with her face or hands?",internal:"What twists or goes sour?",mental:"What is she comparing?"},
+ show:{physical:["She smiled with her mouth and not with her eyes.","She kept picking at the label on her juice bottle."],
+       internal:["Something sour twisted just under her ribs."],
+       mental:["She counted every single thing he had been given that year."]}},
+
+{id:"b1-11",band:1,theme:"travel",tell:"He was bored.",tellWord:"bored",
+ context:"Hour four of a car journey. There is nothing to see but fields.",
+ hint:{physical:"What is he doing to pass the time?",internal:"How heavy or restless does he feel?",mental:"What silly games is he inventing?"},
+ show:{physical:["He drew the same wobbly face on the fogged-up window, over and over.","He slid down in his seat until his knees hit the back of the driver's chair."],
+       internal:["His legs itched to be anywhere else."],
+       mental:["He had counted forty-one red cars. Then he lost interest in red cars."]}},
+
+{id:"b1-12",band:1,theme:"pets",tell:"She was happy.",tellWord:"happy",
+ context:"The dog that ran off two days ago has just walked back through the gate.",
+ hint:{physical:"What does she do the moment she sees him?",internal:"What bursts or loosens inside?",mental:"What does she stop noticing?"},
+ show:{physical:["She was down the garden path before the gate had finished swinging.","She buried her face in his muddy fur and did not care about the mud."],
+       internal:["Something that had been clenched inside her let go all at once."],
+       mental:["She forgot, completely, that she was supposed to be cross with him."]}},
+
+{id:"b1-13",band:1,theme:"school",tell:"He was worried.",tellWord:"worried",
+ context:"He has lost the library book he borrowed, and it is due today.",
+ hint:{physical:"What is he searching or doing?",internal:"What churns inside?",mental:"What is he rehearsing?"},
+ show:{physical:["He emptied his bag onto the floor for the third time.","He kept checking the same pocket, as if it might change its mind."],
+       internal:["His stomach churned every time he looked at the clock."],
+       mental:["He practised the apology under his breath all the way to school."]}},
+
+{id:"b1-14",band:1,theme:"school",tell:"She was relieved.",tellWord:"relieved",
+ context:"The lost book has turned up under the sofa, ten minutes before school.",
+ hint:{physical:"What does her body finally do?",internal:"What unknots or lightens?",mental:"How does the day look now?"},
+ show:{physical:["She sat down on the floor and laughed at the ceiling.","Her shoulders dropped about an inch."],
+       internal:["The knot in her stomach unpicked itself.","She let out a breath she had been holding since Tuesday."],
+       mental:["Suddenly the whole day looked completely manageable."]}},
+
+{id:"b1-15",band:1,theme:"food",tell:"He was hungry.",tellWord:"hungry",
+ context:"He can smell dinner from the hallway, and it is still twenty minutes away.",
+ hint:{physical:"What is he doing near the kitchen?",internal:"What is his stomach doing?",mental:"What can he not stop thinking about?"},
+ show:{physical:["He drifted into the kitchen for the fourth time, looking for nothing.","He lifted the lid off the pan and got his hand smacked."],
+       internal:["His stomach growled loudly enough for his sister to hear."],
+       mental:["Every single thought he had was, somehow, about bread."]}},
+
+/* ---------------- Band 2 — Storyteller (age 12) ---------------- */
+{id:"b2-01",band:2,theme:"school",tell:"She was anxious about the exam.",tellWord:"anxious",
+ context:"Ten minutes before the paper is handed out. The hall is very quiet.",
+ hint:{physical:"What small, repeated movement gives her away?",internal:"What changes in her breathing or stomach?",mental:"How does time or memory behave?"},
+ show:{physical:["She lined her three pens up, then lined them up again.","Her knee bounced under the desk in a rhythm she could not hear."],
+       internal:["Her stomach kept folding over on itself.","Her mouth had gone completely dry, and the water bottle was in her bag."],
+       mental:["Every fact she had revised for a fortnight went politely out of the room.","The clock hand seemed to be moving through syrup."]}},
+
+{id:"b2-02",band:2,theme:"sport",tell:"He was disappointed.",tellWord:"disappointed",
+ context:"The team list is on the noticeboard. His name is not on it.",
+ hint:{physical:"What does he do in front of other people?",internal:"What drops or goes heavy?",mental:"What is he already rewriting?"},
+ show:{physical:["He read the list twice, shrugged, and walked off at a normal speed.","He clapped the ones who had made it, and got the timing slightly wrong."],
+       internal:["Something heavy settled behind his ribs and did not shift all afternoon."],
+       mental:["He replayed the last trial match, minute by minute, looking for the moment it went wrong."]}},
+
+{id:"b2-03",band:2,theme:"school",tell:"She was frustrated.",tellWord:"frustrated",
+ context:"The same maths problem has defeated her four times.",
+ hint:{physical:"What does she do to the paper or the pen?",internal:"What tightens or burns?",mental:"What unhelpful thought arrives?"},
+ show:{physical:["She rubbed out the working so hard the paper tore.","She pressed the heels of her hands into her eyes."],
+       internal:["A hot tightness gathered behind her forehead."],
+       mental:["The numbers had stopped meaning anything at all.","She began, quietly, to wonder whether she was simply stupid."]}},
+
+{id:"b2-04",band:2,theme:"family",tell:"He felt guilty.",tellWord:"guilty",
+ context:"He told his mother he had finished his homework. He had not.",
+ hint:{physical:"What can't he do with his eyes or voice?",internal:"What sits heavily inside?",mental:"What does he keep re-examining?"},
+ show:{physical:["He answered without quite looking at her.","He said yes too quickly, and then said it again more slowly."],
+       internal:["The lie sat in his stomach like something he should not have eaten."],
+       mental:["He kept turning the sentence over, checking it for cracks."]}},
+
+{id:"b2-05",band:2,theme:"sport",tell:"She was determined.",tellWord:"determined",
+ context:"Six weeks until the race. It is raining and it is six in the morning.",
+ hint:{physical:"What does she do that nobody sees?",internal:"What steadies inside?",mental:"What has she decided?"},
+ show:{physical:["She laced her trainers in the dark and went out anyway.","She ran the last hill twice, because the first time had been easy."],
+       internal:["Her breathing found its rhythm and settled there."],
+       mental:["She had stopped negotiating with herself somewhere around week two."]}},
+
+{id:"b2-06",band:2,theme:"friends",tell:"He was homesick.",tellWord:"homesick",
+ context:"First night of a week-long school camp. Lights out was twenty minutes ago.",
+ hint:{physical:"What is he doing with his hands or his sleeping bag?",internal:"What aches or tightens?",mental:"What ordinary thing is he thinking about?"},
+ show:{physical:["He lay very still so the boy in the next bunk would not hear him.","He read the same three lines of his mother's note by torchlight."],
+       internal:["An ache sat under his breastbone, dull and patient."],
+       mental:["He found himself thinking about the exact sound the front door made."]}},
+
+{id:"b2-07",band:2,theme:"school",tell:"She was overwhelmed.",tellWord:"overwhelmed",
+ context:"Three deadlines, a music exam, and a form she forgot to hand in.",
+ hint:{physical:"What does she do instead of starting?",internal:"What is her breathing doing?",mental:"How is her attention behaving?"},
+ show:{physical:["She wrote a list of the lists she needed to write.","She opened her laptop, looked at it, and closed it again."],
+       internal:["Her breath kept catching high in her chest, never quite filling her lungs."],
+       mental:["Every task she picked up reminded her of two more.","Her attention slid off each page like water off glass."]}},
+
+{id:"b2-08",band:2,theme:"school",tell:"He was confident.",tellWord:"confident",
+ context:"The teacher asks a question he happens to know cold.",
+ hint:{physical:"How does he hold himself?",internal:"How steady is he inside?",mental:"What is he already thinking past?"},
+ show:{physical:["His hand went up before the question had quite finished.","He answered without hurrying, and let the pause sit there."],
+       internal:["His pulse did not so much as flicker."],
+       mental:["He was already thinking about the follow-up question she would ask next."]}},
+
+{id:"b2-09",band:2,theme:"family",tell:"She felt resentful.",tellWord:"resentful",
+ context:"It is the third time this month she has been blamed for something her brother did.",
+ hint:{physical:"What is deliberately controlled?",internal:"What goes cold or hard?",mental:"What list is she keeping?"},
+ show:{physical:["She washed up without a word, and put every plate down very gently.","She agreed, in a voice flattened perfectly smooth."],
+       internal:["Something cold and hard set behind her ribs."],
+       mental:["She was keeping a list now, and she knew exactly how long it was."]}},
+
+{id:"b2-10",band:2,theme:"school",tell:"He was hopeful.",tellWord:"hopeful",
+ context:"Results are published online at four o'clock.",
+ hint:{physical:"What does he keep doing?",internal:"What lifts inside?",mental:"What is he allowing himself to imagine?"},
+ show:{physical:["He refreshed the page at 3:58, and again at 3:58.","He had the login screen open in two tabs, for no reason he could explain."],
+       internal:["Something light kept rising in his chest and he kept pushing it back down."],
+       mental:["He let himself picture the good version, just for a second, then stopped."]}},
+
+{id:"b2-11",band:2,theme:"family",tell:"She was shocked.",tellWord:"shocked",
+ context:"Her parents have just told her they are moving to another country.",
+ hint:{physical:"What stops?",internal:"What goes cold or loud?",mental:"How do the words arrive?"},
+ show:{physical:["The fork stayed halfway to her mouth.","She said 'okay', which was not what she meant at all."],
+       internal:["A cold wave went down her arms, all the way to her fingertips.","Sound seemed to come from further away than usual."],
+       mental:["The words arrived one at a time, and none of them fitted together."]}},
+
+{id:"b2-12",band:2,theme:"friends",tell:"He felt awkward.",tellWord:"awkward",
+ context:"He has joined a group at lunch where everyone else already knows each other.",
+ hint:{physical:"What do his hands do with nothing to hold?",internal:"What is uncomfortable inside?",mental:"What is he over-planning?"},
+ show:{physical:["He held his water bottle with both hands, like it was a job.","He laughed half a second after everybody else."],
+       internal:["A warm discomfort crawled across the back of his neck."],
+       mental:["He had three sentences ready and could not find a door for any of them."]}},
+
+{id:"b2-13",band:2,theme:"friends",tell:"She was grateful.",tellWord:"grateful",
+ context:"Someone she barely knows has just told the others to leave her alone.",
+ hint:{physical:"What does she manage to do?",internal:"What loosens or warms?",mental:"What will she remember?"},
+ show:{physical:["She got out a thank-you that came out smaller than she meant it to.","She saved him a seat the next day without making anything of it."],
+       internal:["Something in her throat loosened enough to let her swallow."],
+       mental:["She knew, even then, that she would remember this for years."]}},
+
+{id:"b2-14",band:2,theme:"friends",tell:"He was impatient.",tellWord:"impatient",
+ context:"He sent a message two hours ago. The two ticks are grey.",
+ hint:{physical:"What does he keep doing with the phone?",internal:"What is restless inside?",mental:"What theories is he building?"},
+ show:{physical:["He turned the phone face-down, and turned it back over ninety seconds later.","He typed 'you there?' and deleted it four times."],
+       internal:["A restlessness moved through his legs and would not settle."],
+       mental:["He had already invented six reasons, and the worst one kept coming back."]}},
+
+{id:"b2-15",band:2,theme:"friends",tell:"She was ashamed.",tellWord:"ashamed",
+ context:"She laughed along when the others were unkind to someone. She is thinking about it that night.",
+ hint:{physical:"What can't she look at?",internal:"What burns or turns over?",mental:"What replays?"},
+ show:{physical:["She turned her phone face-down and left it there.","She could not hold her own eye in the bathroom mirror."],
+       internal:["Her face burned in the dark, hours after anyone had seen it."],
+       mental:["The sound of her own laugh replayed, and it was worse each time."]}},
+
+/* ---------------- Band 3 — Novelist (adult) ---------------- */
+{id:"b3-01",band:3,theme:"work",tell:"He was exhausted.",tellWord:"exhausted",
+ context:"Friday, 8pm. He has just got in and hasn't taken his coat off.",
+ hint:{physical:"What small task defeats him?",internal:"What has gone heavy or slow?",mental:"What has his mind stopped doing?"},
+ show:{physical:["He sat down on the edge of the bed to take off one shoe, and stayed there.","He ate standing up, out of the pan, because the plates were in the dishwasher."],
+       internal:["His eyes ached in a way that closing them did not fix."],
+       mental:["He read the same message three times and still could not tell whether it needed a reply.","Somewhere around Thursday he had stopped having opinions about things."]}},
+
+{id:"b3-02",band:3,theme:"work",tell:"She was dreading the conversation.",tellWord:"dread",
+ context:"She has to tell a colleague their contract will not be renewed. The meeting is at eleven.",
+ hint:{physical:"What is she doing instead?",internal:"What sits heavily?",mental:"How is she rehearsing?"},
+ show:{physical:["She answered four emails that could have waited until Monday.","She refilled a coffee she had not drunk."],
+       internal:["Something sat low and cold under her ribs from the moment she woke."],
+       mental:["She had drafted the first sentence eleven times; every version sounded like a press release."]}},
+
+{id:"b3-03",band:3,theme:"memory",tell:"He felt nostalgic.",tellWord:"nostalgic",
+ context:"Clearing the loft, he finds a photograph of a summer he had forgotten.",
+ hint:{physical:"What does he do with the object?",internal:"What is sweet and painful at once?",mental:"What detail surfaces?"},
+ show:{physical:["He sat down on a packing box with the photograph, and the loft went quiet around him.","He put it in his shirt pocket instead of back in the file."],
+       internal:["Something turned over in his chest, warm at the edges and sore in the middle."],
+       mental:["He could not name the boy on the left, and it bothered him more than it should have.","The smell of cut grass arrived out of nowhere, thirty years late."]}},
+
+{id:"b3-04",band:3,theme:"loss",tell:"She was grieving.",tellWord:"grief",
+ context:"Three months on. She is laying the table for dinner.",
+ hint:{physical:"What does her body do out of habit?",internal:"What arrives without warning?",mental:"What does she keep almost doing?"},
+ show:{physical:["She set out four glasses, and stood looking at the fourth one for a while.","She had still not moved his coat from the hook by the door."],
+       internal:["It arrived sideways, in the middle of an ordinary Tuesday, and took her breath with it."],
+       mental:["She kept saving up small things to tell him, and then remembering."]}},
+
+{id:"b3-05",band:3,theme:"work",tell:"He was frustrated in the meeting.",tellWord:"frustrated",
+ context:"Ninety minutes in. The same decision has been deferred twice.",
+ hint:{physical:"What is controlled or held?",internal:"What builds and is not released?",mental:"What is he calculating?"},
+ show:{physical:["He put his pen down with exaggerated care.","He said 'sure' twice, and the second one had an edge to it."],
+       internal:["Pressure built behind his eyes and had nowhere to go."],
+       mental:["He worked out that this was the fourth hour spent on a decision worth about twenty minutes."]}},
+
+{id:"b3-06",band:3,theme:"work",tell:"She felt like a fraud.",tellWord:"insecure",
+ context:"First week in a senior role. Everyone in the room has been there for years.",
+ hint:{physical:"What does she avoid doing?",internal:"What tightens when she is asked to speak?",mental:"What is she monitoring?"},
+ show:{physical:["She wrote down an acronym to look up later rather than ask what it meant.","She waited for a natural gap that never quite came."],
+       internal:["Her chest tightened every time the chair looked in her direction."],
+       mental:["She kept a running estimate of how long it would take them to work it out."]}},
+
+{id:"b3-07",band:3,theme:"family",tell:"He felt tender towards his daughter.",tellWord:"tenderness",
+ context:"She has fallen asleep on the sofa, still holding the book she was reading to him.",
+ hint:{physical:"What does he do very carefully?",internal:"What aches pleasantly?",mental:"What does he notice about time?"},
+ show:{physical:["He eased the book out from under her hand a page at a time.","He stood in the doorway longer than he needed to."],
+       internal:["Something in his chest went soft and unbearably heavy at once."],
+       mental:["He caught himself trying to memorise the exact size of her hand."]}},
+
+{id:"b3-08",band:3,theme:"relationships",tell:"She resented him.",tellWord:"resentment",
+ context:"A dinner party. He tells a story about her, slightly wrong, for the second time this year.",
+ hint:{physical:"What is perfectly, deliberately polite?",internal:"What is cold and old?",mental:"What is she filing away?"},
+ show:{physical:["She laughed at the right moment and refilled everyone's glass but his.","She let him finish, and did not correct the detail."],
+       internal:["Something old and cold turned over quietly under her ribs."],
+       mental:["She added it to a list she had never admitted to keeping."]}},
+
+{id:"b3-09",band:3,theme:"health",tell:"He was relieved.",tellWord:"relieved",
+ context:"The scan result is benign. He is standing in the hospital car park.",
+ hint:{physical:"What does his body finally do?",internal:"What lets go?",mental:"What returns to normal size?"},
+ show:{physical:["He sat in the driver's seat for ten minutes without starting the engine.","He rang his brother and could not, for a moment, get the first word out."],
+       internal:["Everything he had been holding in his shoulders for a fortnight let go at once."],
+       mental:["The rest of the year quietly rearranged itself back into ordinary problems."]}},
+
+{id:"b3-10",band:3,theme:"work",tell:"She was ambitious.",tellWord:"ambitious",
+ context:"The director's post has just been announced internally.",
+ hint:{physical:"What does she do immediately?",internal:"What sharpens?",mental:"What has she already mapped?"},
+ show:{physical:["She had the job description open before the all-staff email was fully read.","She booked the coffee for Tuesday, not Friday."],
+       internal:["Something sharpened in her, the way it does before a race."],
+       mental:["She had already worked out which two people she needed on her side, and in which order."]}},
+
+{id:"b3-11",band:3,theme:"social",tell:"He felt lonely at the party.",tellWord:"lonely",
+ context:"A friend's fortieth. Forty people he half knows.",
+ hint:{physical:"Where does he end up?",internal:"What is hollow?",mental:"How does the noise feel?"},
+ show:{physical:["He spent a while in the kitchen, being useful with ice.","He checked a phone that had nothing on it."],
+       internal:["A hollow opened somewhere behind his sternum and stayed open."],
+       mental:["The noise arrived as one flat sound, with no words he was part of."]}},
+
+{id:"b3-12",band:3,theme:"memory",tell:"She regretted the choice.",tellWord:"regret",
+ context:"Twenty years on, she reads that the company she turned down has been sold.",
+ hint:{physical:"What does she do with the article?",internal:"What drops?",mental:"What version is she running?"},
+ show:{physical:["She read the article twice and did not mention it at dinner.","She closed the tab, then found it again in her history that evening."],
+       internal:["The floor of her stomach gave way an inch."],
+       mental:["For the rest of the evening a second, unlived version of her life ran quietly alongside this one."]}},
+
+{id:"b3-13",band:3,theme:"work",tell:"He was angry, but hid it.",tellWord:"angry",
+ context:"He has been talked over three times in a row by the same person.",
+ hint:{physical:"What is held very still?",internal:"What is hot and contained?",mental:"What is he deciding?"},
+ show:{physical:["He kept his hands flat on the table and his voice exactly level.","He waited until the man had finished, then began again from the same word."],
+       internal:["Heat sat in his throat and he swallowed it back down."],
+       mental:["He decided, calmly, that he would not be doing this man any favours again."]}},
+
+{id:"b3-14",band:3,theme:"home",tell:"She was content.",tellWord:"content",
+ context:"Saturday morning. Nothing in particular is happening.",
+ hint:{physical:"What is she doing slowly?",internal:"What is unhurried inside?",mental:"What is absent from her mind?"},
+ show:{physical:["She drank her coffee sitting down, all the way to the bottom, while it was still hot.","She let the phone ring out and went back to the paper."],
+       internal:["Her breathing had slowed to the pace of the room."],
+       mental:["For once there was nothing in her head that needed to be dealt with by Monday."]}},
+
+{id:"b3-15",band:3,theme:"health",tell:"He was anxious about the future.",tellWord:"anxious",
+ context:"He is waiting on a result that will not come for another nine days.",
+ hint:{physical:"What does he do at 3am?",internal:"What will not settle?",mental:"Which futures does he keep visiting?"},
+ show:{physical:["He got up at three and cleaned a kitchen that was already clean.","He made plans for August and put no weight on any of them."],
+       internal:["His pulse would not settle back to where it had been the week before."],
+       mental:["He kept walking into two different futures and could not stay long in either."]}}
+];
+
+/* ================= lexicons (scoring) =================
+   Each list drives one axis of the rule-based evaluation.
+   Matching is done on word stems, so "tremble" catches "trembled"/"trembling". */
+
+/* Abstract emotion words — using these means you are still TELLING */
+var TELL_WORDS = [
+ "nervous","anxious","anxiety","scared","afraid","fear","frightened","terrified","panic",
+ "angry","anger","mad","furious","cross","annoyed","irritated","rage",
+ "sad","sadness","unhappy","miserable","depressed","upset","grief","heartbroken",
+ "happy","happiness","glad","joy","joyful","delighted","cheerful","pleased",
+ "excited","excitement","thrilled","eager","enthusiastic",
+ "embarrassed","embarrassment","ashamed","shame","humiliated",
+ "lonely","loneliness","isolated","homesick",
+ "jealous","jealousy","envious","envy","resentful","resentment","bitter",
+ "tired","exhausted","exhaustion","weary","sleepy","drained",
+ "proud","pride","confident","confidence","insecure",
+ "bored","boredom","restless","impatient","impatience",
+ "relieved","relief","calm","content","contentment","peaceful",
+ "confused","confusion","overwhelmed","stressed","worried","worry","concerned",
+ "disappointed","disappointment","guilty","guilt","regret","regretful",
+ "surprised","shocked","stunned","astonished","amazed",
+ "determined","determination","hopeful","hope","grateful","gratitude","thankful",
+ "nostalgic","nostalgia","tender","dread","awkward","uncomfortable","hungry","emotional"
+];
+
+/* Crutch words that announce the feeling instead of dramatising it */
+var FILTER_WORDS = [
+ "felt","feel","feeling","feels","seemed","seem","appeared","looked like",
+ "very","really","so much","extremely","totally","incredibly","quite","rather",
+ "a bit","a little","kind of","sort of","somewhat",
+ "began to","started to","could feel","was able to","tried to",
+ "obviously","clearly","of course","suddenly"
+];
+
+/* Concrete nouns, by layer. PHYSICAL = visible from outside. */
+var PHYSICAL_NOUNS = [
+ "hand","hands","finger","fingers","palm","palms","fist","fists","knuckle","knuckles","thumb",
+ "arm","arms","elbow","shoulder","shoulders","wrist","nail","nails",
+ "knee","knees","leg","legs","foot","feet","toe","toes","heel","heels","ankle",
+ "jaw","teeth","tooth","lip","lips","mouth","tongue","chin","cheek","cheeks",
+ "eyebrow","eyebrows","eyelid","eye","eyes","face","forehead","neck","hair","head",
+ "back","spine","posture","voice","shoe","shoes","chair","door","phone","pen","bag","table"
+];
+
+/* INTERNAL = sensations inside the body */
+var INTERNAL_NOUNS = [
+ "stomach","tummy","belly","gut","guts","chest","ribs","rib","breastbone","sternum",
+ "heart","pulse","heartbeat","lung","lungs","breath","breathing","throat","windpipe",
+ "blood","skin","scalp","nerve","nerves","muscle","muscles","bone","bones",
+ "knot","lump","ache","warmth","heat","cold","chill","weight","pressure","hollow","flutter"
+];
+
+/* MENTAL = thought, attention, memory, time perception */
+var MENTAL_NOUNS = [
+ "thought","thoughts","mind","head","memory","memories","idea","plan","list",
+ "clock","minute","minutes","second","seconds","hour","hours","time","moment",
+ "word","words","sentence","page","line","question","answer","reason","reasons",
+ "version","future","past","name","detail","sound","silence","noise"
+];
+
+/* Strong, specific verbs — the engine of a showing sentence */
+var STRONG_VERBS = [
+ /* physical action */
+ "tremble","shake","shook","shaking","fidget","tap","drum","clench","grip","gripped","twist",
+ "wipe","rub","scratch","bounce","pace","slump","stiffen","flinch","freeze","froze","blink",
+ "swallow","bite","bit","chew","fold","cross","shuffle","hunch","straighten","slam","stomp",
+ "tiptoe","shrug","clutch","fumble","pick","peel","tug","yank","press","lean","stare","glance",
+ "laced","lace","dragged","drag","buried","bury","refresh","typed","type","deleted","delete",
+ "sat","stood","walked","ran","turned","reached","held","hold","put","set","poured","refill",
+ /* internal sensation */
+ "tighten","knot","churn","flutter","hammer","pound","thud","race","lurch","drop","sink","sank",
+ "burn","burned","prickle","tingle","buzz","ache","rise","rose","catch","caught","hitch",
+ "squeeze","flip","crawl","spread","settle","loosen","unpick","climb","drain","gave way",
+ /* mental */
+ "rehearse","replay","count","counted","imagine","picture","remember","forget","forgot",
+ "wonder","calculate","notice","noticed","invent","decide","decided","realise","realize",
+ "practise","practice","memorise","estimate","reread","stopped","kept"
+];
+/* ================= storage =================
+   IMPORTANT (long-lived data policy):
+   - STORE_KEY must never change. Progress has to survive every future release.
+   - migrate() may only ADD fields. Nothing in here deletes or resets user data.
+   - Before any schema bump we keep a one-off snapshot under BACKUP_KEY.          */
+var STORE_KEY   = "show-owl-v1";
+var BACKUP_KEY  = "show-owl-v1-prev";
+var API_KEY_STORE = "pte-api-key";   /* shared with PTE SUMMIT on the same origin */
+var SCHEMA = 1;
+
+var BANDS = {
+  1:{id:1,name:"Explorer",age:"age 9",blurb:"Short, concrete, everyday scenes."},
+  2:{id:2,name:"Storyteller",age:"age 12",blurb:"Richer verbs, subtext, real situations."},
+  3:{id:3,name:"Novelist",age:"adult",blurb:"Restraint, implication, literary craft."}
+};
+var LAYERS = {
+  physical:{key:"physical",label:"Physical",icon:"✋",desc:"What the body does, seen from outside."},
+  internal:{key:"internal",label:"Internal",icon:"🫀",desc:"Sensations inside the body."},
+  mental:{key:"mental",label:"Mental",icon:"🧠",desc:"Thought, attention, memory, time."}
+};
+var LAYER_KEYS = ["physical","internal","mental"];
+var DIFFS = {
+  guided:{key:"guided",label:"Guided",blurb:"Hint is open from the start. 5 rounds.",rounds:5,autoHint:true,minWords:5},
+  standard:{key:"standard",label:"Standard",blurb:"Hint on request. 6 rounds.",rounds:6,autoHint:false,minWords:7},
+  hard:{key:"hard",label:"Hard",blurb:"No layer given — you choose. 8 rounds.",rounds:8,autoHint:false,minWords:9,blindLayer:true}
+};
+
+var DIFFS_KEYS={guided:1,standard:1,hard:1};
+function newProfile(id,name,band){
+  return {id:id,name:name,band:band,created:todayStr(),
+    xp:0,streak:0,bestStreak:0,lastActive:null,doneDate:null,doneToday:0,
+    sessions:0,difficulty:(band===1?"guided":"standard"),
+    attempts:[],seen:{},review:[]};
+}
+function blankState(){
+  return {schema:SCHEMA,activeProfile:null,profiles:{},order:[],linked:{},
+          settings:{ai:false,difficulty:"standard"}};
+}
+function loadState(){
+  try{ var r=localStorage.getItem(STORE_KEY); return r?JSON.parse(r):null; }
+  catch(e){ return null; }
+}
+function migrate(s){
+  /* additive only — never remove or reset */
+  if(typeof s.schema!=="number") s.schema=0;
+  if(s.schema<SCHEMA){
+    try{ localStorage.setItem(BACKUP_KEY,JSON.stringify(s)); }catch(e){}
+  }
+  if(!s.profiles) s.profiles={};
+  if(!s.order) s.order=Object.keys(s.profiles);
+  if(!s.linked) s.linked={};
+  if(!s.settings) s.settings={};
+  if(typeof s.settings.ai!=="boolean") s.settings.ai=false;
+  if(!s.settings.difficulty) s.settings.difficulty="standard";
+  Object.keys(s.profiles).forEach(function(k){
+    var p=s.profiles[k];
+    if(!p.attempts) p.attempts=[];
+    if(!p.seen) p.seen={};
+    if(!p.review) p.review=[];
+    if(typeof p.xp!=="number") p.xp=0;
+    if(typeof p.streak!=="number") p.streak=0;
+    if(typeof p.bestStreak!=="number") p.bestStreak=p.streak||0;
+    if(typeof p.sessions!=="number") p.sessions=0;
+    if(!DIFFS_KEYS[p.difficulty]) p.difficulty=(p.band===1?"guided":"standard");
+  });
+  s.schema=SCHEMA;
+  return s;
+}
+var state = migrate(loadState()||blankState());
+
+function saveState(){
+  try{ localStorage.setItem(STORE_KEY,JSON.stringify(state)); }
+  catch(e){ console.error("save failed",e); }
+}
+function P(){ return state.profiles[state.activeProfile]||null; }
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function getApiKey(){ try{ return localStorage.getItem(API_KEY_STORE)||""; }catch(e){ return ""; } }
+function setApiKey(k){ try{ localStorage.setItem(API_KEY_STORE,k); }catch(e){} }
+
+function seedProfilesIfEmpty(){
+  if(state.order.length) return;
+  [["p1","Explorer",1],["p2","Storyteller",2],["p3","Novelist",3]].forEach(function(t){
+    state.profiles[t[0]]=newProfile(t[0],t[1],t[2]);
+    state.order.push(t[0]);
+  });
+  saveState();
+}
+
+/* ================= scoring engine ================= */
+function words(s){
+  return String(s||"").toLowerCase().replace(/[^a-z' -]/g," ").split(/[\s-]+/)
+    .filter(function(w){ return w && w.length>1; });
+}
+function buildSet(list){ var m={}; list.forEach(function(w){ m[w]=1; }); return m; }
+var SET_TELL     = buildSet(TELL_WORDS);
+var SET_PHYS     = buildSet(PHYSICAL_NOUNS);
+var SET_INT      = buildSet(INTERNAL_NOUNS);
+var SET_MENT     = buildSet(MENTAL_NOUNS);
+var SET_VERB     = buildSet(STRONG_VERBS);
+var SET_FILTER   = buildSet(FILTER_WORDS.filter(function(w){ return w.indexOf(" ")<0; }));
+
+/* stem-tolerant lookup: "trembled" matches "tremble", "hands" matches "hand" */
+function hits(ws,set){
+  var found=[],seen={};
+  ws.forEach(function(w){
+    var k=null;
+    if(set[w]) k=w;
+    else{
+      for(var i=0;i<STEM_CUTS.length;i++){
+        var c=STEM_CUTS[i];
+        if(w.length>c.length+2 && w.slice(-c.length)===c){
+          var base=w.slice(0,-c.length);
+          if(set[base]){ k=base; break; }
+          if(c==="ing"||c==="ed"){ if(set[base+"e"]){ k=base+"e"; break; } }
+          if(c==="ied"&&set[base+"y"]){ k=base+"y"; break; }
+        }
+      }
+      if(!k && set[w+"e"]) k=w+"e";
+      if(!k && w.length>4 && set[w.replace(/s$/,"")]) k=w.replace(/s$/,"");
+    }
+    if(k && !seen[k]){ seen[k]=1; found.push(w); }
+  });
+  return found;
+}
+var STEM_CUTS=["ing","ied","ies","ed","es","s"];
+
+function countPhrases(text,list){
+  var t=" "+String(text||"").toLowerCase().replace(/[^a-z' ]/g," ").replace(/\s+/g," ")+" ";
+  var found=[];
+  list.forEach(function(p){
+    if(p.indexOf(" ")>=0 && t.indexOf(" "+p+" ")>=0) found.push(p);
+  });
+  return found;
+}
+function clamp01(x){ return x<0?0:x>1?1:x; }
+
+/* returns { total, axes:{...}, marks:{...}, notes:[] } */
+function evaluate(text,targetLayer,diffKey){
+  var d=DIFFS[diffKey]||DIFFS.standard;
+  var ws=words(text);
+  var wc=ws.length;
+
+  var tellHits   = hits(ws,SET_TELL);
+  var physHits   = hits(ws,SET_PHYS);
+  var intHits    = hits(ws,SET_INT);
+  var mentHits   = hits(ws,SET_MENT);
+  var verbHits   = hits(ws,SET_VERB);
+  var filterHits = hits(ws,SET_FILTER).concat(countPhrases(text,FILTER_WORDS));
+
+  var layerHits = targetLayer==="physical"?physHits : targetLayer==="internal"?intHits : mentHits;
+  var senseHits = physHits.concat(intHits);
+
+  /* 1. no telling — reusing the abstract word is the cardinal sin */
+  var noTell = clamp01(1 - tellHits.length*0.55);
+
+  /* 2. body & senses — concrete nouns you can point at */
+  var senses = clamp01(senseHits.length/2);
+
+  /* 3. strong verbs */
+  var verbs = clamp01(verbHits.length/2);
+
+  /* 4. layer match — did you write in the layer you were asked for? */
+  var layer = clamp01(layerHits.length/1.5);
+
+  /* 5. craft — enough detail, not padded with filter words */
+  var lenScore = wc<d.minWords ? clamp01(wc/d.minWords)*0.7
+               : wc>34 ? 0.72 : 1;
+  var craft = clamp01(lenScore - filterHits.length*0.18);
+
+  var axes={
+    noTell:{label:"No telling",v:noTell,w:25,
+      note:tellHits.length?("still telling: "+tellHits.join(", ")):"nothing abstract left in"},
+    senses:{label:"Body & senses",v:senses,w:20,
+      note:senseHits.length?senseHits.slice(0,4).join(", "):"no concrete body detail yet"},
+    verbs:{label:"Strong verbs",v:verbs,w:20,
+      note:verbHits.length?verbHits.slice(0,4).join(", "):"verbs are doing little work"},
+    layer:{label:LAYERS[targetLayer].label+" layer",v:layer,w:25,
+      note:layerHits.length?layerHits.slice(0,4).join(", "):"nothing from this layer yet"},
+    craft:{label:"Craft",v:craft,w:10,
+      note:filterHits.length?("crutch words: "+filterHits.slice(0,3).join(", "))
+           :(wc<d.minWords?"a little short":"clean and specific")}
+  };
+  var tot=0,wsum=0;
+  LAYER_ORDER_AX.forEach(function(k){ tot+=axes[k].v*axes[k].w; wsum+=axes[k].w; });
+  var total=Math.round(tot/wsum*100);
+
+  return {total:total,axes:axes,wc:wc,
+    marks:{tell:tellHits,sense:senseHits,verb:verbHits,layer:layerHits,filter:filterHits}};
+}
+var LAYER_ORDER_AX=["noTell","senses","verbs","layer","craft"];
+
+function grade(total){
+  if(total>=85) return {label:"Vivid",cls:"good",owl:"That is the real thing. I could see it."};
+  if(total>=70) return {label:"Solid",cls:"good",owl:"Good showing. One more concrete detail and it sings."};
+  if(total>=50) return {label:"Getting there",cls:"",owl:"Halfway out of telling. Push into the body."};
+  return {label:"Still telling",cls:"bad",owl:"You named the feeling. Now make me watch it happen."};
+}
+
+/* highlight the user's own sentence */
+function highlight(text,marks){
+  var out=esc(text);
+  function wrap(list,cls){
+    list.forEach(function(w){
+      var re=new RegExp("\\b("+w.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")\\b","gi");
+      out=out.replace(re,'<mark class="'+cls+'">$1</mark>');
+    });
+  }
+  wrap(marks.tell,"tellhit");
+  wrap(marks.sense.concat(marks.verb),"");
+  return out;
+}
+
+/* ================= session building ================= */
+function bankFor(band){
+  return PROMPT_BANK.filter(function(p){ return p.band===band; });
+}
+function pickSession(band,category,diffKey){
+  var d=DIFFS[diffKey]||DIFFS.standard;
+  var p=P();
+  var pool=bankFor(band).slice();
+  /* prefer prompts this profile has seen least */
+  pool.sort(function(a,b){
+    var sa=(p.seen[a.id]||0),sb=(p.seen[b.id]||0);
+    if(sa!==sb) return sa-sb;
+    return Math.random()-0.5;
+  });
+  var n=Math.min(d.rounds,pool.length);
+  var chosen=pool.slice(0,n);
+  /* shuffle so order is not always the same */
+  for(var i=chosen.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1)),t=chosen[i];chosen[i]=chosen[j];chosen[j]=t;
+  }
+  return chosen.map(function(item){
+    var layer;
+    if(category==="mixed"||d.blindLayer){
+      var avail=LAYER_KEYS.filter(function(k){ return (item.show[k]||[]).length; });
+      layer=avail[Math.floor(Math.random()*avail.length)];
+    }else{
+      layer=(item.show[category]||[]).length?category:
+        LAYER_KEYS.filter(function(k){return (item.show[k]||[]).length;})[0];
+    }
+    return {item:item,layer:layer};
+  });
+}
+
+/* ================= progress ================= */
+function recordAttempt(item,layer,text,ev,self){
+  var p=P(); if(!p) return;
+  var today=todayStr();
+  var yest=new Date(Date.now()-864e5).toISOString().slice(0,10);
+  if(p.lastActive!==today){
+    p.streak=(p.lastActive===yest)?p.streak+1:1;
+    if(p.streak>p.bestStreak) p.bestStreak=p.streak;
+  }
+  p.lastActive=today;
+  p.doneToday=(p.doneDate===today?p.doneToday:0)+1;
+  p.doneDate=today;
+  p.seen[item.id]=(p.seen[item.id]||0)+1;
+  p.xp+=10+Math.round(ev.total/10);
+  p.attempts.push({d:today,id:item.id,layer:layer,score:ev.total,self:self||null,
+                   text:String(text).slice(0,240),
+                   ax:{n:r2(ev.axes.noTell.v),s:r2(ev.axes.senses.v),v:r2(ev.axes.verbs.v),
+                       l:r2(ev.axes.layer.v),c:r2(ev.axes.craft.v)}});
+  if(p.attempts.length>600) p.attempts=p.attempts.slice(-600);
+  var weak=(ev.total<70)||(self==="miss");
+  p.review=p.review.filter(function(r){ return !(r.id===item.id&&r.layer===layer); });
+  if(weak) p.review.unshift({id:item.id,layer:layer,score:ev.total,d:today,text:String(text).slice(0,240)});
+  if(p.review.length>40) p.review=p.review.slice(0,40);
+  saveState();
+}
+function r2(x){ return Math.round(x*100)/100; }
+
+function profileStats(p){
+  var a=p.attempts||[];
+  var recent=a.slice(-30);
+  var avg=recent.length?Math.round(recent.reduce(function(s,x){return s+x.score;},0)/recent.length):null;
+  var byLayer={};
+  LAYER_KEYS.forEach(function(k){
+    var f=a.filter(function(x){return x.layer===k;});
+    byLayer[k]=f.length?Math.round(f.reduce(function(s,x){return s+x.score;},0)/f.length):null;
+  });
+  var axNames={n:"No telling",s:"Body & senses",v:"Strong verbs",l:"Layer match",c:"Craft"};
+  var axAvg={},best=null,worst=null;
+  ["n","s","v","l","c"].forEach(function(k){
+    var f=a.filter(function(x){return x.ax&&typeof x.ax[k]==="number";});
+    axAvg[k]=f.length?f.reduce(function(s,x){return s+x.ax[k];},0)/f.length:null;
+    if(axAvg[k]!==null){
+      if(worst===null||axAvg[k]<axAvg[worst]) worst=k;
+      if(best===null||axAvg[k]>axAvg[best]) best=k;
+    }
+  });
+  return {total:a.length,avg:avg,byLayer:byLayer,axAvg:axAvg,axNames:axNames,
+          best:best,worst:worst,reviewCount:(p.review||[]).length};
+}
+
+/* ================= transfer (backup / parent view) ================= */
+function download(name,text){
+  var b=new Blob([text],{type:"application/json"});
+  var u=URL.createObjectURL(b);
+  var a=document.createElement("a");
+  a.href=u;a.download=name;document.body.appendChild(a);a.click();
+  setTimeout(function(){ URL.revokeObjectURL(u);a.remove(); },400);
+}
+function fullBackup(){
+  return JSON.stringify({kind:"show-owl-backup",v:SCHEMA,at:new Date().toISOString(),state:state},null,1);
+}
+/* small, shareable summary for a parent's device */
+function progressCard(p){
+  var st=profileStats(p);
+  return {kind:"show-owl-card",v:SCHEMA,at:new Date().toISOString(),
+    id:p.id,name:p.name,band:p.band,xp:p.xp,streak:p.streak,bestStreak:p.bestStreak,
+    sessions:p.sessions,total:st.total,avg:st.avg,byLayer:st.byLayer,axAvg:st.axAvg,
+    reviewCount:st.reviewCount,
+    recent:(p.attempts||[]).slice(-12).map(function(a){
+      return {d:a.d,id:a.id,layer:a.layer,score:a.score,text:a.text};
+    })};
+}
+function b64encode(obj){
+  var s=JSON.stringify(obj);
+  return btoa(unescape(encodeURIComponent(s)));
+}
+function b64decode(code){
+  return JSON.parse(decodeURIComponent(escape(atob(String(code).trim()))));
+}
+/* merge, never replace: existing profiles are updated, unknown ones added,
+   and nothing already on this device is removed. */
+function importPayload(obj){
+  if(!obj||!obj.kind) throw new Error("Unrecognised file.");
+  if(obj.kind==="show-owl-card"){
+    state.linked[obj.id+"@"+(obj.name||"")]=obj;
+    saveState();
+    return "Progress card from "+(obj.name||"a learner")+" added to the Family view.";
+  }
+  if(obj.kind==="show-owl-backup"&&obj.state){
+    var inc=migrate(obj.state);
+    Object.keys(inc.profiles).forEach(function(k){
+      var mine=state.profiles[k],theirs=inc.profiles[k];
+      if(!mine){
+        state.profiles[k]=theirs;
+        if(state.order.indexOf(k)<0) state.order.push(k);
+      }else{
+        /* keep whichever has more history, then union the attempt log */
+        var seen={},merged=[];
+        mine.attempts.concat(theirs.attempts).forEach(function(a){
+          var key=a.d+"|"+a.id+"|"+a.layer+"|"+a.score+"|"+(a.text||"").slice(0,40);
+          if(!seen[key]){ seen[key]=1; merged.push(a); }
+        });
+        merged.sort(function(x,y){ return x.d<y.d?-1:1; });
+        mine.attempts=merged.slice(-600);
+        mine.xp=Math.max(mine.xp,theirs.xp);
+        mine.bestStreak=Math.max(mine.bestStreak,theirs.bestStreak);
+        mine.sessions=Math.max(mine.sessions,theirs.sessions);
+        Object.keys(theirs.seen||{}).forEach(function(id){
+          mine.seen[id]=Math.max(mine.seen[id]||0,theirs.seen[id]);
+        });
+      }
+    });
+    Object.keys(inc.linked||{}).forEach(function(k){
+      if(!state.linked[k]) state.linked[k]=inc.linked[k];
+    });
+    saveState();
+    return "Backup merged. Nothing on this device was removed.";
+  }
+  throw new Error("Unrecognised file.");
+}
+
+/* ================= optional AI review (adult mode only) ================= */
+function aiReview(item,layer,text,onDone,onError){
+  var key=getApiKey();
+  if(!key){ onError("No API key saved."); return; }
+  var prompt=
+    "You are a warm but exacting creative-writing tutor working with an advanced non-native English writer.\n"+
+    "The abstract sentence to be dramatised: \""+item.tell+"\"\n"+
+    "Situation: "+item.context+"\n"+
+    "Required layer: "+layer+" ("+LAYERS[layer].desc+")\n"+
+    "The writer's attempt: \""+text+"\"\n\n"+
+    "Reply as JSON only, no markdown fence:\n"+
+    "{\"verdict\":\"one sentence, specific, on whether this shows rather than tells\","+
+    "\"keep\":\"the strongest phrase they wrote, quoted\","+
+    "\"fix\":\"the single highest-leverage change, one sentence\","+
+    "\"rewrite\":\"your own one-sentence version in the same voice and register\","+
+    "\"score\":0-100}";
+  fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",
+    headers:{"content-type":"application/json","x-api-key":key,
+      "anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+    body:JSON.stringify({model:"claude-sonnet-4-5",max_tokens:600,
+      messages:[{role:"user",content:prompt}]})
+  }).then(function(r){
+    if(!r.ok) return r.text().then(function(t){ throw new Error("API "+r.status+": "+t.slice(0,160)); });
+    return r.json();
+  }).then(function(j){
+    var txt=(j.content&&j.content[0]&&j.content[0].text)||"";
+    var m=txt.match(/\{[\s\S]*\}/);
+    onDone(JSON.parse(m?m[0]:txt));
+  }).catch(function(e){ onError(e.message||String(e)); });
+}
+/* ================= UI ================= */
+var root=document.getElementById("root");
+function screen(html,cls){
+  root.className="screen "+(cls||"");
+  root.innerHTML=html;
+  window.scrollTo(0,0);
+}
+function on(id,fn,ev){ var e=document.getElementById(id); if(e) e.addEventListener(ev||"click",fn); }
+function each(sel,fn){ var n=root.querySelectorAll(sel); for(var i=0;i<n.length;i++) fn(n[i],i); }
+function applyBand(b){ document.documentElement.setAttribute("data-band",b||2); }
+
+function owlHTML(line,cls){
+  return '<div class="mascot"><img class="owl '+(cls||"bob")+'" src="owl.webp" alt="" width="88">'+
+         '<div class="speech">'+line+'</div></div>';
+}
+function backBar(label,handlerId){
+  return '<button id="'+handlerId+'" class="btn quiet sm" style="width:auto;padding:7px 12px;margin-bottom:12px;">‹ '+label+'</button>';
+}
+function layerChip(k){
+  var L=LAYERS[k];
+  return '<span class="laychip lay-'+k+'">'+L.icon+' '+L.label+'</span>';
+}
+
+/* ---------- 1. who is writing ---------- */
+function renderProfiles(){
+  applyBand(2);
+  var cards=state.order.map(function(id){
+    var p=state.profiles[id],st=profileStats(p);
+    return '<button class="tile" data-p="'+id+'">'+
+      '<div><div style="font-weight:800;font-size:1.05em;">'+esc(p.name)+'</div>'+
+      '<div class="xs sub">'+(p.name===BANDS[p.band].name?BANDS[p.band].blurb:
+        BANDS[p.band].name+' · '+BANDS[p.band].age)+'</div></div>'+
+      '<div style="text-align:right;">'+
+        '<div class="xs sub">'+(st.avg===null?"new":st.avg+" avg")+'</div>'+
+        '<div class="xs" style="color:var(--brand);font-weight:800;">'+p.xp+' XP · '+p.streak+'🔥</div>'+
+      '</div></button>';
+  }).join("");
+  screen(
+    '<div style="text-align:center;padding:8px 0 4px;">'+
+      '<img class="owl bob" src="owl.webp" alt="Owl mascot" width="120" style="margin:0 auto 6px;width:120px;">'+
+      '<div class="xs" style="letter-spacing:.28em;color:var(--brand);font-weight:800;">SHOW · DON\'T · TELL</div>'+
+      '<h1 style="margin:4px 0 2px;">Owl Studio</h1>'+
+      '<p class="sm sub">Turn a flat sentence into one the reader can see.</p>'+
+    '</div>'+
+    '<div class="stack mt">'+cards+'</div>'+
+    '<div class="row mt"><button class="btn quiet sm" id="family">👨‍👩‍👧 Family view</button>'+
+    '<button class="btn quiet sm" id="settings">⚙︎ Settings</button></div>'
+  );
+  each("[data-p]",function(b){
+    b.addEventListener("click",function(){
+      state.activeProfile=this.getAttribute("data-p"); saveState(); renderMenu();
+    });
+  });
+  on("family",renderFamily); on("settings",renderSettings);
+}
+
+/* ---------- 2. menu ---------- */
+function renderMenu(){
+  var p=P(); if(!p){ renderProfiles(); return; }
+  applyBand(p.band);
+  var st=profileStats(p);
+  var diff=p.difficulty||"standard";
+  var lines={1:"Ready when you are. Pick a layer and let’s make something we can see.",
+             2:"Choose your target layer. Mixed keeps you honest.",
+             3:"Pick your constraint. Restraint is the whole discipline."};
+
+  var catTiles=LAYER_KEYS.map(function(k){
+    var L=LAYERS[k],v=st.byLayer[k];
+    return '<button class="tile" data-cat="'+k+'"><div>'+
+      '<div style="font-weight:800;">'+L.icon+' '+L.label+'</div>'+
+      '<div class="xs sub">'+L.desc+'</div></div>'+
+      '<div class="xs sub" style="text-align:right;">'+(v===null?"—":v+"<br>avg")+'</div></button>';
+  }).join("")+
+  '<button class="tile" data-cat="mixed"><div><div style="font-weight:800;">🎲 Mixed</div>'+
+  '<div class="xs sub">A different layer every round.</div></div>'+
+  '<div class="xs sub">'+(st.avg===null?"—":st.avg+"<br>avg")+'</div></button>';
+
+  var diffBtns=Object.keys(DIFFS).map(function(k){
+    return '<button class="tile sm" data-diff="'+k+'" aria-pressed="'+(k===diff)+'" '+
+      'style="display:block;text-align:center;padding:9px 6px;">'+
+      '<div style="font-weight:800;font-size:.86em;">'+DIFFS[k].label+'</div>'+
+      '<div class="xs sub">'+DIFFS[k].rounds+' rounds</div></button>';
+  }).join("");
+
+  screen(
+    backBar("Switch writer","toprof")+
+    owlHTML(lines[p.band])+
+    '<div class="card mb" style="display:flex;gap:12px;text-align:center;">'+
+      statCell(p.xp,"XP")+statCell(p.streak+"🔥","streak")+
+      statCell(st.avg===null?"—":st.avg,"avg score")+statCell(st.total,"written")+
+    '</div>'+
+    (st.worst&&st.total>=5?'<div class="card mb" style="border-color:var(--accent);">'+
+      '<div class="xs" style="font-weight:800;color:var(--accent);letter-spacing:.08em;">FOCUS ON</div>'+
+      '<div class="sm mt" style="margin-top:4px;"><strong>'+st.axNames[st.worst]+'</strong> is your weakest axis right now'+
+      (st.best?', <span class="sub">'+st.axNames[st.best]+' is your strongest</span>':'')+'.</div></div>':'')+
+    '<div class="xs sub mb" style="font-weight:800;letter-spacing:.1em;">TARGET LAYER</div>'+
+    '<div class="stack">'+catTiles+'</div>'+
+    '<div class="xs sub mb" style="font-weight:800;letter-spacing:.1em;margin-top:16px;">CHALLENGE</div>'+
+    '<div class="row">'+diffBtns+'</div>'+
+    '<p class="xs sub mt">'+esc(DIFFS[diff].blurb)+'</p>'+
+    '<div class="row mt">'+
+      '<button class="btn quiet sm" id="review">📌 Review'+(st.reviewCount?' ('+st.reviewCount+')':'')+'</button>'+
+      '<button class="btn quiet sm" id="prog">📈 Progress</button>'+
+    '</div>'
+  );
+  on("toprof",renderProfiles);
+  each("[data-diff]",function(b){
+    b.addEventListener("click",function(){
+      P().difficulty=this.getAttribute("data-diff"); saveState(); renderMenu();
+    });
+  });
+  each("[data-cat]",function(b){
+    b.addEventListener("click",function(){
+      startSession(this.getAttribute("data-cat"));
+    });
+  });
+  on("review",renderReview); on("prog",renderProgress);
+}
+function statCell(v,l){
+  return '<div style="flex:1;"><div class="big" style="font-size:1.5em;">'+v+'</div>'+
+         '<div class="xs sub">'+l+'</div></div>';
+}
+
+/* ---------- 3. the round ---------- */
+var S=null;   /* live session */
+function startSession(category){
+  var p=P();
+  var diff=p.difficulty||"standard";
+  var list=pickSession(p.band,category,diff);
+  if(!list.length){ alert("No prompts available for this band yet."); return; }
+  S={list:list,i:0,category:category,diff:diff,results:[]};
+  p.sessions++; saveState();
+  renderRound();
+}
+function progDots(){
+  return '<div class="prog">'+S.list.map(function(_,i){
+    return '<i class="'+(i<S.i?"on":i===S.i?"now":"")+'"></i>';
+  }).join("")+'</div>';
+}
+function renderRound(){
+  if(S.i>=S.list.length){ renderSummary(); return; }
+  var p=P(),d=DIFFS[S.diff],cur=S.list[S.i],item=cur.item;
+  applyBand(p.band);
+  var needPick=d.blindLayer&&!cur.picked;
+
+  var hintOpen=d.autoHint;
+  var body=
+    backBar("Quit session","quit")+
+    progDots()+
+    '<div class="tellcard mb">'+
+      '<div class="xs sub" style="letter-spacing:.14em;font-weight:800;">TELL</div>'+
+      '<div class="q mt" style="margin-top:6px;">“'+esc(item.tell)+'”</div>'+
+    '</div>'+
+    '<p class="sm sub"><strong>Scene.</strong> '+esc(item.context)+'</p>';
+
+  if(needPick){
+    body+='<div class="card mt"><div class="sm mb"><strong>Hard mode.</strong> Choose the layer you will write in.</div>'+
+      '<div class="stack">'+LAYER_KEYS.filter(function(k){return (item.show[k]||[]).length;}).map(function(k){
+        return '<button class="tile" data-pick="'+k+'"><div><div style="font-weight:800;">'+
+          LAYERS[k].icon+' '+LAYERS[k].label+'</div><div class="xs sub">'+LAYERS[k].desc+'</div></div>›</button>';
+      }).join("")+'</div></div>';
+    screen(body);
+    on("quit",quitSession);
+    each("[data-pick]",function(b){
+      b.addEventListener("click",function(){
+        cur.layer=this.getAttribute("data-pick"); cur.picked=true; renderRound();
+      });
+    });
+    return;
+  }
+
+  var layer=cur.layer;
+  body+=
+    '<div class="mt mb">'+layerChip(layer)+
+      ' <span class="xs sub">Write in this layer.</span></div>'+
+    '<div id="hintbox" class="card mb lay-'+layer+'" style="display:'+(hintOpen?"block":"none")+
+      ';border-left:3px solid var(--lc);"><div class="xs" style="font-weight:800;color:var(--lc);letter-spacing:.08em;">HINT</div>'+
+      '<div class="sm mt" style="margin-top:4px;">'+esc(item.hint[layer]||"What can the reader actually see or feel?")+'</div></div>'+
+    '<textarea id="ans" rows="4" placeholder="Rewrite it so the reader sees it happen…"></textarea>'+
+    '<div class="row mt">'+
+      (hintOpen?'':'<button class="btn ghost sm" id="hint">💡 Hint</button>')+
+      '<button class="btn ghost sm" id="peek">👀 Examples</button>'+
+    '</div>'+
+    '<button class="btn mt" id="submit" style="margin-top:8px;">Submit</button>'+
+    '<div id="peeked"></div>';
+
+  screen(body);
+  on("quit",quitSession);
+  on("hint",function(){
+    document.getElementById("hintbox").style.display="block";
+    this.remove();
+  });
+  on("peek",function(){
+    cur.peeked=true;
+    document.getElementById("peeked").innerHTML=
+      '<div class="card mt pop lay-'+layer+'"><div class="xs" style="font-weight:800;color:var(--lc);letter-spacing:.08em;">'+
+      'REFERENCE LINES <span class="pill grey" style="margin-left:6px;">peeked</span></div>'+
+      '<div class="mt">'+(item.show[layer]||[]).map(function(s){
+        return '<div class="ref">'+esc(s)+'</div>'; }).join("")+'</div></div>';
+    this.remove();
+  });
+  on("submit",function(){
+    var txt=(document.getElementById("ans").value||"").trim();
+    if(txt.split(/\s+/).filter(Boolean).length<3){
+      alert("Write a little more first — at least a few words.");
+      return;
+    }
+    var ev=evaluate(txt,layer,S.diff);
+    renderFeedback(cur,txt,ev);
+  });
+}
+function quitSession(){
+  if(S&&S.i>0&&!confirm("Leave this session? Finished rounds are already saved.")) return;
+  S=null; renderMenu();
+}
+
+/* ---------- 4. feedback ---------- */
+function renderFeedback(cur,txt,ev){
+  var item=cur.item,layer=cur.layer,g=grade(ev.total);
+  applyBand(P().band);
+  var axesHTML=LAYER_ORDER_AX.map(function(k){
+    var a=ev.axes[k];
+    return '<div class="axis"><span><strong>'+a.label+'</strong> <span class="sub">'+esc(a.note)+'</span></span>'+
+      '<span style="font-weight:800;">'+Math.round(a.v*100)+'</span>'+
+      '<div class="bar"><i data-w="'+Math.round(a.v*100)+'"></i></div></div>';
+  }).join("");
+
+  var canAI=P().band===3&&state.settings.ai&&getApiKey();
+
+  screen(
+    progDots()+
+    owlHTML(esc(g.owl),"cheer")+
+    '<div class="card mb" style="text-align:center;">'+
+      '<div class="big" style="color:var(--brand);">'+ev.total+'</div>'+
+      '<span class="pill '+g.cls+'">'+g.label+'</span>'+
+      (cur.peeked?' <span class="pill grey">peeked</span>':'')+
+    '</div>'+
+    '<div class="card mb"><div class="xs sub" style="font-weight:800;letter-spacing:.1em;">YOUR SENTENCE</div>'+
+      '<p class="mt" style="font-family:var(--serif);font-size:1.05em;line-height:1.55;margin-top:6px;">'+
+      highlight(txt,ev.marks)+'</p>'+
+      '<div class="xs sub">Highlighted = concrete. <mark class="tellhit">Wavy</mark> = still an abstract feeling word.</div>'+
+    '</div>'+
+    '<div class="card mb">'+axesHTML+'</div>'+
+    '<div class="card mb lay-'+layer+'">'+
+      '<div class="xs" style="font-weight:800;color:var(--lc);letter-spacing:.08em;">HOW A NATIVE WRITER MIGHT DO IT — '+
+      LAYERS[layer].label.toUpperCase()+'</div>'+
+      '<div class="mt">'+(item.show[layer]||[]).map(function(s){
+        return '<div class="ref">'+esc(s)+'</div>'; }).join("")+'</div>'+
+      '<details class="mt"><summary class="xs sub" style="cursor:pointer;">Other layers for the same line</summary>'+
+        LAYER_KEYS.filter(function(k){return k!==layer&&(item.show[k]||[]).length;}).map(function(k){
+          return '<div class="mt lay-'+k+'">'+layerChip(k)+
+            (item.show[k]||[]).map(function(s){ return '<div class="ref mt" style="margin-top:6px;">'+esc(s)+'</div>'; }).join("")+
+          '</div>';
+        }).join("")+
+      '</details>'+
+    '</div>'+
+    (canAI?'<button class="btn ghost sm mb" id="ai">🤖 Ask for a tutor’s read</button><div id="aiout"></div>':'')+
+    '<div class="card mb"><div class="sm mb"><strong>Your call.</strong> Compared with those lines, how did yours do?</div>'+
+      '<div class="stack">'+
+      '<button class="tile" data-self="close"><div><div style="font-weight:800;">✅ As good as those</div>'+
+        '<div class="xs sub">Same idea, same concreteness.</div></div>›</button>'+
+      '<button class="tile" data-self="alt"><div><div style="font-weight:800;">🌱 Different, but it works</div>'+
+        '<div class="xs sub">Not their image — still shows, not tells.</div></div>›</button>'+
+      '<button class="tile" data-self="miss"><div><div style="font-weight:800;">📌 Mine missed it</div>'+
+        '<div class="xs sub">Save this one for review.</div></div>›</button>'+
+      '</div></div>'
+  );
+  setTimeout(function(){ each(".bar>i",function(b){ b.style.width=b.getAttribute("data-w")+"%"; }); },40);
+
+  if(canAI) on("ai",function(){
+    var btn=this; btn.disabled=true; btn.textContent="Reading…";
+    aiReview(item,layer,txt,function(j){
+      document.getElementById("aiout").innerHTML=
+        '<div class="card mb pop"><div class="xs sub" style="font-weight:800;letter-spacing:.1em;">TUTOR</div>'+
+        '<p class="sm mt">'+esc(j.verdict||"")+'</p>'+
+        (j.keep?'<p class="sm"><strong>Keep:</strong> '+esc(j.keep)+'</p>':'')+
+        (j.fix?'<p class="sm"><strong>Fix:</strong> '+esc(j.fix)+'</p>':'')+
+        (j.rewrite?'<div class="ref">'+esc(j.rewrite)+'</div>':'')+'</div>';
+      btn.remove();
+    },function(err){
+      document.getElementById("aiout").innerHTML='<p class="xs" style="color:var(--bad);">'+esc(err)+'</p>';
+      btn.disabled=false; btn.textContent="🤖 Try again";
+    });
+  });
+
+  each("[data-self]",function(b){
+    b.addEventListener("click",function(){
+      var self=this.getAttribute("data-self");
+      recordAttempt(item,layer,txt,ev,self);
+      S.results.push({item:item,layer:layer,text:txt,score:ev.total,self:self,peeked:!!cur.peeked});
+      S.i++; renderRound();
+    });
+  });
+}
+
+/* ---------- 5. summary ---------- */
+function renderSummary(){
+  var p=P(),r=S.results;
+  applyBand(p.band);
+  var avg=r.length?Math.round(r.reduce(function(s,x){return s+x.score;},0)/r.length):0;
+  var best=r.slice().sort(function(a,b){return b.score-a.score;})[0];
+  var missed=r.filter(function(x){ return x.score<70||x.self==="miss"; });
+  var xpGain=r.reduce(function(s,x){ return s+10+Math.round(x.score/10); },0);
+  var lines={1:"That was good work. Come back tomorrow and keep the streak alive!",
+             2:"Nice session. The weak axis is where the next jump lives.",
+             3:"Solid. Note what you reached for automatically — that is your default, and defaults are worth interrogating."};
+
+  screen(
+    owlHTML(esc(lines[p.band]),"cheer")+
+    '<div class="card mb" style="text-align:center;">'+
+      '<div class="xs sub" style="letter-spacing:.14em;font-weight:800;">SESSION AVERAGE</div>'+
+      '<div class="big" style="color:var(--brand);">'+avg+'</div>'+
+      '<div class="sm sub">'+r.length+' rewritten · +'+xpGain+' XP · '+p.streak+'🔥 day streak</div>'+
+    '</div>'+
+    (best?'<div class="card mb"><div class="xs sub" style="font-weight:800;letter-spacing:.1em;">YOUR BEST LINE</div>'+
+      '<div class="ref mt">'+esc(best.text)+'</div>'+
+      '<div class="xs sub">'+esc(best.item.tell)+' → '+LAYERS[best.layer].label+' · '+best.score+'</div></div>':'')+
+    (missed.length?'<div class="card mb"><div class="xs sub" style="font-weight:800;letter-spacing:.1em;">SAVED FOR REVIEW</div>'+
+      missed.map(function(x){
+        return '<div class="mt" style="margin-top:8px;"><div class="sm"><strong>'+esc(x.item.tell)+'</strong> '+layerChip(x.layer)+'</div>'+
+          '<div class="xs sub">you wrote: '+esc(x.text)+'</div>'+
+          '<div class="ref" style="margin-top:5px;">'+esc((x.item.show[x.layer]||[])[0]||"")+'</div></div>';
+      }).join("")+'</div>':
+      '<div class="card mb" style="text-align:center;"><span class="pill good">Nothing to review — every round landed</span></div>')+
+    '<div class="stack">'+
+      '<button class="btn" id="again">Another session</button>'+
+      '<button class="btn quiet sm" id="menu">Back to menu</button>'+
+    '</div>'
+  );
+  on("again",function(){ startSession(S.category); });
+  on("menu",function(){ S=null; renderMenu(); });
+}
+
+/* ---------- 6. review ---------- */
+function renderReview(){
+  var p=P();
+  applyBand(p.band);
+  var byId={}; PROMPT_BANK.forEach(function(x){ byId[x.id]=x; });
+  var items=(p.review||[]).filter(function(r){ return byId[r.id]; });
+  screen(
+    backBar("Menu","back")+
+    '<h2 class="mb">Review</h2>'+
+    '<p class="sm sub">Lines that did not land. Rewrite one, and it leaves this list when it scores 70+.</p>'+
+    (items.length?items.map(function(r,i){
+      var it=byId[r.id];
+      return '<div class="card mb lay-'+r.layer+'">'+
+        '<div class="sm"><strong>“'+esc(it.tell)+'”</strong></div>'+
+        '<div class="mt" style="margin-top:6px;">'+layerChip(r.layer)+' <span class="xs sub">scored '+r.score+' on '+r.d+'</span></div>'+
+        '<div class="xs sub mt" style="margin-top:6px;">you wrote: '+esc(r.text||"")+'</div>'+
+        '<div class="ref mt">'+esc((it.show[r.layer]||[])[0]||"")+'</div>'+
+        '<button class="btn ghost sm mt" data-retry="'+i+'">Rewrite this</button></div>';
+    }).join(""):'<div class="card" style="text-align:center;">'+
+      '<img class="owl bob" src="owl.webp" width="80" style="margin:0 auto 8px;width:80px;">'+
+      '<p class="sm sub">Nothing here. Everything you have written landed.</p></div>')
+  );
+  on("back",renderMenu);
+  each("[data-retry]",function(b){
+    b.addEventListener("click",function(){
+      var r=items[parseInt(this.getAttribute("data-retry"),10)];
+      S={list:[{item:byId[r.id],layer:r.layer}],i:0,category:r.layer,
+         diff:P().difficulty||"standard",results:[]};
+      renderRound();
+    });
+  });
+}
+
+/* ---------- 7. progress ---------- */
+function renderProgress(){
+  var p=P(),st=profileStats(p);
+  applyBand(p.band);
+  var recent=(p.attempts||[]).slice(-24);
+  var spark="";
+  if(recent.length>1){
+    var W=280,H=54,max=100;
+    var pts=recent.map(function(a,i){
+      return (i/(recent.length-1)*W).toFixed(1)+","+(H-a.score/max*H).toFixed(1);
+    }).join(" ");
+    spark='<svg viewBox="0 0 '+W+' '+H+'" width="100%" height="60" preserveAspectRatio="none">'+
+      '<polyline points="'+pts+'" fill="none" stroke="var(--brand)" stroke-width="2.5" '+
+      'stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  }
+  var axRows=["n","s","v","l","c"].map(function(k){
+    var v=st.axAvg[k];
+    return '<div class="axis"><span>'+st.axNames[k]+'</span><span style="font-weight:800;">'+
+      (v===null?"—":Math.round(v*100))+'</span>'+
+      '<div class="bar"><i data-w="'+(v===null?0:Math.round(v*100))+'"></i></div></div>';
+  }).join("");
+  screen(
+    backBar("Menu","back")+
+    '<h2 class="mb">'+esc(p.name)+' · progress</h2>'+
+    '<div class="card mb" style="display:flex;gap:12px;text-align:center;">'+
+      statCell(st.total,"written")+statCell(st.avg===null?"—":st.avg,"avg")+
+      statCell(p.bestStreak+"🔥","best streak")+statCell(p.sessions,"sessions")+
+    '</div>'+
+    (spark?'<div class="card mb"><div class="xs sub" style="font-weight:800;letter-spacing:.1em;">LAST '+recent.length+' SCORES</div>'+spark+'</div>':'')+
+    '<div class="card mb"><div class="xs sub mb" style="font-weight:800;letter-spacing:.1em;">AXIS AVERAGES</div>'+axRows+'</div>'+
+    '<div class="card mb"><div class="xs sub mb" style="font-weight:800;letter-spacing:.1em;">BY LAYER</div>'+
+      LAYER_KEYS.map(function(k){
+        var v=st.byLayer[k];
+        return '<div class="axis"><span>'+LAYERS[k].icon+' '+LAYERS[k].label+'</span>'+
+          '<span style="font-weight:800;">'+(v===null?"—":v)+'</span>'+
+          '<div class="bar"><i data-w="'+(v===null?0:v)+'"></i></div></div>';
+      }).join("")+'</div>'+
+    '<button class="btn quiet sm" id="share">📤 Share my progress card</button>'
+  );
+  setTimeout(function(){ each(".bar>i",function(b){ b.style.width=b.getAttribute("data-w")+"%"; }); },40);
+  on("back",renderMenu);
+  on("share",function(){ shareCard(p); });
+}
+
+function shareCard(p){
+  var code=b64encode(progressCard(p));
+  screen(
+    backBar("Back","back")+
+    '<h2 class="mb">Progress card</h2>'+
+    '<p class="sm sub">Send this to the family device. Paste it into <strong>Family view → Add a card</strong>. '+
+    'It carries a summary only — nothing is uploaded anywhere.</p>'+
+    '<textarea id="code" rows="6" readonly style="font-size:11px;font-family:ui-monospace,Menlo,monospace;">'+code+'</textarea>'+
+    '<div class="row mt"><button class="btn sm" id="copy">Copy code</button>'+
+    '<button class="btn ghost sm" id="file">Save as file</button></div>'
+  );
+  on("back",renderProgress);
+  on("copy",function(){
+    var t=document.getElementById("code"); t.select(); t.setSelectionRange(0,99999);
+    var ok=false;
+    try{ ok=document.execCommand("copy"); }catch(e){}
+    if(navigator.clipboard) navigator.clipboard.writeText(code).then(function(){},function(){});
+    this.textContent=ok||navigator.clipboard?"Copied ✓":"Select and copy";
+  });
+  on("file",function(){ download("show-owl-card-"+p.name+".json",JSON.stringify(progressCard(p),null,1)); });
+}
+
+/* ---------- 8. family view ---------- */
+function renderFamily(){
+  applyBand(2);
+  var mine=state.order.map(function(id){ return state.profiles[id]; });
+  var linked=Object.keys(state.linked).map(function(k){ return state.linked[k]; });
+
+  function rowFor(name,band,avg,total,streak,xp,extra){
+    return '<div class="card mb">'+
+      '<div style="display:flex;justify-content:space-between;align-items:baseline;">'+
+        '<div><strong>'+esc(name)+'</strong> <span class="xs sub">'+BANDS[band].name+'</span></div>'+
+        '<div class="xs" style="color:var(--brand);font-weight:800;">'+xp+' XP · '+streak+'🔥</div></div>'+
+      '<div class="row mt" style="text-align:center;">'+
+        statCell(total,"written")+statCell(avg===null?"—":avg,"avg")+
+      '</div>'+(extra||'')+'</div>';
+  }
+  screen(
+    backBar("Back","back")+
+    '<h2>Family view</h2>'+
+    '<p class="sm sub mb">Everyone on this device, plus any progress cards you have been sent.</p>'+
+    mine.map(function(p){
+      var st=profileStats(p);
+      var w=st.worst?'<div class="xs sub mt">weakest axis: <strong>'+st.axNames[st.worst]+'</strong>'+
+        (st.reviewCount?' · '+st.reviewCount+' in review':'')+'</div>':'';
+      return rowFor(p.name,p.band,st.avg,st.total,p.streak,p.xp,w);
+    }).join("")+
+    (linked.length?'<div class="xs sub mb" style="font-weight:800;letter-spacing:.1em;margin-top:16px;">RECEIVED CARDS</div>'+
+      linked.map(function(c){
+        var w='<div class="xs sub mt">updated '+String(c.at).slice(0,10)+
+          (c.reviewCount?' · '+c.reviewCount+' in review':'')+'</div>'+
+          (c.recent&&c.recent.length?'<details class="mt"><summary class="xs sub" style="cursor:pointer;">Recent lines</summary>'+
+            c.recent.slice().reverse().slice(0,6).map(function(a){
+              return '<div class="ref mt" style="margin-top:6px;">'+esc(a.text)+
+                '<div class="xs sub" style="font-family:var(--sans);">'+a.layer+' · '+a.score+'</div></div>';
+            }).join("")+'</details>':'');
+        return rowFor(c.name,c.band,c.avg,c.total,c.streak,c.xp,w);
+      }).join(""):'')+
+    '<div class="stack mt">'+
+      '<button class="btn ghost sm" id="add">➕ Add a progress card</button>'+
+    '</div>'
+  );
+  on("back",function(){ P()?renderMenu():renderProfiles(); });
+  on("add",function(){
+    screen(
+      backBar("Back","back")+
+      '<h2 class="mb">Add a progress card</h2>'+
+      '<p class="sm sub">Paste the code from the other device, or load a saved <code>.json</code> file.</p>'+
+      '<textarea id="in" rows="6" placeholder="Paste the code here…" style="font-size:12px;"></textarea>'+
+      '<button class="btn mt" id="go">Add</button>'+
+      '<button class="btn ghost sm mt" id="pick">Choose a file instead</button>'+
+      '<input type="file" id="f" accept=".json,application/json" style="display:none;">'+
+      '<div id="msg" class="mt"></div>'
+    );
+    on("back",renderFamily);
+    function apply(text){
+      var msg=document.getElementById("msg");
+      try{
+        var t=text.trim();
+        var obj=(t.charAt(0)==="{")?JSON.parse(t):b64decode(t);
+        var res=importPayload(obj);
+        msg.innerHTML='<p class="sm" style="color:var(--good);">'+esc(res)+'</p>';
+        setTimeout(renderFamily,900);
+      }catch(e){
+        msg.innerHTML='<p class="sm" style="color:var(--bad);">Could not read that: '+esc(e.message||e)+'</p>';
+      }
+    }
+    on("go",function(){ apply(document.getElementById("in").value||""); });
+    on("pick",function(){ document.getElementById("f").click(); });
+    on("f",function(){
+      var f=this.files[0]; if(!f) return;
+      var fr=new FileReader();
+      fr.onload=function(){ apply(String(fr.result)); };
+      fr.readAsText(f);
+    },"change");
+  });
+}
+
+/* ---------- 9. settings ---------- */
+function renderSettings(){
+  applyBand(P()?P().band:2);
+  var hasKey=!!getApiKey();
+  screen(
+    backBar("Back","back")+
+    '<h2 class="mb">Settings</h2>'+
+    '<div class="card mb"><div class="xs sub mb" style="font-weight:800;letter-spacing:.1em;">WRITERS</div>'+
+      state.order.map(function(id){
+        var p=state.profiles[id];
+        return '<div class="mb" style="display:flex;gap:8px;align-items:center;">'+
+          '<input type="text" data-name="'+id+'" value="'+esc(p.name)+'" style="flex:2;">'+
+          '<select data-band="'+id+'" style="flex:1;font-size:14px;padding:10px;border-radius:8px;'+
+          'border:1.5px solid var(--line);font-family:inherit;background:#fff;color:var(--ink);">'+
+          [1,2,3].map(function(b){
+            return '<option value="'+b+'"'+(p.band===b?" selected":"")+'>'+BANDS[b].name+'</option>';
+          }).join("")+'</select></div>';
+      }).join("")+
+      '<button class="btn ghost sm" id="savep">Save writers</button></div>'+
+
+    '<div class="card mb"><div class="xs sub mb" style="font-weight:800;letter-spacing:.1em;">TUTOR REVIEW (NOVELIST ONLY)</div>'+
+      '<p class="sm">Everything works offline. Optionally, the adult mode can send a single sentence to '+
+      'Claude for a closer read, using your own API key.</p>'+
+      '<label class="sm" style="display:flex;gap:8px;align-items:center;margin:10px 0;">'+
+        '<input type="checkbox" id="ai"'+(state.settings.ai?" checked":"")+' style="width:18px;height:18px;">'+
+        'Enable tutor review</label>'+
+      '<input type="text" id="key" placeholder="'+(hasKey?"API key saved ✓ — paste to replace":"sk-ant-…")+'">'+
+      '<button class="btn ghost sm mt" id="savekey">Save key</button>'+
+      '<p class="xs sub mt">Stored only in this browser. Shared with PTE SUMMIT on this device.</p></div>'+
+
+    '<div class="card mb"><div class="xs sub mb" style="font-weight:800;letter-spacing:.1em;">YOUR DATA</div>'+
+      '<p class="sm">Progress is kept in this browser and is never cleared by an app update. '+
+      'Export a backup before switching device or clearing Safari data.</p>'+
+      '<div class="row mt"><button class="btn ghost sm" id="exp">⬆︎ Export backup</button>'+
+      '<button class="btn ghost sm" id="imp">⬇︎ Import backup</button></div>'+
+      '<input type="file" id="impf" accept=".json,application/json" style="display:none;">'+
+      '<p class="xs sub mt">Importing <strong>merges</strong> — it never deletes what is already here.</p>'+
+      '<div id="msg"></div></div>'+
+    '<p class="xs sub" style="text-align:center;">Show Don’t Tell · Owl Studio · offline-ready</p>'
+  );
+  on("back",function(){ P()?renderMenu():renderProfiles(); });
+  on("savep",function(){
+    each("[data-name]",function(el){
+      var id=el.getAttribute("data-name"),v=el.value.trim();
+      if(v) state.profiles[id].name=v;
+    });
+    each("[data-band]",function(el){
+      state.profiles[el.getAttribute("data-band")].band=parseInt(el.value,10);
+    });
+    saveState(); renderSettings();
+  });
+  on("ai",function(){ state.settings.ai=this.checked; saveState(); },"change");
+  on("savekey",function(){
+    var v=document.getElementById("key").value.trim();
+    if(v){ setApiKey(v); document.getElementById("key").value=""; }
+    renderSettings();
+  });
+  on("exp",function(){ download("show-owl-backup-"+todayStr()+".json",fullBackup()); });
+  on("imp",function(){ document.getElementById("impf").click(); });
+  on("impf",function(){
+    var f=this.files[0]; if(!f) return;
+    var fr=new FileReader();
+    fr.onload=function(){
+      var msg=document.getElementById("msg");
+      try{
+        var res=importPayload(JSON.parse(String(fr.result)));
+        msg.innerHTML='<p class="sm mt" style="color:var(--good);">'+esc(res)+'</p>';
+      }catch(e){
+        msg.innerHTML='<p class="sm mt" style="color:var(--bad);">'+esc(e.message||e)+'</p>';
+      }
+    };
+    fr.readAsText(f);
+  },"change");
+}
+/* ================= external content (content.json) =================
+   Same philosophy as PTE SUMMIT: the app ships with a built-in bank and
+   merges anything found in content.json at start-up. Add prompts by editing
+   that one file on GitHub — no rebuild, no tooling. If the file is missing
+   or malformed the app still starts on the built-in bank alone.          */
+function mergeContent(c){
+  if(!c) return;
+  var have={}; PROMPT_BANK.forEach(function(p){ have[p.id]=1; });
+  (c.prompts||[]).forEach(function(p){
+    if(!p||!p.id||!p.tell||!p.show||have[p.id]) return;
+    if(!p.band||!BANDS[p.band]) return;
+    if(!LAYER_KEYS.some(function(k){ return (p.show[k]||[]).length; })) return;
+    if(!p.hint) p.hint={};
+    if(!p.context) p.context="";
+    have[p.id]=1; PROMPT_BANK.push(p);
+  });
+  /* optional lexicon top-ups */
+  function add(list,set,extra){
+    (extra||[]).forEach(function(w){
+      w=String(w).toLowerCase().trim();
+      if(w&&!set[w]){ set[w]=1; list.push(w); }
+    });
+  }
+  if(c.lexicon){
+    add(TELL_WORDS,SET_TELL,c.lexicon.tell);
+    add(PHYSICAL_NOUNS,SET_PHYS,c.lexicon.physical);
+    add(INTERNAL_NOUNS,SET_INT,c.lexicon.internal);
+    add(MENTAL_NOUNS,SET_MENT,c.lexicon.mental);
+    add(STRONG_VERBS,SET_VERB,c.lexicon.verbs);
+  }
+}
+
+var booted=false;
+function boot(){
+  if(booted) return;
+  booted=true;
+  seedProfilesIfEmpty();
+  if(state.activeProfile&&state.profiles[state.activeProfile]) renderMenu();
+  else renderProfiles();
+}
+/* start even if content.json never answers */
+setTimeout(boot,3000);
+fetch("content.json")
+  .then(function(r){ return r.ok?r.json():null; })
+  .then(function(c){ try{ mergeContent(c); }catch(e){} boot(); })
+  .catch(function(){ boot(); });
+
+/* service worker — offline / home-screen install */
+if("serviceWorker" in navigator){
+  window.addEventListener("load",function(){
+    navigator.serviceWorker.register("sw.js").catch(function(){});
+  });
+}
+</script>
+</body>
+</html>

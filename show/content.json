@@ -1,0 +1,122 @@
+{
+  "_comment": [
+    "Show Don't Tell — Owl Studio · extra content",
+    "",
+    "The app ships with a built-in prompt bank and merges this file on top at start-up.",
+    "Add prompts by editing this file on GitHub and reloading the app. No build step.",
+    "If this file is missing or malformed the app still runs on the built-in bank.",
+    "",
+    "prompt format:",
+    "{",
+    "  id      : unique string, e.g. 'x-b2-07' (duplicates of built-in ids are ignored)",
+    "  band    : 1 = Explorer (age 9) | 2 = Storyteller (age 12) | 3 = Novelist (adult)",
+    "  theme   : free label, e.g. 'school' | 'work' | 'family'",
+    "  tell    : the flat abstract sentence to be rewritten",
+    "  tellWord: the emotion being named, lowercase",
+    "  context : one or two sentences of scene, so the writer can picture it",
+    "  hint    : { physical, internal, mental } — one guiding question each",
+    "  show    : { physical:[], internal:[], mental:[] } — reference lines; at least one layer required",
+    "}",
+    "",
+    "lexicon (optional) tops up the scoring word lists:",
+    "  { tell:[], physical:[], internal:[], mental:[], verbs:[] }",
+    "",
+    "Note: do not use raw double quotes inside a JSON string (escape them as \\\"),",
+    "and never leave a trailing comma after the last element."
+  ],
+
+  "prompts": [
+    {
+      "id": "x-b1-01", "band": 1, "theme": "school", "tell": "She was surprised.", "tellWord": "surprised",
+      "context": "She opens her desk and finds a birthday card from the whole class.",
+      "hint": {
+        "physical": "What does her face and body do first?",
+        "internal": "What jumps or rushes inside?",
+        "mental": "How long does it take her to understand?"
+      },
+      "show": {
+        "physical": ["Her mouth opened and nothing came out of it.", "She sat down again without meaning to."],
+        "internal": ["Her heart gave one big thump and then carried on as normal."],
+        "mental": ["It took her three whole seconds to work out that all those names were for her."]
+      }
+    },
+    {
+      "id": "x-b1-02", "band": 1, "theme": "weather", "tell": "He was cold.", "tellWord": "cold",
+      "context": "Waiting for the bus in the rain with no coat.",
+      "hint": {
+        "physical": "What is his body doing to keep warm?",
+        "internal": "What has gone numb or stiff?",
+        "mental": "What is he counting or wishing for?"
+      },
+      "show": {
+        "physical": ["He pulled his sleeves down over his hands and held them shut.", "He hopped from foot to foot on the same paving stone."],
+        "internal": ["His fingers had stopped being able to feel the strap of his bag."],
+        "mental": ["He worked out that the bus was four minutes late, then worked it out again."]
+      }
+    },
+    {
+      "id": "x-b2-01", "band": 2, "theme": "school", "tell": "He was relieved when it was over.", "tellWord": "relieved",
+      "context": "He has just walked out of a presentation he had been dreading for a fortnight.",
+      "hint": {
+        "physical": "What does his body do the moment the door closes?",
+        "internal": "What unclenches?",
+        "mental": "What does he suddenly notice again?"
+      },
+      "show": {
+        "physical": ["He leaned against the corridor wall and let his bag slide down his arm.", "He laughed at something that was not particularly funny."],
+        "internal": ["The band around his chest came loose one notch at a time."],
+        "mental": ["He noticed, for the first time all morning, that he was extremely hungry."]
+      }
+    },
+    {
+      "id": "x-b2-02", "band": 2, "theme": "family", "tell": "She was proud of her brother.", "tellWord": "proud",
+      "context": "Her younger brother, who never speaks in public, has just read his poem to the whole hall.",
+      "hint": {
+        "physical": "What does she do that she would deny doing?",
+        "internal": "What swells or stings?",
+        "mental": "What is she planning to say later?"
+      },
+      "show": {
+        "physical": ["She clapped a beat longer than everybody else and pretended she had not.", "She got her phone up too late and filmed the last four words."],
+        "internal": ["Something rose in her throat and made a nuisance of itself."],
+        "mental": ["She was already deciding exactly how casually she would mention it to him afterwards."]
+      }
+    },
+    {
+      "id": "x-b3-01", "band": 3, "theme": "work", "tell": "He was bored in the meeting.", "tellWord": "bored",
+      "context": "A quarterly review. Slide nineteen of forty-two.",
+      "hint": {
+        "physical": "What is he doing that looks like attention?",
+        "internal": "What is heavy or restless?",
+        "mental": "Where has his mind actually gone?"
+      },
+      "show": {
+        "physical": ["He nodded at intervals he had calibrated earlier in his career.", "He wrote the date at the top of a fresh page and underlined it twice."],
+        "internal": ["A dull weight settled behind his eyes and refused to shift."],
+        "mental": ["Somewhere around slide twelve he had begun mentally rearranging his kitchen."]
+      }
+    },
+    {
+      "id": "x-b3-02", "band": 3, "theme": "relationships", "tell": "She was falling in love.", "tellWord": "love",
+      "context": "Six weeks in. They are walking back from somewhere ordinary.",
+      "hint": {
+        "physical": "What small physical negotiation is happening?",
+        "internal": "What is unsteady?",
+        "mental": "What has changed about how she plans?"
+      },
+      "show": {
+        "physical": ["She took the long way back and did not explain why.", "Their hands kept arriving at the same place and apologising."],
+        "internal": ["Something under her ribs kept losing its footing."],
+        "mental": ["She caught herself checking whether he would like a restaurant she was not going to for another month."]
+      }
+    }
+  ],
+
+  "lexicon": {
+    "tell": [],
+    "physical": [],
+    "internal": [],
+    "mental": [],
+    "verbs": []
+  }
+}
