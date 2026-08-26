@@ -29,6 +29,7 @@
     --serif:'Iowan Old Style','Palatino Linotype','Palatino','Georgia',serif;
     --sans:'Avenir Next','Helvetica Neue',-apple-system,system-ui,'Segoe UI',sans-serif;
     --fs:16px;           /* base font size, retuned per band */
+    --zoom:1;            /* reader-controlled text scale, 3 steps — set via JS, shared device-wide */
     --radius:16px;
   }
   /* --- age-band skins --- */
@@ -39,8 +40,21 @@
 
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
-    font-size:var(--fs);-webkit-font-smoothing:antialiased;overscroll-behavior-y:contain;}
-  #app{max-width:520px;margin:0 auto;padding:14px 14px calc(40px + env(safe-area-inset-bottom));}
+    font-size:calc(var(--fs) * var(--zoom));-webkit-font-smoothing:antialiased;overscroll-behavior-y:contain;}
+  #app{max-width:520px;margin:0 auto;padding:0 14px calc(40px + env(safe-area-inset-bottom));}
+  #topbar{position:sticky;top:0;z-index:30;display:flex;justify-content:flex-end;align-items:center;
+    gap:8px;padding:10px 0 6px;background:linear-gradient(var(--bg) 72%,transparent);}
+  .zoomctl{display:inline-flex;align-items:center;gap:1px;background:var(--card);
+    border:1.5px solid var(--line);border-radius:999px;padding:3px;box-shadow:0 1px 2px rgba(80,60,40,.05);}
+  .zoomctl button{border:none;background:transparent;color:var(--brand);font-family:inherit;
+    font-weight:800;cursor:pointer;border-radius:999px;width:30px;height:30px;font-size:12px;
+    display:flex;align-items:center;justify-content:center;transition:background .15s;}
+  .zoomctl button:active{background:var(--brand-soft);}
+  .zoomctl button[disabled]{opacity:.35;cursor:default;}
+  .zoomctl button:first-child{font-size:10px;} .zoomctl button:last-child{font-size:15px;}
+  .zoomdots{display:flex;gap:3px;padding:0 5px;}
+  .zoomdots i{width:5px;height:5px;border-radius:50%;background:var(--line);display:block;}
+  .zoomdots i.on{background:var(--brand);}
   h1,h2{font-family:var(--serif);font-weight:600;letter-spacing:-.015em;margin:0;}
   h1{font-size:1.55em;} h2{font-size:1.2em;}
   p{margin:0 0 .6em;line-height:1.6;}
@@ -138,7 +152,15 @@
 </style>
 </head>
 <body>
-<div id="app"><div id="err"></div><div id="root" class="sub">Loading…</div></div>
+<div id="app"><div id="err"></div>
+<div id="topbar">
+  <div class="zoomctl">
+    <button id="zoomOut" aria-label="Smaller text">A-</button>
+    <span class="zoomdots" id="zoomDots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <button id="zoomIn" aria-label="Larger text">A+</button>
+  </div>
+</div>
+<div id="root" class="sub">Loading…</div></div>
 <script>
 "use strict";
 window.onerror=function(m,s,l){var e=document.getElementById("err");
@@ -584,7 +606,7 @@ function newProfile(id,name,band){
 }
 function blankState(){
   return {schema:SCHEMA,activeProfile:null,profiles:{},order:[],linked:{},
-          settings:{ai:false,difficulty:"standard"}};
+          settings:{ai:false,difficulty:"standard",fontStep:1}};
 }
 function loadState(){
   try{ var r=localStorage.getItem(STORE_KEY); return r?JSON.parse(r):null; }
@@ -602,6 +624,7 @@ function migrate(s){
   if(!s.settings) s.settings={};
   if(typeof s.settings.ai!=="boolean") s.settings.ai=false;
   if(!s.settings.difficulty) s.settings.difficulty="standard";
+  if(typeof s.settings.fontStep!=="number"||s.settings.fontStep<0||s.settings.fontStep>2) s.settings.fontStep=1;
   Object.keys(s.profiles).forEach(function(k){
     var p=s.profiles[k];
     if(!p.attempts) p.attempts=[];
@@ -825,9 +848,10 @@ function profileStats(p){
   var a=p.attempts||[];
   var recent=a.slice(-30);
   var avg=recent.length?Math.round(recent.reduce(function(s,x){return s+x.score;},0)/recent.length):null;
-  var byLayer={};
+  var byLayer={},layerN={};
   LAYER_KEYS.forEach(function(k){
     var f=a.filter(function(x){return x.layer===k;});
+    layerN[k]=f.length;
     byLayer[k]=f.length?Math.round(f.reduce(function(s,x){return s+x.score;},0)/f.length):null;
   });
   var axNames={n:"No telling",s:"Body & senses",v:"Strong verbs",l:"Layer match",c:"Craft"};
@@ -840,8 +864,86 @@ function profileStats(p){
       if(best===null||axAvg[k]>axAvg[best]) best=k;
     }
   });
-  return {total:a.length,avg:avg,byLayer:byLayer,axAvg:axAvg,axNames:axNames,
-          best:best,worst:worst,reviewCount:(p.review||[]).length};
+
+  /* weekly trend — Monday-anchored buckets, so "this week vs last week" means the same
+     thing every time this screen is opened, not just "last N attempts vs the N before". */
+  var weeks={};
+  a.forEach(function(x){
+    var wk=weekKey(x.d);
+    if(!weeks[wk]) weeks[wk]={sum:0,n:0};
+    weeks[wk].sum+=x.score; weeks[wk].n++;
+  });
+  var weekKeys=Object.keys(weeks).sort();
+  var trend=weekKeys.slice(-8).map(function(k){
+    return {week:k,avg:Math.round(weeks[k].sum/weeks[k].n),n:weeks[k].n};
+  });
+  var delta=null;
+  if(trend.length>=2) delta=trend[trend.length-1].avg-trend[trend.length-2].avg;
+
+  /* the clearest recent miss on the weakest axis — a concrete line beats a bare number */
+  var worstExample=null;
+  if(worst){
+    var cand=a.filter(function(x){ return x.ax&&typeof x.ax[worst]==="number"; }).slice(-25)
+      .sort(function(x,y){ return x.ax[worst]-y.ax[worst]; });
+    if(cand.length) worstExample=cand[0];
+  }
+
+  /* this week's suggested focus: clear the queue first, otherwise the layer with the
+     lowest average that has enough attempts to trust, otherwise Mixed to build a baseline */
+  var weakestLayer=null,weakestLayerAvg=101;
+  LAYER_KEYS.forEach(function(k){
+    if(layerN[k]>=3&&byLayer[k]!==null&&byLayer[k]<weakestLayerAvg){ weakestLayerAvg=byLayer[k]; weakestLayer=k; }
+  });
+  var reviewCount=(p.review||[]).length;
+  var suggestion;
+  if(reviewCount>0){
+    suggestion={kind:"review",label:"Clear the review queue",
+      detail:reviewCount+" line"+(reviewCount===1?"":"s")+" waiting for a rewrite."};
+  }else if(weakestLayer){
+    suggestion={kind:"layer",layer:weakestLayer,label:LAYERS[weakestLayer].label,
+      detail:LAYERS[weakestLayer].label+" is averaging "+weakestLayerAvg+
+        (worst?", and "+axNames[worst].toLowerCase()+" is the weakest skill behind it.":"."+"")};
+  }else{
+    suggestion={kind:"layer",layer:"mixed",label:"Mixed",
+      detail:"Still building a baseline — a Mixed session covers all three layers evenly."};
+  }
+
+  return {total:a.length,avg:avg,byLayer:byLayer,layerN:layerN,axAvg:axAvg,axNames:axNames,
+          best:best,worst:worst,reviewCount:reviewCount,trend:trend,delta:delta,
+          worstExample:worstExample,suggestion:suggestion};
+}
+function weekKey(d){
+  var dt=new Date(d+"T00:00:00Z");
+  var dow=(dt.getUTCDay()+6)%7;   /* Monday = 0 */
+  dt.setUTCDate(dt.getUTCDate()-dow);
+  return dt.toISOString().slice(0,10);
+}
+function shortDate(d){
+  var dt=new Date(d+"T00:00:00Z");
+  return (dt.getUTCMonth()+1)+"/"+dt.getUTCDate();
+}
+
+/* ================= milestones ================= */
+var MILESTONES=[
+  {id:"w10",  icon:"✏️",label:"10 rewrites",   test:function(p,st){return st.total>=10;},  need:function(st){return 10-st.total;}},
+  {id:"w50",  icon:"📚",label:"50 rewrites",   test:function(p,st){return st.total>=50;},  need:function(st){return 50-st.total;}},
+  {id:"w100", icon:"🏆",label:"100 rewrites",  test:function(p,st){return st.total>=100;}, need:function(st){return 100-st.total;}},
+  {id:"s7",   icon:"🔥",label:"7-day streak",  test:function(p){return p.bestStreak>=7;},  need:function(st,p){return 7-p.bestStreak;}},
+  {id:"s30",  icon:"⚡",label:"30-day streak", test:function(p){return p.bestStreak>=30;}, need:function(st,p){return 30-p.bestStreak;}},
+  {id:"a70",  icon:"🌱",label:"Average 70+",   test:function(p,st){return st.avg!==null&&st.avg>=70;}, need:function(st){return st.avg===null?70:70-st.avg;}},
+  {id:"a85",  icon:"✨",label:"Average 85+",   test:function(p,st){return st.avg!==null&&st.avg>=85;}, need:function(st){return st.avg===null?85:85-st.avg;}},
+  {id:"lp",   icon:LAYERS.physical.icon,label:"Physical mastery",
+    test:function(p,st){return st.layerN.physical>=8&&st.byLayer.physical>=80;},
+    need:function(st){return st.byLayer.physical===null?80:80-st.byLayer.physical;}},
+  {id:"li",   icon:LAYERS.internal.icon,label:"Internal mastery",
+    test:function(p,st){return st.layerN.internal>=8&&st.byLayer.internal>=80;},
+    need:function(st){return st.byLayer.internal===null?80:80-st.byLayer.internal;}},
+  {id:"lm",   icon:LAYERS.mental.icon,label:"Mental mastery",
+    test:function(p,st){return st.layerN.mental>=8&&st.byLayer.mental>=80;},
+    need:function(st){return st.byLayer.mental===null?80:80-st.byLayer.mental;}}
+];
+function computeBadges(p,st){
+  return MILESTONES.map(function(m){ return {id:m.id,icon:m.icon,label:m.label,earned:m.test(p,st)}; });
 }
 
 /* ================= transfer (backup / parent view) ================= */
@@ -956,6 +1058,30 @@ function screen(html,cls){
 function on(id,fn,ev){ var e=document.getElementById(id); if(e) e.addEventListener(ev||"click",fn); }
 function each(sel,fn){ var n=root.querySelectorAll(sel); for(var i=0;i<n.length;i++) fn(n[i],i); }
 function applyBand(b){ document.documentElement.setAttribute("data-band",b||2); }
+
+/* ---------- text-size control (3 steps, shared across every profile on this device) ---------- */
+var ZOOM_STEPS=[0.88,1,1.14];
+var ZOOM_LABELS=["Small text","Standard text","Large text"];
+function applyZoom(){
+  var step=state.settings.fontStep;
+  document.documentElement.style.setProperty("--zoom",ZOOM_STEPS[step]);
+  var dots=document.querySelectorAll(".zoomdots i");
+  for(var i=0;i<dots.length;i++) dots[i].className=(i===step?"on":"");
+  var out=document.getElementById("zoomOut"),inn=document.getElementById("zoomIn");
+  if(out) out.disabled=(step===0);
+  if(inn) inn.disabled=(step===ZOOM_STEPS.length-1);
+  var bar=document.getElementById("topbar");
+  if(bar) bar.setAttribute("title",ZOOM_LABELS[step]);
+}
+function initZoomControl(){
+  applyZoom();
+  on("zoomOut",function(){
+    if(state.settings.fontStep>0){ state.settings.fontStep--; saveState(); applyZoom(); }
+  });
+  on("zoomIn",function(){
+    if(state.settings.fontStep<ZOOM_STEPS.length-1){ state.settings.fontStep++; saveState(); applyZoom(); }
+  });
+}
 
 function owlHTML(line,cls){
   return '<div class="mascot"><img class="owl '+(cls||"bob")+'" src="owl.webp" alt="" width="88">'+
@@ -1323,23 +1449,87 @@ function renderProgress(){
     var pts=recent.map(function(a,i){
       return (i/(recent.length-1)*W).toFixed(1)+","+(H-a.score/max*H).toFixed(1);
     }).join(" ");
+    var lastPt=pts.split(" ").slice(-1)[0].split(",");
     spark='<svg viewBox="0 0 '+W+' '+H+'" width="100%" height="60" preserveAspectRatio="none">'+
       '<polyline points="'+pts+'" fill="none" stroke="var(--brand)" stroke-width="2.5" '+
-      'stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      'stroke-linecap="round" stroke-linejoin="round"/>'+
+      '<circle cx="'+lastPt[0]+'" cy="'+lastPt[1]+'" r="3.4" fill="var(--brand)"/></svg>';
   }
+
+  /* weekly trend bars, with a plain-language delta so "am I improving" has one clear answer */
+  var trendHTML="";
+  if(st.trend.length){
+    var tmax=Math.max(70,Math.max.apply(null,st.trend.map(function(w){return w.avg;})));
+    var bars=st.trend.map(function(w,i){
+      var isNow=(i===st.trend.length-1);
+      return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;">'+
+        '<div style="width:100%;height:64px;display:flex;align-items:flex-end;">'+
+        '<div style="width:100%;border-radius:4px 4px 0 0;background:'+(isNow?"var(--brand)":"var(--line)")+
+        ';height:'+Math.max(6,Math.round(w.avg/tmax*64))+'px;"></div></div>'+
+        '<div class="xs sub" style="font-weight:'+(isNow?"800":"600")+';">'+w.avg+'</div>'+
+        '<div class="xs sub" style="opacity:.7;">'+shortDate(w.week)+'</div></div>';
+    }).join("");
+    var deltaBadge=st.delta===null?"":
+      '<span class="pill '+(st.delta>0?"good":st.delta<0?"bad":"grey")+'">'+
+      (st.delta>0?"▲ +":st.delta<0?"▼ ":"– ")+Math.abs(st.delta)+' vs last week</span>';
+    trendHTML='<div class="card mb"><div style="display:flex;justify-content:space-between;align-items:center;">'+
+      '<div class="xs sub" style="font-weight:800;letter-spacing:.1em;">WEEKLY AVERAGE</div>'+deltaBadge+'</div>'+
+      '<div class="mt" style="display:flex;gap:6px;align-items:flex-end;margin-top:10px;">'+bars+'</div></div>';
+  }
+
   var axRows=["n","s","v","l","c"].map(function(k){
     var v=st.axAvg[k];
-    return '<div class="axis"><span>'+st.axNames[k]+'</span><span style="font-weight:800;">'+
-      (v===null?"—":Math.round(v*100))+'</span>'+
+    return '<div class="axis"><span>'+st.axNames[k]+(k===st.worst?' <span class="pill bad" style="margin-left:4px;">focus</span>':'')+
+      '</span><span style="font-weight:800;">'+(v===null?"—":Math.round(v*100))+'</span>'+
       '<div class="bar"><i data-w="'+(v===null?0:Math.round(v*100))+'"></i></div></div>';
   }).join("");
+
+  /* the weakest axis made concrete: what you actually wrote, and where it fell short */
+  var exampleHTML="";
+  if(st.worstExample){
+    var byId={}; PROMPT_BANK.forEach(function(x){ byId[x.id]=x; });
+    var ex=st.worstExample,item=byId[ex.id];
+    if(item){
+      exampleHTML='<div class="card mb lay-'+ex.layer+'">'+
+        '<div class="xs sub" style="font-weight:800;letter-spacing:.1em;">WHERE '+st.axNames[st.worst].toUpperCase()+' SLIPPED</div>'+
+        '<div class="sm mt" style="margin-top:6px;">"'+esc(item.tell)+'" '+layerChip(ex.layer)+'</div>'+
+        '<div class="xs sub mt" style="margin-top:6px;">you wrote:</div>'+
+        '<div class="ref" style="margin-top:2px;">'+esc(ex.text)+'</div>'+
+        '<div class="xs sub mt" style="margin-top:8px;">a line that scores well here:</div>'+
+        '<div class="ref" style="margin-top:2px;">'+esc((item.show[ex.layer]||[])[0]||"")+'</div></div>';
+    }
+  }
+
+  /* this week's suggested target — one concrete next step, not a wall of stats */
+  var sug=st.suggestion;
+  var sugHTML='<div class="card mb" style="border-color:var(--accent);">'+
+    '<div class="xs" style="font-weight:800;color:var(--accent);letter-spacing:.08em;">THIS WEEK\'S TARGET</div>'+
+    '<div class="sm mt" style="margin-top:6px;"><strong>'+esc(sug.label)+'</strong></div>'+
+    '<div class="xs sub mt" style="margin-top:3px;">'+esc(sug.detail)+'</div>'+
+    '<button class="btn ghost sm mt" id="gofocus">'+
+    (sug.kind==="review"?"Open review":"Start this session")+'</button></div>';
+
+  /* milestones — earned ones lead, the single nearest unearned one shows how close it is */
+  var badges=computeBadges(p,st);
+  var earned=badges.filter(function(b){return b.earned;});
+  var locked=badges.filter(function(b){return !b.earned;});
+  var badgeGrid=badges.map(function(b){
+    return '<div style="text-align:center;padding:10px 4px;border-radius:12px;'+
+      (b.earned?'background:var(--brand-soft);':'background:transparent;opacity:.4;')+'">'+
+      '<div style="font-size:1.6em;">'+b.icon+'</div>'+
+      '<div class="xs" style="font-weight:700;margin-top:2px;line-height:1.25;">'+b.label+'</div></div>';
+  }).join("");
+
   screen(
     backBar("Menu","back")+
     '<h2 class="mb">'+esc(p.name)+' · progress</h2>'+
     '<div class="card mb" style="display:flex;gap:12px;text-align:center;">'+
       statCell(st.total,"written")+statCell(st.avg===null?"—":st.avg,"avg")+
-      statCell(p.bestStreak+"🔥","best streak")+statCell(p.sessions,"sessions")+
+      statCell(p.bestStreak+"🔥","best streak")+statCell(earned.length+"/"+badges.length,"badges")+
     '</div>'+
+    trendHTML+
+    sugHTML+
+    exampleHTML+
     (spark?'<div class="card mb"><div class="xs sub" style="font-weight:800;letter-spacing:.1em;">LAST '+recent.length+' SCORES</div>'+spark+'</div>':'')+
     '<div class="card mb"><div class="xs sub mb" style="font-weight:800;letter-spacing:.1em;">AXIS AVERAGES</div>'+axRows+'</div>'+
     '<div class="card mb"><div class="xs sub mb" style="font-weight:800;letter-spacing:.1em;">BY LAYER</div>'+
@@ -1349,11 +1539,19 @@ function renderProgress(){
           '<span style="font-weight:800;">'+(v===null?"—":v)+'</span>'+
           '<div class="bar"><i data-w="'+(v===null?0:v)+'"></i></div></div>';
       }).join("")+'</div>'+
+    '<div class="card mb"><div class="xs sub mb" style="font-weight:800;letter-spacing:.1em;">MILESTONES · '+earned.length+'/'+badges.length+'</div>'+
+      '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;">'+badgeGrid+'</div>'+
+      (locked.length?'<div class="xs sub mt" style="margin-top:10px;">Next up: <strong>'+locked[0].label+'</strong></div>':'')+
+    '</div>'+
     '<button class="btn quiet sm" id="share">📤 Share my progress card</button>'
   );
   setTimeout(function(){ each(".bar>i",function(b){ b.style.width=b.getAttribute("data-w")+"%"; }); },40);
   on("back",renderMenu);
   on("share",function(){ shareCard(p); });
+  on("gofocus",function(){
+    if(sug.kind==="review") renderReview();
+    else startSession(sug.layer);
+  });
 }
 
 function shareCard(p){
@@ -1564,6 +1762,7 @@ var booted=false;
 function boot(){
   if(booted) return;
   booted=true;
+  initZoomControl();
   seedProfilesIfEmpty();
   if(state.activeProfile&&state.profiles[state.activeProfile]) renderMenu();
   else renderProfiles();
