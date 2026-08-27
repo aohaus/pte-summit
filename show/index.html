@@ -124,6 +124,20 @@
   .ref{border-left:3px solid var(--lc,var(--brand));padding:7px 0 7px 11px;margin-bottom:9px;
     font-family:var(--serif);font-size:.98em;line-height:1.5;}
 
+  /* fill-in-the-blank scaffold */
+  .cloze{font-family:var(--serif);font-size:1.02em;line-height:2.1;}
+  .blank{display:inline-block;vertical-align:baseline;font-family:var(--sans);
+    min-width:74px;padding:2px 9px;margin:0 1px;border-radius:8px;cursor:pointer;
+    border:1.5px dashed color-mix(in srgb,var(--lc,var(--brand)) 55%,#fff);
+    background:color-mix(in srgb,var(--lc,var(--brand)) 8%,#fff);
+    color:var(--lc,var(--brand));font-size:.72em;font-weight:800;letter-spacing:.04em;
+    transition:background .15s,border-color .15s,color .15s;}
+  .blank:active{transform:translateY(1px);}
+  .blank .bl-hint{text-transform:uppercase;opacity:.75;}
+  .blank.done{border-style:solid;font-family:var(--serif);font-size:1em;font-weight:600;
+    letter-spacing:0;text-transform:none;cursor:default;
+    background:color-mix(in srgb,var(--lc,var(--brand)) 15%,#fff);color:var(--ink);}
+
   .screen{animation:in .32s cubic-bezier(.22,1,.36,1);}
   @keyframes in{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
   .pop{animation:pop .35s cubic-bezier(.22,1.4,.4,1);}
@@ -784,6 +798,81 @@ function highlight(text,marks){
   return out;
 }
 
+/* ================= cloze scaffold =================
+   Turns a reference line into a fill-in-the-blank puzzle by hiding exactly the
+   words the scorer rewards: concrete body/sense nouns and strong verbs. The
+   writer sees the shape of a showing sentence without being handed the wording,
+   which is the step between "guiding question" and "here is the answer".      */
+var CLOZE_STOP=buildSet([
+ "the","a","an","and","but","or","so","if","then","than","that","this","these","those",
+ "there","here","when","while","until","after","before","because","although","though",
+ "with","without","from","into","onto","over","under","about","around","across","along",
+ "for","not","was","were","been","being","have","has","had","having","does","did","doing",
+ "will","would","could","should","might","must","can","just","only","even","also","still",
+ "very","really","quite","rather","much","more","most","less","least","some","any","all",
+ "she","her","hers","herself","him","his","himself","they","them","their","theirs",
+ "you","your","yours","who","whom","whose","what","which","how","why","one","two","three",
+ "again","anyway","already","never","always","other","another","same","own","itself"
+]);
+function buildCloze(sentence,layer){
+  var layerSet=layer==="physical"?SET_PHYS:layer==="internal"?SET_INT:SET_MENT;
+  /* split into words and the punctuation/space between them, so we can rebuild verbatim */
+  var tokens=String(sentence).split(/(\b[A-Za-z']+\b)/);
+  var picks=[];
+  for(var i=0;i<tokens.length;i++){
+    if(i%2===0) continue;                       /* odd indices are the words */
+    var w=tokens[i],lw=w.toLowerCase();
+    if(lw.length<3) continue;
+    var isVerb=hits([lw],SET_VERB).length>0;
+    var isLayerNoun=hits([lw],layerSet).length>0;
+    var isSense=hits([lw],SET_PHYS).length>0||hits([lw],SET_INT).length>0;
+    if(isVerb||isLayerNoun||isSense){
+      picks.push({idx:i,word:w,kind:isVerb?"verb":"noun"});
+    }
+  }
+  /* Fallback: plenty of good reference lines carry their weight in ordinary words
+     ("She saved the seat beside her anyway"). Rather than refusing to build a puzzle,
+     blank the content words — anything that is not a function word and not the
+     abstract feeling we are training the writer to avoid. */
+  if(!picks.length){
+    for(var j=1;j<tokens.length;j+=2){
+      var fw=tokens[j],flw=fw.toLowerCase();
+      if(flw.length<4||CLOZE_STOP[flw]) continue;
+      if(hits([flw],SET_TELL).length) continue;
+      picks.push({idx:j,word:fw,kind:/(ed|ing)$/.test(flw)?"verb":"word"});
+    }
+  }
+  if(!picks.length) return null;
+  /* keep it a puzzle, not a deletion: up to 3 blanks, spread across the line, and
+     never more than roughly a third of a short sentence, so the scaffold still reads */
+  var wordCount=Math.floor(tokens.length/2);
+  var maxBlanks=Math.min(3,picks.length,Math.max(1,Math.round(wordCount*0.3)));
+  var chosen=[];
+  if(picks.length<=maxBlanks){
+    chosen=picks;
+  }else{
+    var stride=picks.length/maxBlanks;
+    for(var b=0;b<maxBlanks;b++) chosen.push(picks[Math.floor(b*stride)]);
+  }
+  var blankAt={};
+  chosen.forEach(function(c,n){ blankAt[c.idx]=n; });
+  return {tokens:tokens,blanks:chosen,blankAt:blankAt};
+}
+function clozeHTML(cz){
+  var out="";
+  for(var i=0;i<cz.tokens.length;i++){
+    if(i%2===1&&cz.blankAt[i]!==undefined){
+      var n=cz.blankAt[i],c=cz.blanks[n];
+      out+='<button type="button" class="blank" data-blank="'+n+'" '+
+           'data-word="'+esc(c.word)+'" aria-label="Reveal hidden '+c.kind+'">'+
+           '<span class="bl-hint">'+(c.kind==="verb"?"verb":"noun")+'</span></button>';
+    }else{
+      out+=esc(cz.tokens[i]);
+    }
+  }
+  return out;
+}
+
 /* ================= session building ================= */
 function bankFor(band){
   return PROMPT_BANK.filter(function(p){ return p.band===band; });
@@ -1249,7 +1338,9 @@ function renderRound(){
       ' <span class="xs sub">Write in this layer.</span></div>'+
     '<div id="hintbox" class="card mb lay-'+layer+'" style="display:'+(hintOpen?"block":"none")+
       ';border-left:3px solid var(--lc);"><div class="xs" style="font-weight:800;color:var(--lc);letter-spacing:.08em;">HINT</div>'+
-      '<div class="sm mt" style="margin-top:4px;">'+esc(item.hint[layer]||"What can the reader actually see or feel?")+'</div></div>'+
+      '<div class="sm mt" style="margin-top:4px;">'+esc(item.hint[layer]||"What can the reader actually see or feel?")+'</div>'+
+      '<div id="clozeslot"></div>'+
+      '<button class="btn ghost sm mt" id="cloze">🧩 Fill in the blanks</button></div>'+
     '<textarea id="ans" rows="4" placeholder="Rewrite it so the reader sees it happen…"></textarea>'+
     '<div class="row mt">'+
       (hintOpen?'':'<button class="btn ghost sm" id="hint">💡 Hint</button>')+
@@ -1263,6 +1354,35 @@ function renderRound(){
   on("hint",function(){
     document.getElementById("hintbox").style.display="block";
     this.remove();
+  });
+  on("cloze",function(){
+    var refs=item.show[layer]||[];
+    var cz=null,src="";
+    for(var i=0;i<refs.length&&!cz;i++){ cz=buildCloze(refs[i],layer); src=refs[i]; }
+    if(!cz){ this.textContent="No blanks available for this one"; this.disabled=true; return; }
+    cur.scaffolded=true;
+    document.getElementById("clozeslot").innerHTML=
+      '<div class="mt pop" style="margin-top:12px;">'+
+        '<div class="xs" style="font-weight:800;color:var(--lc);letter-spacing:.08em;">'+
+        'FILL IN THE BLANKS <span class="pill grey" style="margin-left:6px;">scaffold</span></div>'+
+        '<div class="xs sub" style="margin:5px 0 8px;">One way a native writer built this line. '+
+        'Guess each blank, then tap it to check — or just borrow the shape for your own sentence.</div>'+
+        '<div class="cloze" id="clozeline">'+clozeHTML(cz)+'</div>'+
+        '<button class="btn quiet sm mt" id="revealall" style="margin-top:10px;">Reveal all</button>'+
+      '</div>';
+    this.remove();
+    function reveal(btn){
+      if(btn.classList.contains("done")) return;
+      btn.className="blank done";
+      btn.textContent=btn.getAttribute("data-word");
+    }
+    each("#clozeline .blank",function(btn){
+      btn.addEventListener("click",function(){ reveal(this); });
+    });
+    on("revealall",function(){
+      each("#clozeline .blank",function(btn){ reveal(btn); });
+      this.remove();
+    });
   });
   on("peek",function(){
     cur.peeked=true;
@@ -1307,7 +1427,15 @@ function renderFeedback(cur,txt,ev){
     '<div class="card mb" style="text-align:center;">'+
       '<div class="big" style="color:var(--brand);">'+ev.total+'</div>'+
       '<span class="pill '+g.cls+'">'+g.label+'</span>'+
+      (cur.scaffolded?' <span class="pill grey">scaffold</span>':'')+
       (cur.peeked?' <span class="pill grey">peeked</span>':'')+
+    '</div>'+
+    /* the prompt you were answering, so the feedback can be read without scrolling back */
+    '<div class="card mb lay-'+layer+'" style="border-left:3px solid var(--lc);">'+
+      '<div class="xs sub" style="font-weight:800;letter-spacing:.1em;">THE PROMPT</div>'+
+      '<div class="mt" style="font-family:var(--serif);font-size:1.1em;line-height:1.4;margin-top:5px;">“'+esc(item.tell)+'”</div>'+
+      '<div class="xs sub" style="margin-top:7px;">'+esc(item.context)+'</div>'+
+      '<div style="margin-top:8px;">'+layerChip(layer)+'</div>'+
     '</div>'+
     '<div class="card mb"><div class="xs sub" style="font-weight:800;letter-spacing:.1em;">YOUR SENTENCE</div>'+
       '<p class="mt" style="font-family:var(--serif);font-size:1.05em;line-height:1.55;margin-top:6px;">'+
