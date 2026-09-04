@@ -83,31 +83,31 @@
       }
     },
     {
-      "id": "x-b3-01", "band": 3, "theme": "work", "tell": "He was bored in the meeting.", "tellWord": "bored",
-      "context": "A quarterly review. Slide nineteen of forty-two.",
+      "id": "x-b3-01", "band": 3, "theme": "school", "tell": "He was bored in class.", "tellWord": "bored",
+      "context": "Twenty minutes still to go, and the worksheet was finished eight minutes ago.",
       "hint": {
-        "physical": "What is he doing that looks like attention?",
-        "internal": "What is heavy or restless?",
-        "mental": "Where has his mind actually gone?"
+        "physical": "What has he turned an ordinary object into?",
+        "internal": "What prickles, and where?",
+        "mental": "What has he counted, more than once?"
       },
       "show": {
-        "physical": ["He nodded at intervals he had calibrated earlier in his career.", "He wrote the date at the top of a fresh page and underlined it twice."],
-        "internal": ["A dull weight settled behind his eyes and refused to shift."],
-        "mental": ["Somewhere around slide twelve he had begun mentally rearranging his kitchen."]
+        "physical": ["He had turned his ruler into a see-saw balanced on one finger."],
+        "internal": ["Restlessness prickled up and down his legs under the desk."],
+        "mental": ["He had counted the ceiling tiles twice and got a different number both times."]
       }
     },
     {
-      "id": "x-b3-02", "band": 3, "theme": "relationships", "tell": "She was falling in love.", "tellWord": "love",
-      "context": "Six weeks in. They are walking back from somewhere ordinary.",
+      "id": "x-b3-02", "band": 3, "theme": "hobby", "tell": "She was falling in love with it again.", "tellWord": "joy",
+      "context": "She has started running again, properly, for the first time since before the boys were born.",
       "hint": {
-        "physical": "What small physical negotiation is happening?",
-        "internal": "What is unsteady?",
-        "mental": "What has changed about how she plans?"
+        "physical": "What is she doing that she doesn't quite explain to herself?",
+        "internal": "What loses its footing, and is that a bad thing?",
+        "mental": "What is she planning, even on rest days?"
       },
       "show": {
-        "physical": ["She took the long way back and did not explain why.", "Their hands kept arriving at the same place and apologising."],
-        "internal": ["Something under her ribs kept losing its footing."],
-        "mental": ["She caught herself checking whether he would like a restaurant she was not going to for another month."]
+        "physical": ["She left ten minutes earlier than she needed to, most mornings, without quite admitting why."],
+        "internal": ["Something under her ribs kept losing its footing, the good way, on the last hill."],
+        "mental": ["She had started planning routes on days she wasn't even running."]
       }
     }
   ],
