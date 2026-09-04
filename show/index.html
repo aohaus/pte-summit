@@ -41,7 +41,11 @@
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
     font-size:calc(var(--fs) * var(--zoom));-webkit-font-smoothing:antialiased;overscroll-behavior-y:contain;}
+  /* the 520px column is sized for a phone; widen it on tablets so an iPad Pro
+     doesn't read as a phone screen marooned in whitespace. iPhone 7/16 stay untouched. */
   #app{max-width:520px;margin:0 auto;padding:0 14px calc(40px + env(safe-area-inset-bottom));}
+  @media(min-width:700px){ #app{max-width:640px;} }
+  @media(min-width:1000px){ #app{max-width:760px;} }
   #topbar{position:sticky;top:0;z-index:30;display:flex;justify-content:flex-end;align-items:center;
     gap:8px;padding:10px 0 6px;background:linear-gradient(var(--bg) 72%,transparent);}
   .zoomctl{display:inline-flex;align-items:center;gap:1px;background:var(--card);
@@ -76,7 +80,10 @@
   .row{display:flex;gap:8px;} .row>*{flex:1;}
   .stack{display:grid;gap:8px;}
 
-  textarea,input[type=text]{width:100%;font-size:16px;padding:13px;border:1.5px solid var(--line);
+  /* follows the reader's zoom level like everything else; never drops below 16px so
+     focusing the field doesn't trigger iOS Safari's automatic viewport zoom-in */
+  textarea,input[type=text]{width:100%;font-size:max(16px,calc(var(--fs) * var(--zoom)));
+    padding:13px;border:1.5px solid var(--line);
     border-radius:calc(var(--radius) - 4px);font-family:inherit;color:var(--ink);background:#fff;
     resize:none;line-height:1.55;transition:border-color .15s ease,box-shadow .15s ease;}
   textarea:focus,input[type=text]:focus{outline:none;border-color:var(--brand);
@@ -170,7 +177,7 @@
 <div id="topbar">
   <div class="zoomctl">
     <button id="zoomOut" aria-label="Smaller text">A-</button>
-    <span class="zoomdots" id="zoomDots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="zoomdots" id="zoomDots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span>
     <button id="zoomIn" aria-label="Larger text">A+</button>
   </div>
 </div>
@@ -620,7 +627,7 @@ function newProfile(id,name,band){
 }
 function blankState(){
   return {schema:SCHEMA,activeProfile:null,profiles:{},order:[],linked:{},
-          settings:{ai:false,difficulty:"standard",fontStep:1}};
+          settings:{ai:false,difficulty:"standard",fontStep:3}};
 }
 function loadState(){
   try{ var r=localStorage.getItem(STORE_KEY); return r?JSON.parse(r):null; }
@@ -638,7 +645,7 @@ function migrate(s){
   if(!s.settings) s.settings={};
   if(typeof s.settings.ai!=="boolean") s.settings.ai=false;
   if(!s.settings.difficulty) s.settings.difficulty="standard";
-  if(typeof s.settings.fontStep!=="number"||s.settings.fontStep<0||s.settings.fontStep>2) s.settings.fontStep=1;
+  if(typeof s.settings.fontStep!=="number"||s.settings.fontStep<0||s.settings.fontStep>5) s.settings.fontStep=3;
   Object.keys(s.profiles).forEach(function(k){
     var p=s.profiles[k];
     if(!p.attempts) p.attempts=[];
@@ -1148,9 +1155,11 @@ function on(id,fn,ev){ var e=document.getElementById(id); if(e) e.addEventListen
 function each(sel,fn){ var n=root.querySelectorAll(sel); for(var i=0;i<n.length;i++) fn(n[i],i); }
 function applyBand(b){ document.documentElement.setAttribute("data-band",b||2); }
 
-/* ---------- text-size control (3 steps, shared across every profile on this device) ---------- */
-var ZOOM_STEPS=[0.88,1,1.14];
-var ZOOM_LABELS=["Small text","Standard text","Large text"];
+/* ---------- text-size control (6 steps, shared across every profile on this device) ----------
+   Step 3 (index 3, "Large") sits at the old control's maximum — reading comfort starts where
+   the old one topped out, and there is real headroom above it now. */
+var ZOOM_STEPS=[0.82,0.92,1.02,1.14,1.32,1.52];
+var ZOOM_LABELS=["Extra small text","Small text","Standard text","Large text","Extra large text","Maximum text"];
 function applyZoom(){
   var step=state.settings.fontStep;
   document.documentElement.style.setProperty("--zoom",ZOOM_STEPS[step]);
@@ -1310,11 +1319,11 @@ function renderRound(){
   var body=
     backBar("Quit session","quit")+
     progDots()+
+    '<p class="sm sub"><strong>Scene.</strong> '+esc(item.context)+'</p>'+
     '<div class="tellcard mb">'+
       '<div class="xs sub" style="letter-spacing:.14em;font-weight:800;">TELL</div>'+
       '<div class="q mt" style="margin-top:6px;">“'+esc(item.tell)+'”</div>'+
-    '</div>'+
-    '<p class="sm sub"><strong>Scene.</strong> '+esc(item.context)+'</p>';
+    '</div>';
 
   if(needPick){
     body+='<div class="card mt"><div class="sm mb"><strong>Hard mode.</strong> Choose the layer you will write in.</div>'+
@@ -1433,8 +1442,8 @@ function renderFeedback(cur,txt,ev){
     /* the prompt you were answering, so the feedback can be read without scrolling back */
     '<div class="card mb lay-'+layer+'" style="border-left:3px solid var(--lc);">'+
       '<div class="xs sub" style="font-weight:800;letter-spacing:.1em;">THE PROMPT</div>'+
-      '<div class="mt" style="font-family:var(--serif);font-size:1.1em;line-height:1.4;margin-top:5px;">“'+esc(item.tell)+'”</div>'+
-      '<div class="xs sub" style="margin-top:7px;">'+esc(item.context)+'</div>'+
+      '<div class="xs sub" style="margin-top:6px;">'+esc(item.context)+'</div>'+
+      '<div class="mt" style="font-family:var(--serif);font-size:1.1em;line-height:1.4;margin-top:6px;">“'+esc(item.tell)+'”</div>'+
       '<div style="margin-top:8px;">'+layerChip(layer)+'</div>'+
     '</div>'+
     '<div class="card mb"><div class="xs sub" style="font-weight:800;letter-spacing:.1em;">YOUR SENTENCE</div>'+
