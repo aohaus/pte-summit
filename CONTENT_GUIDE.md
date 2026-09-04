@@ -136,6 +136,19 @@ PTE SUMMIT と同じです。アプリは起動時に `show/content.json` を読
 | `context` | | 場面設定1〜2文。これが無いと書きようがないので実質必須 |
 | `hint` | | レイヤーごとの誘導質問。Guided難易度では最初から表示される |
 
+### Novelist(band 3)だけのルール
+
+Novelistは大人（あなた自身）が日常会話・日記で使うことを想定しているため、
+**主人公の代名詞を家族に固定**しています。band 3 に問題を追加するときはこれに合わせてください。
+
+- `He`/`his`/`him` → 息子（学校・宿題・スポーツ・ゲーム・兄弟関係など、小学生の日常）
+- `She`/`her`/`hers` → 妻（育児・家事・趣味・友人関係・健康など、大人の日常）
+- 実名は使わない（`his son` `his younger brother` `she` のように）
+- 文章の難易度・視点は大人向け(Novelistらしい抑制の効いた文体)のまま、**題材だけ**を家族の日常に寄せる
+
+Band 1(Explorer)・Band 2(Storyteller)は学習者本人と同年代の男女どちらの主人公にも
+共感できることを狙っているため、この縛りは適用しません(`he`/`she`とも学習者と同年代のまま)。
+
 ### 3レイヤーの定義
 
 - **physical** — 外から見える体の動き・行動(手、肩、膝、顔、声、物の扱い)
@@ -197,8 +210,13 @@ Rules:
   - Concrete and specific. No cliché ("heart pounded like a drum").
 - Band 1: everyday scenes (school, friends, family, pets, weather), short sentences,
   but real English — the reader is fluent, just young. Band 2: friendship, exams,
-  sport, moving, social media, with some subtext. Band 3: work, relationships,
-  memory, ageing, loss — restraint and implication.
+  sport, moving, social media, with some subtext. Band 3: adult register (restraint,
+  implication) but keep it close to home — see the house rule below.
+- Band 3 only: "he" is always one of the writer's two sons (roughly 9 and
+  upper-primary) — school, homework, sport, video games, sibling relationships.
+  "she" is always his wife — childcare, housework, hobbies, friendships, health.
+  Never use a real name; write "his son" / "his younger brother" / "she". Keep the
+  literary, restrained voice of the band — only the subject matter is close to home.
 - British spelling.
 - Do not duplicate any of these existing ids or `tell` sentences:
 【ここに現在の show/content.json と、必要なら内蔵問題の tell 一覧を貼る】
